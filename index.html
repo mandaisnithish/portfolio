@@ -1039,15 +1039,89 @@ footer{
 
 <!-- =========== SKILLS =========== -->
 <section id="skills">
-  <div class="sec-glow"></div>
-  <div class="amb amb-formula" style="top:8%;right:2%;animation-delay:6s" aria-hidden="true">θ := θ − α · ∇<sub>θ</sub>J(θ)</div>
-  <div class="amb amb-code" style="bottom:20%;right:3%;animation-delay:2s" aria-hidden="true">GridSearchCV(pipeline, param_grid, cv=5, scoring='roc_auc')</div>
-  <div class="amb amb-metric" style="top:50%;left:1%;animation-delay:10s" aria-hidden="true">R² = 1 − Σ(yᵢ − ŷᵢ)² / Σ(yᵢ − ȳ)²</div>
+   <!-- ═══ t-SNE SCATTER BACKGROUND — paste as first child of #skills ═══ -->
+ <canvas id="tsneCanvas" style="
+   position:absolute;inset:0;width:100%;height:100%;
+   pointer-events:none;z-index:1;opacity:.22;
+ "></canvas>
 
-  <div class="sh-wrap">
+ <style>
+ #skills{overflow:hidden} /* ensure canvas doesn't bleed */
+ </style>
+
+ <script>
+ (function(){
+   const cvs=document.getElementById('tsneCanvas');
+   const ctx=cvs.getContext('2d');
+   let W,H,pts=[],raf=null,active=false;
+
+  /* ── cluster definitions: centre, spread, color, label ── */
+   const CLUSTERS=[
+     {cx:.22,cy:.35,sx:.09,sy:.12,r:3.5, color:'#06f0ff', label:'legitimate',  n:110},
+     {cx:.68,cy:.55,sx:.10,sy:.09,r:3,   color:'#a855f7', label:'fraudulent',  n:70 },
+     {cx:.44,cy:.22,sx:.07,sy:.08,r:2.5, color:'#f472b6', label:'borderline',  n:40 },
+     {cx:.78,cy:.25,sx:.06,sy:.07,r:2.2, color:'#fbbf24', label:'anomaly',     n:25 },
+   ];
+
+   function gauss(){
+     // Box-Muller transform
+     let u=0,v=0;
+     while(u===0)u=Math.random();
+     while(v===0)v=Math.random();
+     return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+   }
+
+   function init(){
+     W=cvs.width=cvs.offsetWidth;
+     H=cvs.height=cvs.offsetHeight;
+     pts=[];
+     CLUSTERS.forEach(c=>{
+       for(let i=0;i{
+       // gentle drift around base position
+       p.x=p.bx+Math.sin(t*p.speed*1000+p.phase)*W*.04;
+       p.y=p.by+Math.cos(t*p.speed*800+p.phase)*H*.04;
+       ctx.beginPath();
+       ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+       ctx.fillStyle=p.color;
+       ctx.globalAlpha=p.alpha;
+       ctx.fill();
+     });
+     // draw faint cluster hulls (convex-ish ellipses)
+     ctx.globalAlpha=.06;
+     CLUSTERS.forEach((c,ci)=>{
+       const cx=c.cx*W, cy=c.cy*H;
+       const drift=Math.sin(t*.3+ci)*W*.02;
+       ctx.beginPath();
+       ctx.ellipse(cx+drift,cy,c.sx*W*2.2,c.sy*H*2.2,ci*.4,0,Math.PI*2);
+       ctx.strokeStyle=c.color;ctx.lineWidth=1;ctx.stroke();
+     });
+     ctx.globalAlpha=1;
+     raf=requestAnimationFrame(draw);
+   }
+
+  // Only run when in view
+   const obs=new IntersectionObserver(entries=>{
+     if(entries[0].isIntersecting){
+       if(!active){active=true;init();raf=requestAnimationFrame(draw);}
+     } else {
+       active=false;
+       if(raf)cancelAnimationFrame(raf);
+     }
+   },{threshold:.05});
+   obs.observe(document.getElementById('skills'));
+
+   window.addEventListener('resize',()=>{if(active){init();}});
+ })();
+ </script>
+ <div class="sec-glow"></div>
+ <div class="amb amb-formula" style="top:8%;right:2%;animation-delay:6s" aria-hidden="true">θ := θ − α · ∇<sub>θ</sub>J(θ)</div>
+ <div class="amb amb-code" style="bottom:20%;right:3%;animation-delay:2s" aria-hidden="true">GridSearchCV(pipeline, param_grid, cv=5, scoring='roc_auc')</div>
+ <div class="amb amb-metric" style="top:50%;left:1%;animation-delay:10s" aria-hidden="true">R² = 1 − Σ(yᵢ − ŷᵢ)² / Σ(yᵢ − ȳ)²</div>
+
+ <div class="sh-wrap">
     <div class="slabel">Skills</div>
     <h2 class="st">Technical <em>depth.</em></h2>
-    <p class="ssub">Built across academic rigour, self-directed learning, and production deployment.</p>
+  <p class="ssub">Built across academic rigour, self-directed learning, and production deployment.</p>
   </div>
 
   <div class="sgrid">
