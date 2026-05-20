@@ -821,150 +821,150 @@ footer{
     </div>
   </div>
    <!-- ═══ TRAINING LOG TICKER ═══ -->
-<div class="tlog-wrap" id="trainingLog">
-  <div class="tlog-bar">
-    <span class="tlog-dot" style="background:#ff5f57"></span>
-    <span class="tlog-dot" style="background:#febc2e"></span>
-    <span class="tlog-dot" style="background:#28c840"></span>
-    <span class="tlog-title">ags_forecast_model.py — training pipeline</span>
-    <span class="tlog-badge" id="tlogStatus">● RUNNING</span>
+  <div class="tlog-wrap" id="trainingLog">
+    <div class="tlog-bar">
+      <span class="tlog-dot" style="background:#ff5f57"></span>
+      <span class="tlog-dot" style="background:#febc2e"></span>
+      <span class="tlog-dot" style="background:#28c840"></span>
+      <span class="tlog-title">ags_forecast_model.py — training pipeline</span>
+      <span class="tlog-badge" id="tlogStatus">● RUNNING</span>
+    </div>
+    <div class="tlog-body" id="tlogBody"></div>
+    <div class="tlog-metrics">
+      <div class="tlog-met"><span class="tlog-mlabel">best val_loss</span><span class="tlog-mval" id="tmBestLoss">—</span></div>
+      <div class="tlog-met"><span class="tlog-mlabel">current epoch</span><span class="tlog-mval" id="tmEpoch">0</span></div>
+      <div class="tlog-met"><span class="tlog-mlabel">MAE</span><span class="tlog-mval" id="tmMAE">—</span></div>
+      <div class="tlog-met"><span class="tlog-mlabel">status</span><span class="tlog-mval" id="tmStatus" style="color:#10ffa0">initialising</span></div>
+    </div>
   </div>
-  <div class="tlog-body" id="tlogBody"></div>
-  <div class="tlog-metrics">
-    <div class="tlog-met"><span class="tlog-mlabel">best val_loss</span><span class="tlog-mval" id="tmBestLoss">—</span></div>
-    <div class="tlog-met"><span class="tlog-mlabel">current epoch</span><span class="tlog-mval" id="tmEpoch">0</span></div>
-    <div class="tlog-met"><span class="tlog-mlabel">MAE</span><span class="tlog-mval" id="tmMAE">—</span></div>
-    <div class="tlog-met"><span class="tlog-mlabel">status</span><span class="tlog-mval" id="tmStatus" style="color:#10ffa0">initialising</span></div>
-  </div>
-</div>
 
-<style>
-.tlog-wrap{
-  margin-top:2.5rem;
-  background:rgba(2,8,18,.92);
-  border:1px solid rgba(6,240,255,.12);
-  border-radius:10px;
-  overflow:hidden;
-  font-family:'JetBrains Mono',monospace;
-  position:relative;
-}
-.tlog-wrap::before{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
-  background:linear-gradient(to bottom,transparent 70%,rgba(2,8,18,.95));
-}
-.tlog-bar{
-  display:flex;align-items:center;gap:.5rem;
-  background:rgba(255,255,255,.04);
-  border-bottom:1px solid rgba(255,255,255,.06);
-  padding:.6rem 1rem;
-}
-.tlog-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
-.tlog-title{font-size:.72rem;color:rgba(255,255,255,.35);margin-left:.4rem;flex:1}
-.tlog-badge{
-  font-size:.65rem;letter-spacing:.12em;
-  color:#10ffa0;
-  animation:tlogBlink 1.5s ease-in-out infinite;
-}
-@keyframes tlogBlink{0%,100%{opacity:1}50%{opacity:.4}}
-.tlog-body{
-  padding:.8rem 1.2rem;
-  height:180px;
-  overflow:hidden;
-  position:relative;
-  display:flex;flex-direction:column;justify-content:flex-end;
-  gap:1px;
-}
-.tlog-line{
-  font-size:.72rem;line-height:1.7;
-  white-space:nowrap;overflow:hidden;
-  animation:tlogFade .4s ease both;
-}
-@keyframes tlogFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.tlog-line .ep{color:rgba(255,255,255,.35)}
-.tlog-line .lv{color:#3b82f6}
-.tlog-line .vv{color:#a855f7}
-.tlog-line .lr{color:rgba(255,255,255,.25)}
-.tlog-line .ok{color:#10ffa0}
-.tlog-line .warn{color:#fbbf24}
-.tlog-line .info{color:#06f0ff}
-.tlog-metrics{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  border-top:1px solid rgba(255,255,255,.05);
-  padding:.6rem 1rem;
-}
-.tlog-met{display:flex;flex-direction:column;gap:2px}
-.tlog-mlabel{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.25)}
-.tlog-mval{font-size:.85rem;font-weight:500;color:var(--cyan,#06f0ff)}
-</style>
-
-<script>
-(function(){
-  const MAX_EPOCHS=50;
-  let epoch=0, started=false, bestLoss=99;
-  const body=document.getElementById('tlogBody');
-  const tEpoch=document.getElementById('tmEpoch');
-  const tBest=document.getElementById('tmBestLoss');
-  const tMAE=document.getElementById('tmMAE');
-  const tStat=document.getElementById('tmStatus');
-  const tBadge=document.getElementById('tlogStatus');
-  const MAX_LINES=10;
-
-  function loss(e){ return 1.42*Math.exp(-.09*e)+.045+.012*(Math.random()-.5); }
-  function vloss(e){ return 1.55*Math.exp(-.085*e)+.06+.018*(Math.random()-.5); }
-  function mae(e){ return .185*Math.exp(-.07*e)+.04+.008*(Math.random()-.5); }
-
-  function pad(n,l=3){return String(n).padStart(l,' ');}
-  function fmt(n){return n.toFixed(4);}
-
-  function addLine(html){
-    const div=document.createElement('div');
-    div.className='tlog-line';div.innerHTML=html;
-    body.appendChild(div);
-    while(body.children.length>MAX_LINES)body.removeChild(body.firstChild);
+  <style>
+  .tlog-wrap{
+    margin-top:2.5rem;
+    background:rgba(2,8,18,.92);
+    border:1px solid rgba(6,240,255,.12);
+    border-radius:10px;
+    overflow:hidden;
+    font-family:'JetBrains Mono',monospace;
+    position:relative;
   }
-
-  function tick(){
-    epoch++;
-    const l=loss(epoch), vl=vloss(epoch), m=mae(epoch);
-    const lr=(epoch<20?.001:epoch<35?.0005:.0002).toExponential(1);
-    const improved=vl✓ saved':'';
-    const flag=vl>l*1.35?' ⚠ overfit?':'';
-    addLine(
-      `Epoch ${pad(epoch)}/${MAX_EPOCHS}  ` +
-      `loss: ${fmt(l)}  ` +
-      `val_loss: ${fmt(vl)}  ` +
-      `mae: ${fmt(m)}  lr: ${lr}` +
-      saved+flag
-    );
-    tEpoch.textContent=epoch;
-    tBest.textContent=fmt(bestLoss);
-    tMAE.textContent=fmt(m);
-
-    if(epoch===1){ addLine('▸ feature matrix (10,847 × 23) loaded'); }
-    if(epoch===5){ addLine('▸ early stopping patience=8 active'); }
-    if(epoch===15){ addLine('▸ lr scheduler: ReduceLROnPlateau triggered'); }
-    if(epoch===30){ addLine('▸ checkpoint → ags_forecast_best.pkl'); }
-
-    if(epoch✓ Training complete — best val_loss: ${fmt(bestLoss)}  MAE: ${fmt(mae(MAX_EPOCHS))}`);
-      addLine('✓ SHAP explainer fitted — saving feature importances...');
-      tStat.textContent='complete';tStat.style.color='#10ffa0';
-      tBadge.textContent='● COMPLETE';tBadge.style.color='#10ffa0';tBadge.style.animation='none';
-    }
+  .tlog-wrap::before{
+    content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+    background:linear-gradient(to bottom,transparent 70%,rgba(2,8,18,.95));
   }
+  .tlog-bar{
+    display:flex;align-items:center;gap:.5rem;
+    background:rgba(255,255,255,.04);
+    border-bottom:1px solid rgba(255,255,255,.06);
+    padding:.6rem 1rem;
+  }
+  .tlog-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .tlog-title{font-size:.72rem;color:rgba(255,255,255,.35);margin-left:.4rem;flex:1}
+  .tlog-badge{
+    font-size:.65rem;letter-spacing:.12em;
+    color:#10ffa0;
+    animation:tlogBlink 1.5s ease-in-out infinite;
+  }
+  @keyframes tlogBlink{0%,100%{opacity:1}50%{opacity:.4}}
+  .tlog-body{
+    padding:.8rem 1.2rem;
+    height:180px;
+    overflow:hidden;
+    position:relative;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    gap:1px;
+  }
+  .tlog-line{
+    font-size:.72rem;line-height:1.7;
+    white-space:nowrap;overflow:hidden;
+    animation:tlogFade .4s ease both;
+}
+  @keyframes tlogFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .tlog-line .ep{color:rgba(255,255,255,.35)}
+  .tlog-line .lv{color:#3b82f6}
+  .tlog-line .vv{color:#a855f7}
+  .tlog-line .lr{color:rgba(255,255,255,.25)}
+  .tlog-line .ok{color:#10ffa0}
+  .tlog-line .warn{color:#fbbf24}
+  .tlog-line .info{color:#06f0ff}
+  .tlog-metrics{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    border-top:1px solid rgba(255,255,255,.05);
+    padding:.6rem 1rem;
+  }
+  .tlog-met{display:flex;flex-direction:column;gap:2px}
+  .tlog-mlabel{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.25)}
+  .tlog-mval{font-size:.85rem;font-weight:500;color:var(--cyan,#06f0ff)}
+  </style>
 
-  // Trigger only when scrolled into view
-  const obs=new IntersectionObserver(entries=>{
-    if(entries[0].isIntersecting&&!started){
-      started=true;
-      addLine('▸ initialising ags_forecast_model.py');
-      addLine('▸ loading preprocessing pipeline...');
-      setTimeout(tick,900);
-      obs.disconnect();
+  <script>
+  (function(){
+    const MAX_EPOCHS=50;
+    let epoch=0, started=false, bestLoss=99;
+    const body=document.getElementById('tlogBody');
+    const tEpoch=document.getElementById('tmEpoch');
+    const tBest=document.getElementById('tmBestLoss');
+    const tMAE=document.getElementById('tmMAE');
+    const tStat=document.getElementById('tmStatus');
+    const tBadge=document.getElementById('tlogStatus');
+    const MAX_LINES=10;
+
+    function loss(e){ return 1.42*Math.exp(-.09*e)+.045+.012*(Math.random()-.5); }
+    function vloss(e){ return 1.55*Math.exp(-.085*e)+.06+.018*(Math.random()-.5); }
+    function mae(e){ return .185*Math.exp(-.07*e)+.04+.008*(Math.random()-.5); }
+
+    function pad(n,l=3){return String(n).padStart(l,' ');}
+    function fmt(n){return n.toFixed(4);}
+
+    function addLine(html){
+      const div=document.createElement('div');
+      div.className='tlog-line';div.innerHTML=html;
+      body.appendChild(div);
+      while(body.children.length>MAX_LINES)body.removeChild(body.firstChild);
     }
-  },{threshold:.3});
-  obs.observe(document.getElementById('trainingLog'));
-})();
-</script>
+
+    function tick(){
+      epoch++;
+      const l=loss(epoch), vl=vloss(epoch), m=mae(epoch);
+      const lr=(epoch<20?.001:epoch<35?.0005:.0002).toExponential(1);
+      const improved=vl✓ saved':'';
+      const flag=vl>l*1.35?' ⚠ overfit?':'';
+      addLine(
+       `Epoch ${pad(epoch)}/${MAX_EPOCHS}  ` +
+       `loss: ${fmt(l)}  ` +
+       `val_loss: ${fmt(vl)}  ` +
+       `mae: ${fmt(m)}  lr: ${lr}` +
+        saved+flag
+      );
+      tEpoch.textContent=epoch;
+      tBest.textContent=fmt(bestLoss);
+      tMAE.textContent=fmt(m);
+
+      if(epoch===1){ addLine('▸ feature matrix (10,847 × 23) loaded'); }
+      if(epoch===5){ addLine('▸ early stopping patience=8 active'); }
+      if(epoch===15){ addLine('▸ lr scheduler: ReduceLROnPlateau triggered'); }
+      if(epoch===30){ addLine('▸ checkpoint → ags_forecast_best.pkl'); }
+
+      if(epoch✓ Training complete — best val_loss: ${fmt(bestLoss)}  MAE: ${fmt(mae(MAX_EPOCHS))}`);
+        addLine('✓ SHAP explainer fitted — saving feature importances...');
+        tStat.textContent='complete';tStat.style.color='#10ffa0';
+        tBadge.textContent='● COMPLETE';tBadge.style.color='#10ffa0';tBadge.style.animation='none';
+      }
+    }
+
+    // Trigger only when scrolled into view
+    const obs=new IntersectionObserver(entries=>{
+      if(entries[0].isIntersecting&&!started){
+        started=true;
+        addLine('▸ initialising ags_forecast_model.py');
+        addLine('▸ loading preprocessing pipeline...');
+        setTimeout(tick,900);
+        obs.disconnect();
+    }
+    },{threshold:.3});
+    obs.observe(document.getElementById('trainingLog'));
+  })();
+  </script>
 </section>
 
 <!-- =========== PROJECTS =========== -->
