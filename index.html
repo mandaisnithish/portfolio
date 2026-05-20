@@ -1251,6 +1251,19 @@ footer{
   0%{opacity:0;transform:scale(.96)}
   100%{opacity:1;transform:scale(1)}
 }
+#projects .pcard,
+#projects .rev,
+#projects .sgrp{
+  opacity:0;
+  transform:translateY(28px);
+  transition:opacity .7s ease, transform .7s ease;
+}
+#projects .pcard.vis,
+#projects .rev.vis,
+#projects .sgrp.vis{
+  opacity:1;
+  transform:none;
+}
 @media(max-width:900px){
   .dtp-wrap{grid-template-columns:1fr}
   .dtp-section{padding:5rem 1.5rem}
@@ -1262,16 +1275,25 @@ footer{
 
 <script>
 (function(){
-  const stage=document.getElementById('dtpStage');
   const wrap=document.getElementById('data-to-projects');
+  const stage=document.getElementById('dtpStage');
+  const projects=document.getElementById('projects');
+  if(!wrap||!stage||!projects) return;
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(!stage||!wrap)return;
+
+  function revealProjects(){
+    projects.classList.add('section-in');
+    projects.querySelectorAll('.pcard, .rev, .sgrp').forEach(el=>el.classList.add('vis'));
+  }
+
   const obs=new IntersectionObserver(entries=>{
     if(entries[0].isIntersecting){
       if(!reduced) stage.classList.add('dtp-play');
+      setTimeout(revealProjects, 1500);
       obs.disconnect();
     }
-  },{threshold:.35});
+  },{threshold:.25});
+
   obs.observe(wrap);
 })();
 </script>
