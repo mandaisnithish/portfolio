@@ -820,7 +820,7 @@ footer{
       </ul>
     </div>
   </div>
-   <!-- ═══ TRAINING LOG TICKER ═══ -->
+<!-- ═══ TRAINING LOG TICKER ═══ -->
 <div class="tlog-wrap" id="trainingLog">
   <div class="tlog-bar">
     <span class="tlog-dot" style="background:#ff5f57"></span>
@@ -849,11 +849,17 @@ footer{
   position:relative;
 }
 .tlog-wrap::before{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+  content:'';
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
   background:linear-gradient(to bottom,transparent 70%,rgba(2,8,18,.95));
 }
 .tlog-bar{
-  display:flex;align-items:center;gap:.5rem;
+  display:flex;
+  align-items:center;
+  gap:.5rem;
   background:rgba(255,255,255,.04);
   border-bottom:1px solid rgba(255,255,255,.06);
   padding:.6rem 1rem;
@@ -861,7 +867,8 @@ footer{
 .tlog-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
 .tlog-title{font-size:.72rem;color:rgba(255,255,255,.35);margin-left:.4rem;flex:1}
 .tlog-badge{
-  font-size:.65rem;letter-spacing:.12em;
+  font-size:.65rem;
+  letter-spacing:.12em;
   color:#10ffa0;
   animation:tlogBlink 1.5s ease-in-out infinite;
 }
@@ -871,12 +878,16 @@ footer{
   height:180px;
   overflow:hidden;
   position:relative;
-  display:flex;flex-direction:column;justify-content:flex-end;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
   gap:1px;
 }
 .tlog-line{
-  font-size:.72rem;line-height:1.7;
-  white-space:nowrap;overflow:hidden;
+  font-size:.72rem;
+  line-height:1.7;
+  white-space:nowrap;
+  overflow:hidden;
   animation:tlogFade .4s ease both;
 }
 @keyframes tlogFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -888,7 +899,8 @@ footer{
 .tlog-line .warn{color:#fbbf24}
 .tlog-line .info{color:#06f0ff}
 .tlog-metrics{
-  display:grid;grid-template-columns:repeat(4,1fr);
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
   border-top:1px solid rgba(255,255,255,.05);
   padding:.6rem 1rem;
 }
@@ -900,69 +912,81 @@ footer{
 <script>
 (function(){
   const MAX_EPOCHS=50;
-  let epoch=0, started=false, bestLoss=99;
+  let epoch=0, started=false, bestLoss=99, timer=null;
   const body=document.getElementById('tlogBody');
   const tEpoch=document.getElementById('tmEpoch');
   const tBest=document.getElementById('tmBestLoss');
   const tMAE=document.getElementById('tmMAE');
   const tStat=document.getElementById('tmStatus');
   const tBadge=document.getElementById('tlogStatus');
+  const wrap=document.getElementById('trainingLog');
   const MAX_LINES=10;
 
   function loss(e){ return 1.42*Math.exp(-.09*e)+.045+.012*(Math.random()-.5); }
   function vloss(e){ return 1.55*Math.exp(-.085*e)+.06+.018*(Math.random()-.5); }
   function mae(e){ return .185*Math.exp(-.07*e)+.04+.008*(Math.random()-.5); }
-
-  function pad(n,l=3){return String(n).padStart(l,' ');}
-  function fmt(n){return n.toFixed(4);}
+  function pad(n,l=3){ return String(n).padStart(l,' '); }
+  function fmt(n){ return n.toFixed(4); }
 
   function addLine(html){
     const div=document.createElement('div');
-    div.className='tlog-line';div.innerHTML=html;
+    div.className='tlog-line';
+    div.innerHTML=html;
     body.appendChild(div);
-    while(body.children.length>MAX_LINES)body.removeChild(body.firstChild);
+    while(body.children.length>MAX_LINES) body.removeChild(body.firstChild);
+  }
+
+  function finish(){
+    addLine(`<span class="ok">✓ Training complete — best val_loss: ${fmt(bestLoss)}  MAE: ${fmt(mae(MAX_EPOCHS))}</span>`);
+    addLine('<span class="ok">✓ SHAP explainer fitted — saving feature importances...</span>');
+    tStat.textContent='complete';
+    tStat.style.color='#10ffa0';
+    tBadge.textContent='● COMPLETE';
+    tBadge.style.color='#10ffa0';
+    tBadge.style.animation='none';
+    if(timer) clearInterval(timer);
   }
 
   function tick(){
     epoch++;
     const l=loss(epoch), vl=vloss(epoch), m=mae(epoch);
     const lr=(epoch<20?.001:epoch<35?.0005:.0002).toExponential(1);
-    const improved=vl✓ saved':'';
-    const flag=vl>l*1.35?' ⚠ overfit?':'';
+    const improved=vl<bestLoss;
+    if(improved) bestLoss=vl;
     addLine(
-      `Epoch ${pad(epoch)}/${MAX_EPOCHS}  ` +
-      `loss: ${fmt(l)}  ` +
-      `val_loss: ${fmt(vl)}  ` +
-      `mae: ${fmt(m)}  lr: ${lr}` +
-      saved+flag
+      `<span class="ep">Epoch ${pad(epoch)}/${MAX_EPOCHS}</span>  ` +
+      `<span class="lv">loss: ${fmt(l)}</span>  ` +
+      `<span class="vv">val_loss: ${fmt(vl)}</span>  ` +
+      `<span class="lr">mae: ${fmt(m)}  lr: ${lr}</span>` +
+      (improved ? ' <span class="ok">✓ saved</span>' : '') +
+      (vl>l*1.35 ? ' <span class="warn">⚠ overfit?</span>' : '')
     );
     tEpoch.textContent=epoch;
     tBest.textContent=fmt(bestLoss);
     tMAE.textContent=fmt(m);
 
-    if(epoch===1){ addLine('▸ feature matrix (10,847 × 23) loaded'); }
-    if(epoch===5){ addLine('▸ early stopping patience=8 active'); }
-    if(epoch===15){ addLine('▸ lr scheduler: ReduceLROnPlateau triggered'); }
-    if(epoch===30){ addLine('▸ checkpoint → ags_forecast_best.pkl'); }
+    if(epoch===1) addLine('<span class="info">▸ feature matrix (10,847 × 23) loaded</span>');
+    if(epoch===5) addLine('<span class="info">▸ early stopping patience=8 active</span>');
+    if(epoch===15) addLine('<span class="info">▸ lr scheduler: ReduceLROnPlateau triggered</span>');
+    if(epoch===30) addLine('<span class="info">▸ checkpoint → ags_forecast_best.pkl</span>');
 
-    if(epoch✓ Training complete — best val_loss: ${fmt(bestLoss)}  MAE: ${fmt(mae(MAX_EPOCHS))}`);
-      addLine('✓ SHAP explainer fitted — saving feature importances...');
-      tStat.textContent='complete';tStat.style.color='#10ffa0';
-      tBadge.textContent='● COMPLETE';tBadge.style.color='#10ffa0';tBadge.style.animation='none';
-    }
+    if(epoch>=MAX_EPOCHS) finish();
   }
 
-  // Trigger only when scrolled into view
-  const obs=new IntersectionObserver(entries=>{
-    if(entries[0].isIntersecting&&!started){
-      started=true;
-      addLine('▸ initialising ags_forecast_model.py');
-      addLine('▸ loading preprocessing pipeline...');
-      setTimeout(tick,900);
+  const obs = new IntersectionObserver((entries) => {
+    if(entries[0].isIntersecting && !started){
+      started = true;
+      tStat.textContent = 'training';
+      tStat.style.color = '#06f0ff';
+      addLine('<span class="info">▸ initialising ags_forecast_model.py</span>');
+      addLine('<span class="info">▸ loading preprocessing pipeline...</span>');
+      tick();
+      timer = setInterval(tick, 360);
       obs.disconnect();
     }
-  },{threshold:.3});
-  obs.observe(document.getElementById('trainingLog'));
+  }, { threshold: 0.25, rootMargin: '0px 0px -10% 0px' });
+
+  obs.observe(wrap);
 })();
 </script>
 </section>
