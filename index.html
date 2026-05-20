@@ -966,80 +966,6 @@ footer{
 })();
 </script>
 </section>
-<!-- ═══ t-SNE SCATTER BACKGROUND — paste as first child of #skills ═══ -->
-<canvas id="tsneCanvas" style="
-  position:absolute;inset:0;width:100%;height:100%;
-  pointer-events:none;z-index:1;opacity:.22;
-"></canvas>
-
-<style>
-#skills{overflow:hidden} /* ensure canvas doesn't bleed */
-</style>
-
-<script>
-(function(){
-  const cvs=document.getElementById('tsneCanvas');
-  const ctx=cvs.getContext('2d');
-  let W,H,pts=[],raf=null,active=false;
-
-  /* ── cluster definitions: centre, spread, color, label ── */
-  const CLUSTERS=[
-    {cx:.22,cy:.35,sx:.09,sy:.12,r:3.5, color:'#06f0ff', label:'legitimate',  n:110},
-    {cx:.68,cy:.55,sx:.10,sy:.09,r:3,   color:'#a855f7', label:'fraudulent',  n:70 },
-    {cx:.44,cy:.22,sx:.07,sy:.08,r:2.5, color:'#f472b6', label:'borderline',  n:40 },
-    {cx:.78,cy:.25,sx:.06,sy:.07,r:2.2, color:'#fbbf24', label:'anomaly',     n:25 },
-  ];
-
-  function gauss(){
-    // Box-Muller transform
-    let u=0,v=0;
-    while(u===0)u=Math.random();
-    while(v===0)v=Math.random();
-    return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
-  }
-
-  function init(){
-    W=cvs.width=cvs.offsetWidth;
-    H=cvs.height=cvs.offsetHeight;
-    pts=[];
-    CLUSTERS.forEach(c=>{
-      for(let i=0;i{
-      // gentle drift around base position
-      p.x=p.bx+Math.sin(t*p.speed*1000+p.phase)*W*.04;
-      p.y=p.by+Math.cos(t*p.speed*800+p.phase)*H*.04;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle=p.color;
-      ctx.globalAlpha=p.alpha;
-      ctx.fill();
-    });
-    // draw faint cluster hulls (convex-ish ellipses)
-    ctx.globalAlpha=.06;
-    CLUSTERS.forEach((c,ci)=>{
-      const cx=c.cx*W, cy=c.cy*H;
-      const drift=Math.sin(t*.3+ci)*W*.02;
-      ctx.beginPath();
-      ctx.ellipse(cx+drift,cy,c.sx*W*2.2,c.sy*H*2.2,ci*.4,0,Math.PI*2);
-      ctx.strokeStyle=c.color;ctx.lineWidth=1;ctx.stroke();
-    });
-    ctx.globalAlpha=1;
-    raf=requestAnimationFrame(draw);
-  }
-
-  // Only run when in view
-  const obs=new IntersectionObserver(entries=>{
-    if(entries[0].isIntersecting){
-      if(!active){active=true;init();raf=requestAnimationFrame(draw);}
-    } else {
-      active=false;
-      if(raf)cancelAnimationFrame(raf);
-    }
-  },{threshold:.05});
-  obs.observe(document.getElementById('skills'));
-
-  window.addEventListener('resize',()=>{if(active){init();}});
-})();
-</script>
 <!-- =========== PROJECTS =========== -->
 <section id="projects">
   <div class="sec-glow"></div>
@@ -1112,215 +1038,78 @@ footer{
 
 <!-- =========== SKILLS =========== -->
 <section id="skills">
-</section>
-   <!-- ═══ ML PIPELINE SECTION — paste between #experience and #projects ═══ -->
-<section id="pipeline" style="padding:6rem 5rem;position:relative;z-index:5;
-  background:rgba(2,6,14,.8);overflow:hidden">
-
-  <div class="slabel">Architecture</div>
-  <h2 class="st">How I build <em>end-to-end.</em></h2>
-  <p class="ssub">Every model I ship follows this production pipeline pattern.</p>
-
-  <div class="pipeline-wrap" id="pipelineWrap">
-
-    <!-- SVG connector lines — drawn by JS -->
-    <svg class="pipeline-svg" id="pipelineSVG"
-      style="position:absolute;top:0;left:0;width:100%;height:100%;
-      pointer-events:none;z-index:1;overflow:visible"></svg>
-
-    <!-- Pipeline nodes -->
-    <div class="pn" data-step="0" data-color="#06f0ff">
-      <div class="pn-icon">⬡</div>
-      <div class="pn-name">Raw Data</div>
-      <div class="pn-sub">CSVs · SQL · APIs</div>
-      <div class="pn-tag">INGESTION</div>
-    </div>
-
-    <div class="pn" data-step="1" data-color="#3b82f6">
-      <div class="pn-icon">⬡</div>
-      <div class="pn-name">ETL Pipeline</div>
-      <div class="pn-sub">Pandas · NumPy · SQL</div>
-      <div class="pn-tag">−60% prep time</div>
-    </div>
-
-    <div class="pn" data-step="2" data-color="#a855f7">
-      <div class="pn-icon">⬡</div>
-      <div class="pn-name">Feature Eng.</div>
-      <div class="pn-sub">Encoding · Scaling · Selection</div>
-      <div class="pn-tag">−8% OpEx</div>
-    </div>
-
-    <div class="pn" data-step="3" data-color="#06f0ff">
-      <div class="pn-icon">⬡</div>
-      <div class="pn-name">Model Training</div>
-      <div class="pn-sub">XGBoost · sklearn · TF</div>
-      <div class="pn-tag">AUC 0.964</div>
-    </div>
-
-    <div class="pn" data-step="4" data-color="#f472b6">
-      <div class="pn-icon">⬡</div>
-      <div class="pn-name">Evaluation</div>
-      <div class="pn-sub">SHAP · AUC · F1 · MAE</div>
-      <div class="pn-tag">EXPLAINABLE</div>
-    </div>
-
-    <div class="pn" data-step="5" data-color="#fbbf24">
-      <div class="pn-icon">⬡</div>
-      <div class="pn-name">Deployment</div>
-      <div class="pn-sub">Pipeline · Power BI · API</div>
-      <div class="pn-tag">5h/wk saved</div>
-    </div>
-
-    <div class="pn" data-step="6" data-color="#10ffa0">
-      <div class="pn-icon">⬡</div>
-      <div class="pn-name">Monitoring</div>
-      <div class="pn-sub">Drift · Alerts · Retraining</div>
-      <div class="pn-tag">MLOPS</div>
-    </div>
-  </div>
-</section>
+<!-- ═══ t-SNE SCATTER BACKGROUND — paste as first child of #skills ═══ -->
+<canvas id="tsneCanvas" style="
+  position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;z-index:1;opacity:.22;
+"></canvas>
 
 <style>
-.pipeline-wrap{
-  position:relative;
-  display:flex;align-items:center;
-  gap:0;
-  padding:2rem 0;
-}
-.pn{
-  flex:1;min-width:0;
-  background:rgba(4,11,26,.75);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:10px;padding:1.2rem .8rem 1rem;
-  text-align:center;
-  position:relative;z-index:2;
-  opacity:0;
-  transform:translateY(20px) scale(.95);
-  transition:opacity .5s cubic-bezier(.23,1,.32,1),
-             transform .5s cubic-bezier(.23,1,.32,1),
-             border-color .3s, box-shadow .3s;
-  backdrop-filter:blur(16px);
-}
-.pn.active{
-  opacity:1;transform:translateY(0) scale(1);
-}
-.pn.lit{
-  border-color:var(--pn-color,rgba(6,240,255,.35));
-  box-shadow:0 0 28px var(--pn-glow,rgba(6,240,255,.12));
-}
-.pn-icon{
-  font-size:1.4rem;margin-bottom:.4rem;
-  color:var(--pn-color,#06f0ff);
-  transition:color .3s;
-}
-.pn-name{
-  font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;
-  color:#e2eeff;margin-bottom:.2rem;
-}
-.pn-sub{
-  font-family:'JetBrains Mono',monospace;
-  font-size:.6rem;color:#4e6580;line-height:1.5;
-  margin-bottom:.5rem;
-}
-.pn-tag{
-  font-family:'JetBrains Mono',monospace;
-  font-size:.6rem;letter-spacing:.08em;
-  color:var(--pn-color,#06f0ff);
-  border:1px solid currentColor;border-radius:2px;
-  padding:.1rem .4rem;display:inline-block;
-  opacity:.75;
-}
-/* SVG connector pulse animation */
-.pipe-line{
-  stroke-dasharray:6 4;
-  animation:pipeFlow 1.2s linear infinite;
-}
-@keyframes pipeFlow{to{stroke-dashoffset:-20}}
-@media(max-width:900px){
-  .pipeline-wrap{flex-direction:column;align-items:stretch;gap:.8rem}
-  .pipeline-svg{display:none}
-}
+#skills{overflow:hidden} /* ensure canvas doesn't bleed */
 </style>
 
 <script>
 (function(){
-  const wrap=document.getElementById('pipelineWrap');
-  const svgEl=document.getElementById('pipelineSVG');
-  const nodes=Array.from(wrap.querySelectorAll('.pn'));
-  let triggered=false;
+  const cvs=document.getElementById('tsneCanvas');
+  const ctx=cvs.getContext('2d');
+  let W,H,pts=[],raf=null,active=false;
 
-  function getColor(node){return node.getAttribute('data-color')||'#06f0ff';}
+  /* ── cluster definitions: centre, spread, color, label ── */
+  const CLUSTERS=[
+    {cx:.22,cy:.35,sx:.09,sy:.12,r:3.5, color:'#06f0ff', label:'legitimate',  n:110},
+    {cx:.68,cy:.55,sx:.10,sy:.09,r:3,   color:'#a855f7', label:'fraudulent',  n:70 },
+    {cx:.44,cy:.22,sx:.07,sy:.08,r:2.5, color:'#f472b6', label:'borderline',  n:40 },
+    {cx:.78,cy:.25,sx:.06,sy:.07,r:2.2, color:'#fbbf24', label:'anomaly',     n:25 },
+  ];
 
-  function drawConnectors(){
-    svgEl.innerHTML='';
-    const wRect=wrap.getBoundingClientRect();
-    nodes.forEach((node,i)=>{
-      if(i===nodes.length-1)return;
-      const next=nodes[i+1];
-      const r1=node.getBoundingClientRect();
-      const r2=next.getBoundingClientRect();
-      const x1=r1.right-wRect.left;
-      const y1=r1.top-wRect.top+r1.height/2;
-      const x2=r2.left-wRect.left;
-      const y2=r2.top-wRect.top+r2.height/2;
-      const color=getColor(node);
-      // static bg line
-      const bg=document.createElementNS('http://www.w3.org/2000/svg','line');
-      bg.setAttribute('x1',x1);bg.setAttribute('y1',y1);
-      bg.setAttribute('x2',x2);bg.setAttribute('y2',y2);
-      bg.setAttribute('stroke',color);bg.setAttribute('stroke-width','1.5');
-      bg.setAttribute('opacity','0.12');
-      svgEl.appendChild(bg);
-      // animated flow line (delayed by step)
-      const fl=document.createElementNS('http://www.w3.org/2000/svg','line');
-      fl.setAttribute('x1',x1);fl.setAttribute('y1',y1);
-      fl.setAttribute('x2',x2);fl.setAttribute('y2',y2);
-      fl.setAttribute('stroke',color);fl.setAttribute('stroke-width','1.8');
-      fl.setAttribute('opacity','0');
-      fl.setAttribute('stroke-linecap','round');
-      fl.classList.add('pipe-line');
-      fl.style.animationDelay=(i*.18)+'s';
-      svgEl.appendChild(fl);
-      // arrow head
-      const arrow=document.createElementNS('http://www.w3.org/2000/svg','polygon');
-      const ax=x2-1, ay=y2;
-      arrow.setAttribute('points',`${ax},${ay-5} ${ax+9},${ay} ${ax},${ay+5}`);
-      arrow.setAttribute('fill',color);arrow.setAttribute('opacity','0');
-      arrow.id='arr-'+i;
-      svgEl.appendChild(arrow);
-      fl.id='fl-'+i;
-    });
+  function gauss(){
+    // Box-Muller transform
+    let u=0,v=0;
+    while(u===0)u=Math.random();
+    while(v===0)v=Math.random();
+    return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
   }
 
-  function animateIn(){
-    nodes.forEach((node,i)=>{
-      node.style.setProperty('--pn-color',getColor(node));
-      node.style.setProperty('--pn-glow',getColor(node)+'28');
-      setTimeout(()=>{
-        node.classList.add('active');
-        setTimeout(()=>{
-          node.classList.add('lit');
-          // light up connector after this node
-          const fl=document.getElementById('fl-'+i);
-          const arr=document.getElementById('arr-'+i);
-          if(fl){fl.setAttribute('opacity','0.55');}
-          if(arr){arr.setAttribute('opacity','0.7');}
-        },300);
-      },i*160);
+  function init(){
+    W=cvs.width=cvs.offsetWidth;
+    H=cvs.height=cvs.offsetHeight;
+    pts=[];
+    CLUSTERS.forEach(c=>{
+      for(let i=0;i{
+      // gentle drift around base position
+      p.x=p.bx+Math.sin(t*p.speed*1000+p.phase)*W*.04;
+      p.y=p.by+Math.cos(t*p.speed*800+p.phase)*H*.04;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.color;
+      ctx.globalAlpha=p.alpha;
+      ctx.fill();
     });
+    // draw faint cluster hulls (convex-ish ellipses)
+    ctx.globalAlpha=.06;
+    CLUSTERS.forEach((c,ci)=>{
+      const cx=c.cx*W, cy=c.cy*H;
+      const drift=Math.sin(t*.3+ci)*W*.02;
+      ctx.beginPath();
+      ctx.ellipse(cx+drift,cy,c.sx*W*2.2,c.sy*H*2.2,ci*.4,0,Math.PI*2);
+      ctx.strokeStyle=c.color;ctx.lineWidth=1;ctx.stroke();
+    });
+    ctx.globalAlpha=1;
+    raf=requestAnimationFrame(draw);
   }
 
+  // Only run when in view
   const obs=new IntersectionObserver(entries=>{
-    if(entries[0].isIntersecting&&!triggered){
-      triggered=true;
-      drawConnectors();
-      setTimeout(animateIn,200);
-      obs.disconnect();
+    if(entries[0].isIntersecting){
+      if(!active){active=true;init();raf=requestAnimationFrame(draw);}
+    } else {
+      active=false;
+      if(raf)cancelAnimationFrame(raf);
     }
-  },{threshold:.25});
-  obs.observe(wrap);
+  },{threshold:.05});
+  obs.observe(document.getElementById('skills'));
 
-  window.addEventListener('resize',()=>{if(triggered)drawConnectors();});
+  window.addEventListener('resize',()=>{if(active){init();}});
 })();
 </script>
  <div class="sec-glow"></div>
