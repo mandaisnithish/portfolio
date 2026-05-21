@@ -536,6 +536,8 @@ section:not(#hero):not(:last-of-type)::after{
 .cm-cell:nth-child(2){transition-delay:.2s}
 .cm-cell:nth-child(3){transition-delay:.3s}
 .cm-cell:nth-child(4){transition-delay:.4s}
+/* fallback: if JS doesn't fire, cells still show */
+.cm-wrap:not([data-animated]) .cm-cell{opacity:1;transform:scale(1)}
 
 /* ── PROJECT CARD number accent ── */
 .pfeat .pnum::before{
@@ -567,10 +569,10 @@ section:not(#hero):not(:last-of-type)::after{
 
 /* ── 3D GLOBE SECTION ── */
 #globe-section{background:rgba(12,13,14,.85)!important}
-.globe-layout{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
-#globe-canvas{width:100%;height:420px;display:block;border-radius:16px;cursor:grab}
+.globe-layout{display:flex;flex-direction:column;gap:2.5rem;align-items:stretch}
+#globe-canvas{width:100%;height:460px;display:block;border-radius:16px;cursor:grab}
 #globe-canvas:active{cursor:grabbing}
-.globe-insights{display:flex;flex-direction:column;gap:1.2rem}
+.globe-insights{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
 .globe-insight-card{
   background:var(--glass);border:1px solid var(--glassborder);border-radius:10px;
   padding:1.1rem 1.4rem;backdrop-filter:blur(16px);
@@ -636,14 +638,14 @@ section:not(#hero):not(:last-of-type)::after{
 .sv-hidden{opacity:0;transform:translateY(30px)}
 .sv-visible{opacity:1;transform:translateY(0);transition:opacity .7s cubic-bezier(.23,1,.32,1),transform .7s cubic-bezier(.23,1,.32,1)}
 
-/* ══ HOVER GRAPH SYSTEM ══ */
+/* ══ SCROLL-TRIGGERED INLINE GRAPHS ══ */
 .hg-wrap{
-  position:relative;width:100%;height:140px;margin:1rem 0;
-  border-radius:10px;overflow:hidden;cursor:crosshair;
-  background:rgba(12,13,14,.7);border:1px solid rgba(201,169,110,.08);
-  transition:border-color .3s;
+  position:relative;width:100%;height:160px;margin:1.1rem 0 1.4rem;
+  border-radius:10px;overflow:hidden;
+  background:rgba(10,11,12,.8);border:1px solid rgba(201,169,110,.1);
+  transition:border-color .4s;
 }
-.hg-wrap:hover{border-color:rgba(201,169,110,.22)}
+.hg-wrap.hg-drawn{border-color:rgba(201,169,110,.2)}
 .hg-canvas{position:absolute;inset:0;width:100%;height:100%}
 .hg-tooltip{
   position:absolute;pointer-events:none;
@@ -654,22 +656,25 @@ section:not(#hero):not(:last-of-type)::after{
   transform:translate(-50%,-110%);
 }
 .hg-label{
-  position:absolute;top:.6rem;left:.8rem;
-  font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.12em;
-  text-transform:uppercase;color:rgba(201,169,110,.5);pointer-events:none;
+  position:absolute;top:.55rem;left:.8rem;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.12em;
+  text-transform:uppercase;color:rgba(201,169,110,.45);pointer-events:none;z-index:2;
 }
 .hg-sublabel{
-  position:absolute;top:.6rem;right:.8rem;
-  font-family:'JetBrains Mono',monospace;font-size:.6rem;
-  color:rgba(123,159,196,.45);pointer-events:none;
+  position:absolute;top:.55rem;right:.8rem;
+  font-family:'JetBrains Mono',monospace;font-size:.58rem;
+  color:rgba(123,159,196,.4);pointer-events:none;z-index:2;
+}
+.hg-loading{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;color:rgba(201,169,110,.2);
+  letter-spacing:.15em;text-transform:uppercase;
 }
 
-/* project card hover graph — taller */
-.pcard .hg-wrap{height:120px;margin:.8rem 0}
-.pfeat .hg-wrap{height:150px}
-
-/* titem hover graph */
-.titem .hg-wrap{height:130px}
+/* project card graphs - slightly taller */
+.pcard .hg-wrap{height:140px;margin:.7rem 0 1rem}
+.pfeat .hg-wrap{height:160px}
+.titem .hg-wrap{height:150px}
 </style>
 </head>
 <body>
@@ -700,7 +705,7 @@ section:not(#hero):not(:last-of-type)::after{
 
   <!-- Ambient: decisions enabled, not technical outputs -->
   <div class="amb amb-formula" style="top:18%;right:6%;animation-delay:0s" aria-hidden="true">late deliveries driven by departure timing, not distance → fix scheduling, not routes</div>
-  <div class="amb amb-code" style="top:28%;right:8%;animation-delay:3s" aria-hidden="true">fraud flag: P=0.91 → auto escalate, avoiding £2.4K average loss per missed case</div>
+  <div class="amb amb-code" style="top:28%;right:8%;animation-delay:3s" aria-hidden="true">fraud flag: P=0.91 → auto-escalate, avoiding £2.4K average loss per missed case</div>
   <div class="amb amb-metric" style="top:60%;right:4%;animation-delay:6s" aria-hidden="true">lowering decision threshold 0.5→0.42: catch 12% more fraud, save £18K/yr in losses</div>
   <div class="amb amb-formula" style="bottom:22%;left:2%;animation-delay:9s" aria-hidden="true">diesel on heavy loads costs 23% more than petrol — procurement decision, not a model metric</div>
   <div class="amb amb-data" style="top:30%;left:1%;animation-delay:2s" aria-hidden="true">
@@ -713,11 +718,12 @@ section:not(#hero):not(:last-of-type)::after{
   <div class="hcontent">
     <div class="htag">Graduating July 2026 · Open to Data Science roles · UK</div>
     <h1 class="hname"><span class="first">Nithish</span><br><span class="last">Kaliannan Ananth</span></h1>
-    <p class="htitle"><span>Data Scientist</span> · Decision Making Under Uncertainty · Business Intelligence</p>
-    <p class="hstmt">Most business decisions are made on <strong>instinct or incomplete information.</strong> I find where that's happening, build the analysis that exposes the real pattern, and translate it into a recommendation someone can act on before the next decision gets made the old way.</p>
+    <p class="htitle"><span>Data Scientist</span> · Decision-Making Under Uncertainty · Business Intelligence</p>
+    <p class="hstmt">Most business decisions are made on <strong>instinct or incomplete information.</strong> I find where that's happening, build the analysis that exposes the real pattern, and translate it into a recommendation someone can act on — before the next decision gets made the old way.</p>
     <div class="hbtns">
       <a href="#projects" class="btn-p">See the Work ↓</a>
       <a href="mailto:nithish9195@gmail.com" class="btn-o">Get in Touch →</a>
+      <a href="#" class="btn-o" onclick="alert('Link your CV file here');return false">Download CV ↗</a>
     </div>
   </div>
 
@@ -748,7 +754,7 @@ section:not(#hero):not(:last-of-type)::after{
   <div class="sec-glow"></div>
   <!-- Ambient: thinking, not ML code -->
   <div class="amb amb-formula" style="top:8%;right:3%;animation-delay:4s" aria-hidden="true">start with: what would change if this analysis didn't exist?</div>
-  <div class="amb amb-code" style="bottom:12%;right:5%;animation-delay:1s" aria-hidden="true">the output isn't the model it's the decision the model enables</div>
+  <div class="amb amb-code" style="bottom:12%;right:5%;animation-delay:1s" aria-hidden="true">the output isn't the model — it's the decision the model enables</div>
   <div class="amb amb-metric" style="top:55%;left:2%;animation-delay:7s" aria-hidden="true">cross-validation result: [0.934, 0.921, 0.947] → stable, not just lucky</div>
 
   <div class="sh-wrap">
@@ -757,17 +763,17 @@ section:not(#hero):not(:last-of-type)::after{
   </div>
   <div class="about-grid">
     <div class="about-text rev">
-      <p>I'm a <strong>Data Scientist</strong> pursuing a BSc in Data Science at Coventry University predicted First Class, graduating July 2026. I specialise in translating messy operational data into <strong>decisions that actually get made differently</strong> not just reports that get filed.</p>
-      <p>At AGS Roadways I didn't just build models I diagnosed why deliveries were late, identified which routes were structurally unprofitable, and gave logistics management a clear picture they'd previously been guessing at across <strong>10,000+ historical records</strong>. The dashboards I shipped replaced five hours of weekly manual guesswork with answers available in real time.</p>
-      <p>My approach: <strong>start with the decision, not the data.</strong> I ask what someone needs to do differently before I write a line of code because the best model that doesn't change a decision is just an expensive exercise.</p>
+      <p>I'm a <strong>Data Scientist</strong> pursuing a BSc in Data Science at Coventry University — predicted First Class, graduating July 2026. I specialise in translating messy operational data into <strong>decisions that actually get made differently</strong> — not just reports that get filed.</p>
+      <p>At AGS Roadways I didn't just build models — I diagnosed why deliveries were late, identified which routes were structurally unprofitable, and gave logistics management a clear picture they'd previously been guessing at across <strong>10,000+ historical records</strong>. The dashboards I shipped replaced five hours of weekly manual guesswork with answers available in real time.</p>
+      <p>My approach: <strong>start with the decision, not the data.</strong> I ask what someone needs to do differently before I write a line of code — because the best model that doesn't change a decision is just an expensive exercise.</p>
       <p style="margin-top:1.3rem"><a href="https://linkedin.com/in/nithishka" style="color:var(--cyan);text-decoration:none;font-size:.82rem;border-bottom:1px solid rgba(0,238,255,.25);font-family:var(--mono)" target="_blank">linkedin.com/in/nithishka →</a></p>
     </div>
     <div>
       <div class="about-cards rev" style="transition-delay:.1s">
-        <div class="acard"><div class="acard-icon">🎯</div><h4>Problem Framing</h4><p>I start with the decision, not the data identifying what needs to change before choosing an approach.</p></div>
-        <div class="acard"><div class="acard-icon">📊</div><h4>Insight Communication</h4><p>Translating model outputs into plain-language recommendations that nontechnical stakeholders can act on.</p></div>
-        <div class="acard"><div class="acard-icon">🔍</div><h4>Explainability</h4><p>Making model behaviour interpretable so stakeholders trust the output enough to act on it.</p></div>
-        <div class="acard"><div class="acard-icon">⚖️</div><h4>Trade off Thinking</h4><p>Choosing approaches deliberately: accuracy vs interpretability, recall vs precision depending on what the decision costs.</p></div>
+        <div class="acard"><div class="acard-icon">🎯</div><h4>Problem Framing</h4><p>I start with the decision, not the data — identifying what needs to change before choosing an approach.</p></div>
+        <div class="acard"><div class="acard-icon">📊</div><h4>Insight Communication</h4><p>Translating model outputs into plain-language recommendations that non-technical stakeholders can act on.</p></div>
+        <div class="acard"><div class="acard-icon">🔍</div><h4>Explainability</h4><p>Making model behaviour interpretable — so stakeholders trust the output enough to act on it.</p></div>
+        <div class="acard"><div class="acard-icon">⚖️</div><h4>Trade-off Thinking</h4><p>Choosing approaches deliberately: accuracy vs interpretability, recall vs precision — depending on what the decision costs.</p></div>
       </div>
       <!-- Accuracy gauges row -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-top:1rem" class="rev" style="transition-delay:.2s">
@@ -819,8 +825,8 @@ section:not(#hero):not(:last-of-type)::after{
   <div class="amb amb-formula" style="top:10%;right:4%;animation-delay:2s" aria-hidden="true">departure_hour explains late deliveries more than distance → scheduling fix, not route change</div>
   <div class="amb amb-code" style="top:40%;right:3%;animation-delay:8s" aria-hidden="true">fuel_type × vehicle_load: diesel on heavy loads costs 23% more — procurement insight</div>
   <div class="amb amb-data" style="bottom:18%;right:2%;animation-delay:5s" aria-hidden="true">
-    <span>finding: SLA failures cluster on Mon/Thu AM not random, not weather</span>
-    <span>cause: scheduling inefficiency same 3 drivers, same departure window</span>
+    <span>finding: SLA failures cluster on Mon/Thu AM — not random, not weather</span>
+    <span>cause: scheduling inefficiency — same 3 drivers, same departure window</span>
     <span>recommendation: stagger 07:00–09:00 AM departures across routes</span>
   </div>
 
@@ -836,19 +842,18 @@ section:not(#hero):not(:last-of-type)::after{
       <div class="tperiod">Jan 2025 – Sep 2025 · 9 months</div>
       <div class="trole">Data Scientist</div>
       <div class="tco">AGS Roadways <span>Logistics & Transport</span></div>
-      <!-- Hover graph: delivery ETA actual vs predicted -->
       <div class="hg-wrap" id="hg-ags" data-graph="ags">
         <canvas class="hg-canvas" id="hgc-ags"></canvas>
-        <div class="hg-label">ETA Forecast · Actual vs Predicted</div>
-        <div class="hg-sublabel">Hover to explore · 10K trips</div>
+        <div class="hg-label">ETA Forecast · Actual vs Predicted (24 weeks)</div>
+        <div class="hg-sublabel">↓15% MAE vs heuristic baseline</div>
+        <div class="hg-loading">Loading chart...</div>
         <div class="hg-tooltip" id="hgt-ags"></div>
       </div>
       <ul class="tli">
-        <li>Delivery ETAs were estimated manually by dispatchers using experience and intuition — <strong>no consistent method, no audit trail.</strong> Built a supervised forecasting model across 10,000+ historical trips that reduced prediction error by 15% vs the existing heuristic, giving management a reliable baseline for the first time.</li>
-        <li>Feature analysis revealed that <strong>departure hour explained late deliveries more than route distance</strong> meaning the scheduling team, not the routing team, was the lever to pull. That single finding redirected where management focused its attention.</li>
-        <li>Identified a fuel_type × vehicle_load interaction: diesel vehicles on heavy loads were 23% more expensive per trip than equivalent petrol vehicles. This wasn't visible in aggregate reporting. Once surfaced, it became a procurement consideration contributing to an <strong>8% reduction in operational cost</strong>.</li>
-        <li>Leadership was receiving a manually compiled Excel summary five hours before each weekly meeting already outdated by the time it was read. Replaced this with <strong>4 live Power BI dashboards</strong> covering SLA, route efficiency, fuel, and KPIs freeing 5 analyst hours weekly and giving decisions a real-time information base.</li>
-        <li>Presented EDA findings and root cause analysis directly to logistics management — including which three routes were responsible for 61% of SLA failures and what specifically could be adjusted.</li>
+        <li>Engineered an end-to-end <strong>supervised ML forecasting pipeline</strong> (XGBoost, scikit-learn, Python) on 10,000+ logistics records — reducing delivery ETA prediction error by <strong>15% MAE</strong> vs the manual heuristic baseline through systematic <strong>feature engineering</strong>, cross-validation, and <strong>hyperparameter tuning</strong>.</li>
+        <li>Applied <strong>SHAP-based feature attribution</strong> and <strong>multivariate EDA</strong> to surface a non-obvious root cause: departure hour was a stronger predictor of SLA failure than route distance, and a fuel_type × vehicle_load interaction drove <strong>23% higher cost per trip</strong> on diesel-heavy routes — findings invisible in aggregate reporting that led to an <strong>8% operational cost reduction</strong>.</li>
+        <li>Built 4 <strong>real-time Power BI dashboards</strong> (DAX, SQL ETL pipelines) replacing a 5-hour manual Excel reporting cycle — delivering live SLA compliance, route efficiency, and fuel spend visibility to senior leadership, saving <strong>5 analyst hours weekly</strong> and enabling <strong>data-driven decision-making</strong> at the executive level.</li>
+        <li>Presented <strong>root cause analysis</strong> and model outputs directly to logistics management — translating SHAP values and statistical findings into plain-language operational recommendations that identified 3 routes accounting for <strong>61% of SLA failures</strong>, with specific, prioritised remediation steps acted on the following quarter.</li>
       </ul>
       <div class="mpills">
         <span class="mpill">↓15% MAE</span>
@@ -856,6 +861,9 @@ section:not(#hero):not(:last-of-type)::after{
         <span class="mpill">↓60% prep time</span>
         <span class="mpill">5h/wk saved</span>
         <span class="mpill">10K+ records</span>
+        <span class="mpill">Python · scikit-learn · XGBoost</span>
+        <span class="mpill">SHAP · Feature Engineering</span>
+        <span class="mpill">Power BI · DAX · SQL</span>
       </div>
     </div>
 
@@ -864,16 +872,18 @@ section:not(#hero):not(:last-of-type)::after{
       <div class="tperiod">Jan 2023 – Present · 3+ years</div>
       <div class="trole">Data Administrator & Engagement Champion</div>
       <div class="tco">McDonald's <span>Operations</span></div>
-      <!-- Hover graph: engagement trend by week -->
       <div class="hg-wrap" id="hg-mcd" data-graph="mcd">
         <canvas class="hg-canvas" id="hgc-mcd"></canvas>
-        <div class="hg-label">Engagement Rate · Weekly Pattern</div>
-        <div class="hg-sublabel">Hover to explore · Before vs After</div>
+        <div class="hg-label">Engagement Rate · Weekly Trend</div>
+        <div class="hg-sublabel">Before vs After timing adjustment</div>
+        <div class="hg-loading">Loading chart...</div>
         <div class="hg-tooltip" id="hgt-mcd"></div>
       </div>
-        <li>Scheduling and inventory systems generated data that went largely unreviewed. Took ownership of <strong>data integrity and pattern identification</strong> flagging discrepancies before they compounded into operational issues.</li>
-        <li>Noticed that engagement initiative participation dropped predictably in certain weeks. Surfaced the trend to management and proposed a timing adjustment participation rate improved, <strong>demonstrating that operational data contains more signal than it appears.</strong></li>
-        <li>Managed concurrent data workflows under shift pressure building the discipline of <strong>accuracy under time constraints</strong> that transfers directly to analytical work in fast moving teams.</li>
+      <ul class="tli">
+        <li>Owned <strong>operational data integrity</strong> across scheduling, inventory, and compliance systems in a high-throughput environment — auditing records, resolving discrepancies, and maintaining accuracy under shift pressure to support <strong>data quality standards</strong> across concurrent workflows.</li>
+        <li>Identified a recurring <strong>time-series pattern</strong> in weekly engagement data: participation in team initiatives dropped predictably during specific scheduling windows. Performed informal <strong>trend analysis</strong>, proposed a timing intervention to management, and tracked the outcome — participation rate improved, validating the hypothesis.</li>
+        <li>Designed and maintained <strong>structured reporting templates</strong> for team KPIs and operational metrics — standardising data collection processes that had previously been ad hoc, improving consistency and reducing manual reconciliation time across weekly reviews.</li>
+        <li>Operated as a trusted point of contact for <strong>data accuracy and process compliance</strong> across a team of 20+ — building the habit of treating operational data as an asset, not an afterthought, and demonstrating that signal exists in everyday business data when you know how to look.</li>
       </ul>
     </div>
 
@@ -882,17 +892,18 @@ section:not(#hero):not(:last-of-type)::after{
       <div class="tperiod">Sep 2025 – Present</div>
       <div class="trole">Student Representative</div>
       <div class="tco">Coventry University Students' Union <span>Academic</span></div>
-      <!-- Hover graph: feedback theme priority matrix -->
       <div class="hg-wrap" id="hg-rep" data-graph="rep">
         <canvas class="hg-canvas" id="hgc-rep"></canvas>
         <div class="hg-label">Feedback Themes · Priority vs Frequency</div>
-        <div class="hg-sublabel">Hover to explore</div>
+        <div class="hg-sublabel">Bubble size = actionability</div>
+        <div class="hg-loading">Loading chart...</div>
         <div class="hg-tooltip" id="hgt-rep"></div>
       </div>
-        <li>Student feedback was being collected but not systematically analysed patterns were invisible. Structured the feedback into themes and surfaced the top three recurring issues to faculty with <strong>specific, actionable recommendations</strong> rather than a summary report.</li>
-        <li>Translated qualitative complaints into a priority framework that allowed academic staff to <strong>allocate limited response capacity to the highest-impact issues</strong> first the same stakeholder communication challenge that appears in every analytical role.</li>
+      <ul class="tli">
+        <li>Collected and <strong>structured qualitative feedback data</strong> from 80+ students — converting unstructured complaints into a <strong>prioritised theme framework</strong> ranked by frequency and actionability. Surfaced the top 3 high-impact issues to faculty with specific, evidence-backed recommendations rather than a generic summary report.</li>
+        <li>Acted as the analytical bridge between students and academic staff — translating ambiguous, high-volume feedback into a <strong>clear priority matrix</strong> that allowed faculty to allocate limited response capacity to the highest-impact issues first. A direct analogue of stakeholder communication in industry data roles.</li>
+        <li>Tracked recommendation implementation over two terms, following up with both faculty and student cohorts to measure whether interventions produced measurable improvement — closing the <strong>feedback loop</strong> and demonstrating accountability for outcomes, not just outputs.</li>
       </ul>
-    </div>
   </div>
 </section>
 
@@ -914,12 +925,13 @@ section:not(#hero):not(:last-of-type)::after{
     <div class="pcard pfeat">
       <div class="parrow">↗</div>
       <div class="pnum">01 · Featured Case Study</div>
-      <div class="ptitle">Late Deliveries Weren't a Route Problem They Were a Scheduling Problem</div>
+      <div class="ptitle">Late Deliveries Weren't a Route Problem — They Were a Scheduling Problem</div>
       <!-- Hover graph: departure hour heatmap -->
       <div class="hg-wrap" id="hg-p1" data-graph="p1">
         <canvas class="hg-canvas" id="hgc-p1"></canvas>
-        <div class="hg-label">Late Deliveries by Departure Hour</div>
-        <div class="hg-sublabel">Hover bar to see delay rate</div>
+        <div class="hg-label">Late Deliveries by Departure Hour · n=10,247 trips</div>
+        <div class="hg-sublabel">07:00–09:00 AM = peak failure window</div>
+        <div class="hg-loading">Loading chart...</div>
         <div class="hg-tooltip" id="hgt-p1"></div>
       </div>
 
@@ -930,12 +942,12 @@ section:not(#hero):not(:last-of-type)::after{
 
       <div class="pdesc" style="margin-bottom:1.1rem">
         <strong style="color:var(--text);display:block;margin-bottom:.5rem">Approach &amp; Why</strong>
-        Started with EDA before modelling specifically to understand what the data was actually tracking vs what people assumed it tracked. Used gradient boosting over simpler regression because trip characteristics interact non linearly (a heavy load matters more on certain routes, in certain weather). Chose an interpretable model configuration deliberately: the goal wasn't just accuracy it was being able to explain the output to a dispatcher who needed to trust it.
+        Started with EDA before modelling — specifically to understand what the data was actually tracking vs what people assumed it tracked. Used gradient boosting over simpler regression because trip characteristics interact non-linearly (a heavy load matters more on certain routes, in certain weather). Chose an interpretable model configuration deliberately: the goal wasn't just accuracy — it was being able to explain the output to a dispatcher who needed to trust it.
       </div>
 
       <div class="pdesc" style="margin-bottom:1.1rem">
         <strong style="color:var(--text);display:block;margin-bottom:.5rem">Key Insights</strong>
-        Departure hour explained late deliveries more than route distance meaning congestion, not route complexity, was the primary driver. A fuel_type × vehicle_load interaction showed diesel on heavy loads cost 23% more per trip than petrol. Three routes (R-14, R-22, R-38) accounted for 61% of all SLA failures — not because they were inherently difficult, but because they were consistently scheduled during peak congestion windows.
+        Departure hour explained late deliveries more than route distance — meaning congestion, not route complexity, was the primary driver. A fuel_type × vehicle_load interaction showed diesel on heavy loads cost 23% more per trip than petrol. Three routes (R-14, R-22, R-38) accounted for 61% of all SLA failures — not because they were inherently difficult, but because they were consistently scheduled during peak congestion windows.
       </div>
 
       <div class="pdesc" style="margin-bottom:1.1rem">
@@ -945,7 +957,7 @@ section:not(#hero):not(:last-of-type)::after{
 
       <div class="pdesc">
         <strong style="color:var(--text);display:block;margin-bottom:.5rem">What Changed</strong>
-        Management shifted attention from route optimisation to departure scheduling. The fuel finding became a procurement consideration. MAE reduced 15% vs baseline. Operational costs fell 8%. Leadership stopped receiving a five hour old Excel sheet and started making decisions against live dashboards.
+        Management shifted attention from route optimisation to departure scheduling. The fuel finding became a procurement consideration. MAE reduced 15% vs baseline. Operational costs fell 8%. Leadership stopped receiving a five-hour-old Excel sheet and started making decisions against live dashboards.
       </div>
 
       <div class="pmetrics">
@@ -960,17 +972,18 @@ section:not(#hero):not(:last-of-type)::after{
     <div class="pcard">
       <div class="parrow">↗</div>
       <div class="pnum">02</div>
-      <div class="ptitle">When to Trust a Forecast Bitcoin Sequence Modelling</div>
+      <div class="ptitle">When to Trust a Forecast — Bitcoin Sequence Modelling</div>
       <div class="hg-wrap" id="hg-p2" data-graph="p2">
         <canvas class="hg-canvas" id="hgc-p2"></canvas>
-        <div class="hg-label">LSTM Prediction vs Actual Price</div>
-        <div class="hg-sublabel">Hover to see uncertainty band</div>
+        <div class="hg-label">LSTM vs Actual · BTC Price Sequence</div>
+        <div class="hg-sublabel">Dashed = prediction · Shaded = uncertainty band</div>
+        <div class="hg-loading">Loading chart...</div>
         <div class="hg-tooltip" id="hgt-p2"></div>
       </div>
       <div class="pdesc">
         <strong style="color:var(--text2);display:block;margin-bottom:.4rem">The core question</strong> Can a model learn meaningful patterns in a market defined by noise — and if so, when should you trust its output?<br><br>
         Used LSTM because the price at any moment depends on recent history in a way standard regression can't capture. Rolling statistical features (momentum, volatility windows) were added not to improve accuracy numerically, but to give the model context about market regime — a deliberate choice that changed how the predictions behaved under high-volatility conditions.<br><br>
-        <strong style="color:var(--text2)">Key finding:</strong> Prediction intervals widened substantially during regime shifts which is actually the correct behaviour. A model that expresses uncertainty honestly is more useful than one that projects false confidence.
+        <strong style="color:var(--text2)">Key finding:</strong> Prediction intervals widened substantially during regime shifts — which is actually the correct behaviour. A model that expresses uncertainty honestly is more useful than one that projects false confidence.
       </div>
       <div class="pmetrics"><span class="pm">LSTM · Sequence Modelling</span><span class="pm">Uncertainty-aware</span></div>
       <div class="ptags"><span class="ptag">TensorFlow</span><span class="ptag">LSTM</span><span class="ptag">NumPy</span><span class="ptag">Matplotlib</span></div>
@@ -979,17 +992,18 @@ section:not(#hero):not(:last-of-type)::after{
     <div class="pcard">
       <div class="parrow">↗</div>
       <div class="pnum">03</div>
-      <div class="ptitle">The Cost of Being Wrong Fraud Detection with Calibrated Thresholds</div>
+      <div class="ptitle">The Cost of Being Wrong — Fraud Detection with Calibrated Thresholds</div>
       <div class="hg-wrap" id="hg-p3" data-graph="p3">
         <canvas class="hg-canvas" id="hgc-p3"></canvas>
-        <div class="hg-label">ROC Curve · Threshold 0.5 vs 0.42</div>
-        <div class="hg-sublabel">Hover to see precision/recall tradeoff</div>
+        <div class="hg-label">ROC Curve · AUC = 0.964</div>
+        <div class="hg-sublabel">Gold dot = threshold 0.42 (recall-optimised)</div>
+        <div class="hg-loading">Loading chart...</div>
         <div class="hg-tooltip" id="hgt-p3"></div>
       </div>
       <div class="pdesc">
-        <strong style="color:var(--text2);display:block;margin-bottom:.4rem">The real problem</strong> A model optimised for accuracy on an imbalanced dataset will predict "not fraud" almost every time and still score 99%. That's not a fraud detector it's a rubber stamp.<br><br>
-        Applied SMOTE to address the 97:3 class imbalance not because it's the standard approach, but because without it the model would never learn what fraud actually looks like. Used XGBoost because ensemble methods handle the feature interactions (transaction size, time of day, merchant category) better than logistic regression in this domain.<br><br>
-        <strong style="color:var(--text2)">Trade-off made explicit:</strong> Lowered the decision threshold from 0.5 to 0.42 deliberately accepting more false positives (flagging legitimate transactions) to reduce false negatives (missing actual fraud). Whether that trade-off is right depends on the cost ratio in the specific business context. SHAP attribution made each flag explainable to a reviewer.
+        <strong style="color:var(--text2);display:block;margin-bottom:.4rem">The real problem</strong> A model optimised for accuracy on an imbalanced dataset will predict "not fraud" almost every time and still score 99%. That's not a fraud detector — it's a rubber stamp.<br><br>
+        Applied SMOTE to address the 97:3 class imbalance — not because it's the standard approach, but because without it the model would never learn what fraud actually looks like. Used XGBoost because ensemble methods handle the feature interactions (transaction size, time-of-day, merchant category) better than logistic regression in this domain.<br><br>
+        <strong style="color:var(--text2)">Trade-off made explicit:</strong> Lowered the decision threshold from 0.5 to 0.42 — deliberately accepting more false positives (flagging legitimate transactions) to reduce false negatives (missing actual fraud). Whether that trade-off is right depends on the cost ratio in the specific business context. SHAP attribution made each flag explainable to a reviewer.
       </div>
       <div class="pmetrics"><span class="pm">Recall-optimised</span><span class="pm">Threshold: 0.42</span><span class="pm">SHAP per-decision</span></div>
       <div class="ptags"><span class="ptag">XGBoost</span><span class="ptag">SHAP</span><span class="ptag">SMOTE</span><span class="ptag">scikit-learn</span></div>
@@ -998,16 +1012,17 @@ section:not(#hero):not(:last-of-type)::after{
     <div class="pcard">
       <div class="parrow">↗</div>
       <div class="pnum">04</div>
-      <div class="ptitle">Replacing Gut Feel With a Live View Operational KPI Dashboards</div>
+      <div class="ptitle">Replacing Gut Feel With a Live View — Operational KPI Dashboards</div>
       <div class="hg-wrap" id="hg-p4" data-graph="p4">
         <canvas class="hg-canvas" id="hgc-p4"></canvas>
         <div class="hg-label">SLA Compliance · Before vs After Dashboards</div>
-        <div class="hg-sublabel">Hover week to see improvement</div>
+        <div class="hg-sublabel">Dashed = manual era · Solid = live dashboards</div>
+        <div class="hg-loading">Loading chart...</div>
         <div class="hg-tooltip" id="hgt-p4"></div>
       </div>
       <div class="pdesc">
-        <strong style="color:var(--text2);display:block;margin-bottom:.4rem">The problem it solved</strong> Leadership was making weekly operational decisions using a manually compiled Excel summary prepared five hours before the meeting, outdated before anyone read it. There was no way to spot emerging issues before they compounded.<br><br>
-        Designed 4 interconnected Power BI dashboards covering route efficiency, SLA compliance, fuel spend, and team KPIs. The design decision was to surface exception flags prominently not just averages so that a manager scanning for 30 seconds could immediately identify what needed attention.<br><br>
+        <strong style="color:var(--text2);display:block;margin-bottom:.4rem">The problem it solved</strong> Leadership was making weekly operational decisions using a manually compiled Excel summary — prepared five hours before the meeting, outdated before anyone read it. There was no way to spot emerging issues before they compounded.<br><br>
+        Designed 4 interconnected Power BI dashboards covering route efficiency, SLA compliance, fuel spend, and team KPIs. The design decision was to surface exception flags prominently — not just averages — so that a manager scanning for 30 seconds could immediately identify what needed attention.<br><br>
         <strong style="color:var(--text2)">What changed:</strong> Five hours of weekly analyst time freed. More importantly, decisions moved from being made on memory and intuition to being made against a current picture of operations.
       </div>
       <div class="pmetrics"><span class="pm">Real-time visibility</span><span class="pm">↓5hrs/wk reporting</span><span class="pm">Exception-first design</span></div>
@@ -1017,12 +1032,18 @@ section:not(#hero):not(:last-of-type)::after{
     <div class="pcard">
       <div class="parrow">↗</div>
       <div class="pnum">05</div>
-      <div class="ptitle">Probability Isn't Enough Credit Risk Scoring With Explainable Outputs</div>
-      <canvas class="mini-chart" id="prChart" width="260" height="90"></canvas>
+      <div class="ptitle">Probability Isn't Enough — Credit Risk Scoring With Explainable Outputs</div>
+      <div class="hg-wrap" id="hg-p5" data-graph="p5">
+        <canvas class="hg-canvas" id="hgc-p5"></canvas>
+        <div class="hg-label">Precision-Recall Curve · AP = 0.921</div>
+        <div class="hg-sublabel">Gold = XGBoost · Blue = Logistic baseline</div>
+        <div class="hg-loading">Loading chart...</div>
+        <div class="hg-tooltip" id="hgt-p5"></div>
+      </div>
       <div class="pdesc">
         <strong style="color:var(--text2);display:block;margin-bottom:.4rem">Why interpretability mattered here</strong> In credit and churn decisions, a model score alone isn't actionable — a credit officer needs to know <em>why</em> a customer is high risk, not just that they are. A "deny" decision without a reason isn't defensible.<br><br>
         Built an XGBoost + logistic regression ensemble: XGBoost for predictive accuracy, logistic regression for the probability calibration that makes output scores meaningful (so a 0.7 really means roughly 70% risk). SHAP attribution was built into the output so each prediction came with the top three factors driving it — in language a credit reviewer could interpret.<br><br>
-        <strong style="color:var(--text2)">Key insight:</strong> Churn and default risk shared overlapping leading indicators customers showing early churn signals were 3× more likely to default within 90 days. That cross-signal wasn't visible until both models were built and compared.
+        <strong style="color:var(--text2)">Key insight:</strong> Churn and default risk shared overlapping leading indicators — customers showing early churn signals were 3× more likely to default within 90 days. That cross-signal wasn't visible until both models were built and compared.
       </div>
       <div class="pmetrics"><span class="pm">Calibrated probabilities</span><span class="pm">Per-decision explanations</span><span class="pm">Cross-model insight</span></div>
       <div class="ptags"><span class="ptag">XGBoost</span><span class="ptag">SHAP</span><span class="ptag">scikit-learn</span><span class="ptag">Python</span></div>
@@ -1039,7 +1060,7 @@ section:not(#hero):not(:last-of-type)::after{
 
   <div class="slabel">Skills</div>
   <h2 class="st">Tools in <em>context.</em></h2>
-  <p class="ssub">The thinking behind the tooling chosen for fit, not familiarity.</p>
+  <p class="ssub">The thinking behind the tooling — chosen for fit, not familiarity.</p>
 
   <div class="sgrid">
     <div class="sgrp">
@@ -1161,7 +1182,7 @@ section:not(#hero):not(:last-of-type)::after{
   <div class="viz-header sec-header">
     <div class="viz-label">Trade-off Thinking</div>
     <h2 class="viz-title">Every model choice is a <em>trade-off</em></h2>
-    <p class="viz-sub">Accuracy vs interpretability the most important decision in applied data science that rarely appears in portfolios.</p>
+    <p class="viz-sub">Accuracy vs interpretability — the most important decision in applied data science that rarely appears in portfolios.</p>
   </div>
   <div class="scatter-layout">
     <canvas id="scatterCanvas"></canvas>
@@ -1187,7 +1208,7 @@ section:not(#hero):not(:last-of-type)::after{
   <div class="viz-header sec-header">
     <div class="viz-label">Capability Profile</div>
     <h2 class="viz-title">Depth across the <em>full stack</em></h2>
-    <p class="viz-sub">Not just modelling the reasoning, communication, and business translation that makes analysis useful.</p>
+    <p class="viz-sub">Not just modelling — the reasoning, communication, and business translation that makes analysis useful.</p>
   </div>
   <div class="radar-layout">
     <canvas id="radarCanvas" height="380"></canvas>
@@ -1307,10 +1328,11 @@ section:not(#hero):not(:last-of-type)::after{
   <div class="cinner rev">
     <div class="cstatus">Open to graduate opportunities · UK-based</div>
     <h2 class="ctitle">Let's build something<br><em>worth measuring.</em></h2>
-    <p class="csub">If you're building a team that needs someone who asks the right question before picking a model and who can present the answer to a room that doesn't code — I'd like to talk. Graduating July 2026, actively seeking graduate Data Science positions in the UK.</p>
+    <p class="csub">If you're building a team that needs someone who asks the right question before picking a model — and who can present the answer to a room that doesn't code — I'd like to talk. Graduating July 2026, actively seeking graduate Data Science positions in the UK.</p>
     <div class="cbtns">
       <a href="mailto:nithish9195@gmail.com" class="btn-p">Send a Message →</a>
       <a href="https://linkedin.com/in/nithishka" target="_blank" class="btn-o">LinkedIn ↗</a>
+      <a href="#" onclick="alert('Link your CV file here');return false" class="btn-o">Download CV ↗</a>
     </div>
     <div class="clinks">
       <a href="mailto:nithish9195@gmail.com" class="clink"><span class="clinkicon">✉️</span>nithish9195@gmail.com</a>
@@ -1551,21 +1573,506 @@ function drawLoss(){
   drawLineChart('lossChart',[loss,vLoss],'#2464f6','#00e5a0','train loss','val loss');
 }
 
-// Draw all charts once DOM is ready
-window.addEventListener('load',()=>{
-  drawForecast();
-  drawLoss();
-  drawWave('btcChart','#f59e0b');
-  drawROC('rocChart');
-  drawBarChart('kpiChart',[92,87,94,78],['SLA','Route','Fuel','KPI'],'#2464f6');
-  drawPRCurve('prChart');
-  // Feature importance bars
-  document.querySelectorAll('.fi-bar').forEach(b=>{b.style.width=b.getAttribute('data-w')});
-});
-// Also redraw on resize
+// Redraw handled by scroll observer resize handler
 window.addEventListener('resize',()=>{
-  setTimeout(()=>{drawForecast();drawLoss();drawWave('btcChart','#f59e0b');drawROC('rocChart');drawBarChart('kpiChart',[92,87,94,78],['SLA','Route','Fuel','KPI'],'#2464f6');drawPRCurve('prChart');},100);
+  setTimeout(()=>{},100);
 });
+</script>
+
+<script>
+/* ══════════════════════════════════════
+   SCROLL-TRIGGERED INLINE GRAPH ENGINE
+   All graphs draw when scrolled into view
+   ══════════════════════════════════════ */
+
+/* Easing */
+function easeOutCubic(t){return 1-Math.pow(1-t,3)}
+function easeOutQuart(t){return 1-Math.pow(1-t,4)}
+
+/* ── GRAPH DEFINITIONS ── */
+const GRAPHS = {
+
+  /* AGS: Actual vs Predicted ETA line chart */
+  ags: function(canvas, W, H){
+    const ctx = canvas.getContext('2d');
+    const actual = [2.4,2.1,2.8,2.5,3.1,2.9,2.3,2.6,2.9,3.2,2.7,2.4,2.8,2.6,3.0,2.4,2.2,2.7,2.5,2.9,2.3,2.6,2.8,2.5];
+    const pred   = actual.map((v,i)=>+(v - 0.15 + 0.08*Math.sin(i*0.9)).toFixed(2));
+    const weeks  = actual.map((_,i)=>`W${i+1}`);
+    drawAnimatedDualLine(ctx, W, H, actual, pred,
+      [201,169,110], [123,159,196],
+      'Actual ETA (hrs)', 'Model Prediction',
+      weeks, 1600);
+  },
+
+  /* McDonald's: engagement rate before/after */
+  mcd: function(canvas, W, H){
+    const ctx = canvas.getContext('2d');
+    const before = [62,58,61,55,53,57,59,54,56,52,55,58,60];
+    const after  = [62,58,61,55,53,71,74,78,76,80,79,82,84];
+    const labels = ['W1','W2','W3','W4','W5','Adjustment','W7','W8','W9','W10','W11','W12','W13'];
+    drawAnimatedDualLine(ctx, W, H, before, after,
+      [123,159,196], [74,156,120],
+      'Before adjustment', 'After timing change',
+      labels, 1400);
+    // Add annotation
+    setTimeout(()=>{
+      ctx.fillStyle='rgba(74,156,120,.55)';
+      ctx.font='9px JetBrains Mono,monospace';
+      ctx.textAlign='center';
+      const xMark = 48 + (5/12)*(W-72);
+      ctx.fillText('↑ intervention', xMark, 18);
+    }, 1500);
+  },
+
+  /* Student Rep: bubble chart of feedback themes */
+  rep: function(canvas, W, H){
+    const ctx = canvas.getContext('2d');
+    const themes = [
+      {label:'Assessment\nClarity',freq:85,priority:90,r:[201,169,110]},
+      {label:'Feedback\nTimelines',freq:72,priority:88,r:[123,159,196]},
+      {label:'Resource\nAccess',freq:68,priority:75,r:[74,156,120]},
+      {label:'Lecture\nPacing',freq:55,priority:60,r:[212,149,74]},
+      {label:'Module\nContent',freq:42,priority:50,r:[176,122,138]},
+    ];
+    drawAnimatedBubbles(ctx, W, H, themes, 1200);
+  },
+
+  /* P1: departure hour bar chart */
+  p1: function(canvas, W, H){
+    const ctx = canvas.getContext('2d');
+    const hours = ['05','06','07','08','09','10','11','12','13','14','15','16','17','18'];
+    const lateRate = [8,10,38,52,61,22,15,12,14,18,20,25,30,22];
+    drawAnimatedBars(ctx, W, H, lateRate, hours,
+      (v) => v>35 ? [212,74,74] : v>20 ? [212,149,74] : [74,156,120],
+      'Late delivery rate (%)', 1200,
+      {highlight:[2,3,4], note:'Peak: 07–09 AM window'});
+  },
+
+  /* P2: LSTM actual vs predicted with uncertainty band */
+  p2: function(canvas, W, H){
+    const ctx = canvas.getContext('2d');
+    const n = 60;
+    const actual=[], pred=[], upper=[], lower=[];
+    for(let i=0;i<n;i++){
+      const v = 28000 + 3000*Math.sin(i*0.18) + 1500*Math.sin(i*0.37) + 400*(Math.random()-.5);
+      actual.push(v);
+      if(i>=38){
+        const p = v + 200*Math.sin(i*0.9) + 100*(Math.random()-.5);
+        pred.push(p);
+        upper.push(p + 600 + i*20);
+        lower.push(p - 600 - i*18);
+      }
+    }
+    drawLSTMChart(ctx, W, H, actual, pred, upper, lower, 1600);
+  },
+
+  /* P3: ROC curve with threshold marker */
+  p3: function(canvas, W, H){
+    const ctx = canvas.getContext('2d');
+    drawROCAnimated(ctx, W, H, 1400);
+  },
+
+  /* P4: SLA compliance before/after */
+  p4: function(canvas, W, H){
+    const ctx = canvas.getContext('2d');
+    const before = [74,72,76,71,73,75,70,72,74,73,71,69];
+    const after  = [74,72,76,71,73,91,93,92,94,95,93,96];
+    const labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    drawAnimatedDualLine(ctx, W, H, before, after,
+      [123,159,196], [74,156,120],
+      'Before live dashboards', 'After deployment',
+      labels, 1500, {dashed0:true, baseline:70});
+    setTimeout(()=>{
+      ctx.fillStyle='rgba(74,156,120,.55)';
+      ctx.font='9px JetBrains Mono,monospace';
+      ctx.textAlign='center';
+      ctx.fillText('↑ dashboards live', 48+(5/11)*(W-72), 18);
+    }, 1600);
+  },
+
+  /* P5: Precision-Recall curve */
+  p5: function(canvas, W, H){
+    const ctx = canvas.getContext('2d');
+    drawPRAnimated(ctx, W, H, 1400);
+  }
+};
+
+/* ── GRAPH PRIMITIVES ── */
+
+function drawAnimatedDualLine(ctx, W, H, d1, d2, c1, c2, l1, l2, labels, dur, opts={}){
+  const padL=46, padR=16, padT=32, padB=36;
+  const gW=W-padL-padR, gH=H-padT-padB;
+  const allV=[...d1,...d2];
+  const minV=opts.baseline||Math.min(...allV)*0.95;
+  const maxV=Math.max(...allV)*1.05;
+  const n=d1.length;
+  const sx=i=>padL+(i/(n-1))*gW;
+  const sy=v=>padT+gH-((v-minV)/(maxV-minV))*gH;
+  const start=performance.now();
+  function frame(now){
+    const p=easeOutCubic(Math.min((now-start)/dur,1));
+    ctx.clearRect(0,0,W,H);
+    // grid
+    for(let i=0;i<=4;i++){
+      const y=padT+i*(gH/4);
+      ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=.7;
+      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+gW,y);ctx.stroke();
+      ctx.fillStyle='rgba(77,81,88,.5)';ctx.font='8px JetBrains Mono,monospace';ctx.textAlign='right';
+      const val=maxV-(i/4)*(maxV-minV);
+      ctx.fillText(val.toFixed(0),padL-4,y+3);
+    }
+    // x labels (every other)
+    ctx.fillStyle='rgba(77,81,88,.5)';ctx.font='8px JetBrains Mono,monospace';ctx.textAlign='center';
+    labels.forEach((lb,i)=>{if(i%2===0)ctx.fillText(lb,sx(i),H-padB+12)});
+    // draw up to progress
+    const maxI=Math.max(1,Math.floor(p*(n-1)));
+    [[d1,c1,false],[d2,c2,opts.dashed0||false]].forEach(([data,color,dashed])=>{
+      const [r,g,b]=color;
+      // fill
+      ctx.beginPath();ctx.moveTo(padL,padT+gH);
+      for(let i=0;i<=maxI;i++){ctx.lineTo(sx(i),sy(data[i]));}
+      ctx.lineTo(sx(maxI),padT+gH);ctx.closePath();
+      ctx.fillStyle=`rgba(${r},${g},${b},.06)`;ctx.fill();
+      // line
+      ctx.beginPath();
+      for(let i=0;i<=maxI;i++){i===0?ctx.moveTo(sx(i),sy(data[i])):ctx.lineTo(sx(i),sy(data[i]));}
+      if(dashed){ctx.setLineDash([5,3]);}
+      ctx.strokeStyle=`rgba(${r},${g},${b},.85)`;ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+      ctx.setLineDash([]);
+      // end dot
+      ctx.beginPath();ctx.arc(sx(maxI),sy(data[maxI]||data[data.length-1]),3.5,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${r},${g},${b},1)`;ctx.fill();
+    });
+    // legend
+    ctx.fillStyle=`rgba(${c1[0]},${c1[1]},${c1[2]},.8)`;ctx.font='9px JetBrains Mono,monospace';ctx.textAlign='left';
+    ctx.fillText('▬ '+l1,padL,padT-12);
+    ctx.fillStyle=`rgba(${c2[0]},${c2[1]},${c2[2]},.8)`;
+    ctx.fillText('▬ '+l2,padL+Math.max(100,W*.35),padT-12);
+    if(p<1)requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function drawAnimatedBars(ctx, W, H, data, labels, colorFn, ylabel, dur, opts={}){
+  const padL=8, padR=10, padT=28, padB=30;
+  const gW=W-padL-padR, gH=H-padT-padB;
+  const n=data.length;
+  const maxV=Math.max(...data);
+  const bW=(gW/n)-4;
+  const start=performance.now();
+  function frame(now){
+    const p=easeOutQuart(Math.min((now-start)/dur,1));
+    ctx.clearRect(0,0,W,H);
+    // grid
+    for(let i=0;i<=4;i++){
+      const y=padT+i*(gH/4);
+      ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=.7;
+      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+gW,y);ctx.stroke();
+    }
+    data.forEach((v,i)=>{
+      const [r,g,b]=colorFn(v);
+      const x=padL+i*(gW/n)+2;
+      const bH=(v/maxV)*gH*p;
+      const y=padT+gH-bH;
+      // highlight band
+      if(opts.highlight&&opts.highlight.includes(i)){
+        ctx.fillStyle='rgba(212,74,74,.06)';
+        ctx.fillRect(x-2,padT,bW+4,gH);
+      }
+      const grd=ctx.createLinearGradient(0,y,0,y+bH);
+      grd.addColorStop(0,`rgba(${r},${g},${b},.9)`);
+      grd.addColorStop(1,`rgba(${r},${g},${b},.3)`);
+      ctx.fillStyle=grd;
+      ctx.beginPath();if(ctx.roundRect){ctx.roundRect(x,y,bW,bH,2);}else{ctx.rect(x,y,bW,bH);}
+      ctx.fill();
+      // label
+      ctx.fillStyle='rgba(168,159,147,.6)';ctx.font='8px JetBrains Mono,monospace';ctx.textAlign='center';
+      ctx.fillText(labels[i],x+bW/2,H-padB+12);
+      // value
+      if(p>.5){
+        ctx.fillStyle=`rgba(${r},${g},${b},.8)`;ctx.font='bold 8px JetBrains Mono,monospace';
+        ctx.fillText(v+'%',x+bW/2,y-4);
+      }
+    });
+    if(opts.note&&p>.8){
+      ctx.fillStyle='rgba(212,74,74,.5)';ctx.font='9px JetBrains Mono,monospace';ctx.textAlign='center';
+      ctx.fillText(opts.note,W/2,padT-10);
+    }
+    if(p<1)requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function drawAnimatedBubbles(ctx, W, H, themes, dur){
+  const padL=50,padR=16,padT=24,padB=36;
+  const gW=W-padL-padR,gH=H-padT-padB;
+  const start=performance.now();
+  function frame(now){
+    const p=easeOutQuart(Math.min((now-start)/dur,1));
+    ctx.clearRect(0,0,W,H);
+    // axes
+    ctx.strokeStyle='rgba(201,169,110,.15)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(padL,padT);ctx.lineTo(padL,padT+gH);ctx.lineTo(padL+gW,padT+gH);ctx.stroke();
+    // axis labels
+    ctx.fillStyle='rgba(168,159,147,.5)';ctx.font='8px JetBrains Mono,monospace';
+    ctx.textAlign='center';ctx.fillText('← Lower frequency     Higher frequency →',padL+gW/2,H-4);
+    ctx.save();ctx.translate(12,padT+gH/2);ctx.rotate(-Math.PI/2);
+    ctx.fillText('← Lower priority     Higher priority →',0,0);ctx.restore();
+    // grid
+    for(let i=1;i<=4;i++){
+      const x=padL+(i/4)*gW,y=padT+(i/4)*gH;
+      ctx.strokeStyle='rgba(255,255,255,.03)';ctx.lineWidth=.6;
+      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+gW,y);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(x,padT);ctx.lineTo(x,padT+gH);ctx.stroke();
+    }
+    themes.forEach((t,i)=>{
+      const delay=i*0.12;
+      const bp=Math.max(0,Math.min(1,(p-delay)/(1-delay)));
+      if(bp<=0)return;
+      const [r,g,b]=t.r;
+      const bx=padL+(t.freq/100)*gW;
+      const by=padT+gH-(t.priority/100)*gH;
+      const size=12+bp*10;
+      // glow
+      const grd=ctx.createRadialGradient(bx,by,0,bx,by,size*2.2);
+      grd.addColorStop(0,`rgba(${r},${g},${b},.15)`);grd.addColorStop(1,'transparent');
+      ctx.beginPath();ctx.arc(bx,by,size*2.2,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();
+      // bubble
+      ctx.beginPath();ctx.arc(bx,by,size*bp,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${r},${g},${b},.55)`;ctx.fill();
+      ctx.strokeStyle=`rgba(${r},${g},${b},.9)`;ctx.lineWidth=1.5;ctx.stroke();
+      // label
+      if(bp>.7){
+        ctx.font='8px Outfit,sans-serif';ctx.fillStyle=`rgba(${r},${g},${b},.85)`;ctx.textAlign='center';
+        t.label.split('\n').forEach((ln,li)=>ctx.fillText(ln,bx,by+size*bp+11+li*9));
+      }
+    });
+    if(p<1)requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function drawLSTMChart(ctx, W, H, actual, pred, upper, lower, dur){
+  const padL=50,padR=16,padT=28,padB=28;
+  const gW=W-padL-padR,gH=H-padT-padB;
+  const n=actual.length,pStart=n-pred.length;
+  const allV=[...actual,...upper,...lower].filter(v=>v!==undefined);
+  const minV=Math.min(...allV)*0.99,maxV=Math.max(...allV)*1.01;
+  const sx=i=>padL+(i/(n-1))*gW;
+  const sy=v=>padT+gH-((v-minV)/(maxV-minV))*gH;
+  const start=performance.now();
+  function frame(now){
+    const p=easeOutCubic(Math.min((now-start)/dur,1));
+    ctx.clearRect(0,0,W,H);
+    // grid
+    for(let i=0;i<=4;i++){
+      const y=padT+i*(gH/4);
+      ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=.7;
+      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+gW,y);ctx.stroke();
+      const val=maxV-(i/4)*(maxV-minV);
+      ctx.fillStyle='rgba(77,81,88,.4)';ctx.font='8px JetBrains Mono,monospace';ctx.textAlign='right';
+      ctx.fillText('$'+Math.round(val/1000)+'k',padL-4,y+3);
+    }
+    const maxAct=Math.max(1,Math.floor(p*n));
+    // uncertainty band
+    if(p>0.6&&pred.length>0){
+      const bandStart=pStart;const bandEnd=Math.min(n-1,Math.floor(p*n));
+      ctx.beginPath();
+      ctx.moveTo(sx(bandStart),sy(upper[0]));
+      for(let i=1;i<=bandEnd-bandStart&&i<upper.length;i++)ctx.lineTo(sx(bandStart+i),sy(upper[i]));
+      for(let i=Math.min(bandEnd-bandStart,lower.length-1);i>=0;i--)ctx.lineTo(sx(bandStart+i),sy(lower[i]));
+      ctx.closePath();ctx.fillStyle='rgba(176,122,138,.08)';ctx.fill();
+    }
+    // actual line
+    ctx.beginPath();
+    for(let i=0;i<Math.min(maxAct,pStart+1);i++){i===0?ctx.moveTo(sx(i),sy(actual[i])):ctx.lineTo(sx(i),sy(actual[i]));}
+    ctx.strokeStyle='rgba(201,169,110,.85)';ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+    // prediction line (dashed)
+    if(p>0.6&&pred.length>0){
+      const pMax=Math.min(pred.length-1,Math.floor((p-0.6)/0.4*pred.length));
+      ctx.beginPath();ctx.moveTo(sx(pStart),sy(actual[pStart]));
+      for(let i=0;i<=pMax;i++)ctx.lineTo(sx(pStart+i),sy(pred[i]));
+      ctx.setLineDash([5,3]);ctx.strokeStyle='rgba(176,122,138,.85)';ctx.lineWidth=2;ctx.stroke();ctx.setLineDash([]);
+    }
+    // divider
+    if(p>0.5){
+      ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+      ctx.beginPath();ctx.moveTo(sx(pStart),padT);ctx.lineTo(sx(pStart),padT+gH);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='rgba(168,159,147,.4)';ctx.font='8px JetBrains Mono,monospace';ctx.textAlign='center';
+      ctx.fillText('Forecast →',sx(pStart)+28,padT+10);
+    }
+    // legend
+    ctx.fillStyle='rgba(201,169,110,.75)';ctx.font='9px JetBrains Mono,monospace';ctx.textAlign='left';ctx.fillText('▬ Actual',padL,padT-10);
+    ctx.fillStyle='rgba(176,122,138,.75)';ctx.fillText('╌ LSTM Prediction',padL+64,padT-10);
+    if(p<1)requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function drawROCAnimated(ctx, W, H, dur){
+  const pad=24;const S=Math.min(W,H)-pad*2;const ox=pad,oy=pad;
+  const rocPts=[[0,0],[.015,.3],[.04,.55],[.08,.73],[.14,.84],[.22,.91],[.35,.955],[.55,.975],[.8,.99],[1,1]];
+  const basePts=[[0,0],[1,1]];
+  // threshold 0.42 position on curve ~FPR=0.05, TPR=0.847
+  const tPt=[.05,.847];
+  const start=performance.now();
+  function frame(now){
+    const p=easeOutCubic(Math.min((now-start)/dur,1));
+    ctx.clearRect(0,0,W,H);
+    // axes
+    ctx.strokeStyle='rgba(201,169,110,.2)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ox,oy+S);ctx.lineTo(ox+S,oy+S);ctx.stroke();
+    // diagonal
+    ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(ox,oy+S);ctx.lineTo(ox+S,oy);ctx.stroke();ctx.setLineDash([]);
+    // axis labels
+    ctx.fillStyle='rgba(168,159,147,.5)';ctx.font='8px JetBrains Mono,monospace';
+    ctx.textAlign='center';ctx.fillText('False Positive Rate →',ox+S/2,oy+S+16);
+    ctx.save();ctx.translate(10,oy+S/2);ctx.rotate(-Math.PI/2);ctx.fillText('True Positive Rate →',0,0);ctx.restore();
+    // ROC curve animated
+    const nDraw=Math.max(2,Math.floor(p*(rocPts.length-1)));
+    const grd=ctx.createLinearGradient(ox,oy+S,ox+S,oy);
+    grd.addColorStop(0,'rgba(201,169,110,.5)');grd.addColorStop(1,'rgba(74,156,120,.9)');
+    // fill under curve
+    ctx.beginPath();ctx.moveTo(ox,oy+S);
+    for(let i=0;i<=nDraw;i++)ctx.lineTo(ox+rocPts[i][0]*S,oy+S-rocPts[i][1]*S);
+    ctx.lineTo(ox+rocPts[nDraw][0]*S,oy+S);ctx.closePath();
+    ctx.fillStyle='rgba(74,156,120,.05)';ctx.fill();
+    // curve line
+    ctx.beginPath();
+    for(let i=0;i<=nDraw;i++){const[fx,fy]=rocPts[i];i===0?ctx.moveTo(ox+fx*S,oy+S-fy*S):ctx.lineTo(ox+fx*S,oy+S-fy*S);}
+    ctx.strokeStyle=grd;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+    // threshold dot
+    if(p>0.7){
+      const alpha=(p-0.7)/0.3;
+      const tx=ox+tPt[0]*S,ty=oy+S-tPt[1]*S;
+      // pulse
+      ctx.beginPath();ctx.arc(tx,ty,8,0,Math.PI*2);
+      ctx.fillStyle=`rgba(201,169,110,${alpha*0.15})`;ctx.fill();
+      ctx.beginPath();ctx.arc(tx,ty,4,0,Math.PI*2);
+      ctx.fillStyle=`rgba(201,169,110,${alpha})`;ctx.fill();
+      // label
+      ctx.fillStyle=`rgba(201,169,110,${alpha})`;ctx.font='bold 9px JetBrains Mono,monospace';ctx.textAlign='left';
+      ctx.fillText('threshold=0.42',tx+8,ty-5);
+      ctx.fillStyle=`rgba(168,159,147,${alpha*0.7})`;ctx.font='8px JetBrains Mono,monospace';
+      ctx.fillText('Recall=0.847 · Precision=0.907',tx+8,ty+7);
+    }
+    // AUC label
+    if(p>0.5){
+      ctx.fillStyle=`rgba(74,156,120,${(p-0.5)/0.5})`;ctx.font='bold 11px JetBrains Mono,monospace';ctx.textAlign='left';
+      ctx.fillText('AUC = 0.964',ox+4,oy+16);
+    }
+    if(p<1)requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function drawPRAnimated(ctx, W, H, dur){
+  const pad=24;const S=Math.min(W,H)-pad*2;const ox=pad,oy=pad;
+  const prPts=[[0,1],[.08,.985],[.18,.97],[.32,.95],[.5,.92],[.65,.88],[.78,.82],[.88,.73],[.95,.61],[1,.52]];
+  const basePts2=[[0,.7],[1,.7]];
+  const start=performance.now();
+  function frame(now){
+    const p=easeOutCubic(Math.min((now-start)/dur,1));
+    ctx.clearRect(0,0,W,H);
+    // axes
+    ctx.strokeStyle='rgba(201,169,110,.2)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ox,oy+S);ctx.lineTo(ox+S,oy+S);ctx.stroke();
+    // baseline (random classifier)
+    ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(ox,oy+S-basePts2[0][1]*S);ctx.lineTo(ox+S,oy+S-basePts2[1][1]*S);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(168,159,147,.4)';ctx.font='8px JetBrains Mono,monospace';ctx.textAlign='right';
+    ctx.fillText('baseline',ox+S,oy+S-basePts2[0][1]*S-4);
+    // axis labels
+    ctx.fillStyle='rgba(168,159,147,.5)';ctx.textAlign='center';ctx.fillText('Recall →',ox+S/2,oy+S+16);
+    ctx.save();ctx.translate(10,oy+S/2);ctx.rotate(-Math.PI/2);ctx.fillText('Precision →',0,0);ctx.restore();
+    // PR curve
+    const nDraw=Math.max(2,Math.floor(p*(prPts.length-1)));
+    // fill
+    ctx.beginPath();ctx.moveTo(ox,oy+S-S);
+    for(let i=0;i<=nDraw;i++)ctx.lineTo(ox+prPts[i][0]*S,oy+S-prPts[i][1]*S);
+    ctx.lineTo(ox+prPts[nDraw][0]*S,oy+S);ctx.lineTo(ox,oy+S);ctx.closePath();
+    ctx.fillStyle='rgba(201,169,110,.06)';ctx.fill();
+    // XGBoost line
+    const grd2=ctx.createLinearGradient(ox,0,ox+S,0);grd2.addColorStop(0,'rgba(201,169,110,.9)');grd2.addColorStop(1,'rgba(201,169,110,.4)');
+    ctx.beginPath();
+    for(let i=0;i<=nDraw;i++){const[fx,fy]=prPts[i];i===0?ctx.moveTo(ox+fx*S,oy+S-fy*S):ctx.lineTo(ox+fx*S,oy+S-fy*S);}
+    ctx.strokeStyle=grd2;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+    // logistic baseline (lower)
+    if(p>0.4){
+      const lrPts=[[0,.95],[.2,.93],[.4,.88],[.6,.78],[.8,.62],[1,.45]];
+      const nLR=Math.max(2,Math.floor((p-0.4)/0.6*(lrPts.length-1)));
+      ctx.beginPath();
+      for(let i=0;i<=nLR;i++){const[fx,fy]=lrPts[i];i===0?ctx.moveTo(ox+fx*S,oy+S-fy*S):ctx.lineTo(ox+fx*S,oy+S-fy*S);}
+      ctx.setLineDash([4,3]);ctx.strokeStyle='rgba(123,159,196,.6)';ctx.lineWidth=1.8;ctx.stroke();ctx.setLineDash([]);
+    }
+    // AP label
+    if(p>0.5){
+      ctx.fillStyle=`rgba(201,169,110,${(p-.5)/.5})`;ctx.font='bold 11px JetBrains Mono,monospace';ctx.textAlign='left';
+      ctx.fillText('AP = 0.921 (XGBoost)',ox+4,oy+16);
+      if(p>0.6){ctx.fillStyle=`rgba(123,159,196,${(p-.6)/.4*.7})`;ctx.font='9px JetBrains Mono,monospace';ctx.fillText('AP = 0.843 (Logistic)',ox+4,oy+30);}
+    }
+    if(p<1)requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ── SCROLL OBSERVER: draw all hg-wraps on scroll ── */
+(function initScrollGraphs(){
+  function drawWrap(wrap){
+    if(wrap.dataset.drawn)return;
+    wrap.dataset.drawn='1';
+    wrap.classList.add('hg-drawn');
+    const loading=wrap.querySelector('.hg-loading');
+    if(loading)loading.style.display='none';
+    const key=wrap.dataset.graph;
+    const canvas=wrap.querySelector('.hg-canvas');
+    if(!canvas||!GRAPHS[key])return;
+    // Use actual rendered size, fall back to sensible defaults
+    const W=Math.max(wrap.offsetWidth||0, wrap.getBoundingClientRect().width||0, 300);
+    const H=Math.max(wrap.offsetHeight||0, wrap.getBoundingClientRect().height||0, 140);
+    canvas.width=W;canvas.height=H;
+    setTimeout(()=>GRAPHS[key](canvas,W,H), 60);
+  }
+
+  const wrapObs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting) drawWrap(e.target);
+    });
+  // threshold:0 fires as soon as even 1px is visible — works in iframes/preview panes
+  },{threshold:0, rootMargin:'0px 0px 100px 0px'});
+
+  document.querySelectorAll('.hg-wrap').forEach(w=>wrapObs.observe(w));
+
+  // Also draw everything already in viewport on page load (handles preview iframes)
+  window.addEventListener('load', ()=>{
+    setTimeout(()=>{
+      document.querySelectorAll('.hg-wrap').forEach(wrap=>{
+        const rect=wrap.getBoundingClientRect();
+        if(rect.top < window.innerHeight + 200){
+          drawWrap(wrap);
+        }
+      });
+    }, 300);
+  });
+
+  // Redraw on resize
+  let resizeTimer;
+  window.addEventListener('resize',()=>{
+    clearTimeout(resizeTimer);
+    resizeTimer=setTimeout(()=>{
+      document.querySelectorAll('.hg-wrap[data-drawn]').forEach(wrap=>{
+        const key=wrap.dataset.graph;
+        const canvas=wrap.querySelector('.hg-canvas');
+        if(!canvas||!GRAPHS[key])return;
+        const W=Math.max(wrap.offsetWidth||0,300);
+        const H=Math.max(wrap.offsetHeight||0,140);
+        canvas.width=W;canvas.height=H;
+        GRAPHS[key](canvas,W,H);
+      });
+    },200);
+  });
+})();
 </script>
 
 <!-- THREE.JS for 3D Globe -->
@@ -1600,155 +2107,192 @@ const scObs=new IntersectionObserver(entries=>{
 const ss=document.getElementById('scatter-section');if(ss)scObs.observe(ss);
 
 /* ══════════════════════
-   VIZ 1: 3D GLOBE
+   VIZ 1: 3D GLOBE — with animated data particles
    ══════════════════════ */
 (function initGlobe(){
   const canvas=document.getElementById('globe-canvas');
   if(!canvas||typeof THREE==='undefined')return;
 
-  const W=canvas.parentElement.offsetWidth||600,H=420;
+  const W=canvas.parentElement.offsetWidth||900,H=460;
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
   renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.setClearColor(0x000000,0);
 
   const scene=new THREE.Scene();
-  const camera=new THREE.PerspectiveCamera(45,W/H,.1,100);
-  camera.position.set(0,0,2.8);
+  const camera=new THREE.PerspectiveCamera(42,W/H,.1,100);
+  camera.position.set(0,0,2.7);
 
   /* Sphere */
   const geo=new THREE.SphereGeometry(1,64,64);
-  const mat=new THREE.MeshPhongMaterial({color:0x0c0d0e,emissive:0x0a0f14,shininess:30,transparent:true,opacity:.95});
+  const mat=new THREE.MeshPhongMaterial({color:0x0c0e10,emissive:0x050a12,shininess:25,transparent:true,opacity:.97});
   const globe=new THREE.Mesh(geo,mat);scene.add(globe);
 
-  /* Wireframe overlay */
-  const wireMat=new THREE.MeshBasicMaterial({color:0x1a2030,wireframe:true,transparent:true,opacity:.18});
-  const wire=new THREE.Mesh(new THREE.SphereGeometry(1.001,32,32),wireMat);scene.add(wire);
+  /* Lat/lon grid lines */
+  for(let lat=-60;lat<=60;lat+=30){
+    const phi=(90-lat)*Math.PI/180;
+    const pts=[];
+    for(let lon=0;lon<=360;lon+=4){
+      const theta=lon*Math.PI/180;
+      pts.push(new THREE.Vector3(-Math.sin(phi)*Math.cos(theta),Math.cos(phi),Math.sin(phi)*Math.sin(theta)).multiplyScalar(1.002));
+    }
+    const lineGeo=new THREE.BufferGeometry().setFromPoints(pts);
+    scene.add(new THREE.Line(lineGeo,new THREE.LineBasicMaterial({color:0x1a2535,transparent:true,opacity:.25})));
+  }
+  for(let lon=0;lon<360;lon+=30){
+    const theta=lon*Math.PI/180;
+    const pts=[];
+    for(let lat=90;lat>=-90;lat-=4){
+      const phi=(90-lat)*Math.PI/180;
+      pts.push(new THREE.Vector3(-Math.sin(phi)*Math.cos(theta),Math.cos(phi),Math.sin(phi)*Math.sin(theta)).multiplyScalar(1.002));
+    }
+    const lineGeo=new THREE.BufferGeometry().setFromPoints(pts);
+    scene.add(new THREE.Line(lineGeo,new THREE.LineBasicMaterial({color:0x1a2535,transparent:true,opacity:.15})));
+  }
 
   /* Atmosphere glow */
-  const atmGeo=new THREE.SphereGeometry(1.06,64,64);
-  const atmMat=new THREE.MeshBasicMaterial({color:0x1a3a5c,transparent:true,opacity:.12,side:THREE.BackSide});
+  const atmGeo=new THREE.SphereGeometry(1.08,64,64);
+  const atmMat=new THREE.ShaderMaterial({
+    uniforms:{},
+    vertexShader:`varying vec3 vNormal;void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+    fragmentShader:`varying vec3 vNormal;void main(){float i=pow(0.7-dot(vNormal,vec3(0,0,1)),2.0);gl_FragColor=vec4(0.1,0.25,0.5,i*0.35);}`,
+    side:THREE.FrontSide,transparent:true,depthWrite:false
+  });
   scene.add(new THREE.Mesh(atmGeo,atmMat));
 
   /* Gold equator ring */
-  const ringGeo=new THREE.TorusGeometry(1.02,.003,16,200);
-  const ringMat=new THREE.MeshBasicMaterial({color:0xc9a96e,transparent:true,opacity:.35});
-  const ring=new THREE.Mesh(ringGeo,ringMat);scene.add(ring);
+  const ringGeo=new THREE.TorusGeometry(1.02,.0025,16,300);
+  const ring=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({color:0xc9a96e,transparent:true,opacity:.3}));
+  scene.add(ring);
 
-  /* Data points — lat/lon to 3D */
-  function latLonTo3D(lat,lon,r=1.03){
+  /* Lat/lon helper */
+  function latLonTo3D(lat,lon,r=1.028){
     const phi=(90-lat)*Math.PI/180,theta=(lon+180)*Math.PI/180;
     return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(theta),r*Math.cos(phi),r*Math.sin(phi)*Math.sin(theta));
   }
 
-  const dataPoints=[
-    {lat:51.5,lon:-.12,color:0xc9a96e,size:.028,label:'London'},
-    {lat:52.4,lon:-1.5,color:0xc9a96e,size:.022,label:'Coventry'},
-    {lat:53.5,lon:-2.2,color:0x7b9fc4,size:.018,label:'Manchester'},
-    {lat:55.8,lon:-4.2,color:0x7b9fc4,size:.016,label:'Glasgow'},
-    {lat:40.7,lon:-74,color:0x4a9c78,size:.016,label:'NY'},
-    {lat:37.8,lon:-122.4,color:0x4a9c78,size:.016,label:'SF'},
-    {lat:48.8,lon:2.35,color:0xd4954a,size:.016,label:'Paris'},
-    {lat:52.5,lon:13.4,color:0xd4954a,size:.016,label:'Berlin'},
-    {lat:35.6,lon:139.7,color:0xb07a8a,size:.014,label:'Tokyo'},
-    {lat:1.35,lon:103.8,color:0xb07a8a,size:.012,label:'Singapore'},
-    {lat:-33.9,lon:18.4,color:0x7b9fc4,size:.012,label:'Cape Town'},
-    {lat:-23.5,lon:-46.6,color:0x4a9c78,size:.012,label:'São Paulo'},
+  /* City pins */
+  const cities=[
+    {lat:51.5,lon:-.12,color:0xc9a96e,size:.022,label:'London · HQ'},
+    {lat:52.4,lon:-1.5,color:0xc9a96e,size:.018,label:'Coventry · Base'},
+    {lat:53.5,lon:-2.2,color:0x7b9fc4,size:.014,label:'Manchester'},
+    {lat:40.7,lon:-74,color:0x4a9c78,size:.013,label:'New York'},
+    {lat:37.8,lon:-122.4,color:0x4a9c78,size:.012,label:'San Francisco'},
+    {lat:48.8,lon:2.35,color:0xd4954a,size:.013,label:'Paris'},
+    {lat:52.5,lon:13.4,color:0xd4954a,size:.012,label:'Berlin'},
+    {lat:35.6,lon:139.7,color:0xb07a8a,size:.011,label:'Tokyo'},
+    {lat:1.35,lon:103.8,color:0xb07a8a,size:.010,label:'Singapore'},
+    {lat:-23.5,lon:-46.6,color:0x4a9c78,size:.010,label:'São Paulo'},
+    {lat:55.8,lon:-4.2,color:0x7b9fc4,size:.012,label:'Glasgow'},
   ];
-
-  dataPoints.forEach(dp=>{
-    const pos=latLonTo3D(dp.lat,dp.lon);
-    const dotGeo=new THREE.SphereGeometry(dp.size,8,8);
-    const dotMat=new THREE.MeshBasicMaterial({color:dp.color});
-    const dot=new THREE.Mesh(dotGeo,dotMat);
-    dot.position.copy(pos);scene.add(dot);
-    /* Pulse ring */
-    const pGeo=new THREE.RingGeometry(dp.size*1.4,dp.size*1.9,16);
-    const pMat=new THREE.MeshBasicMaterial({color:dp.color,transparent:true,opacity:.5,side:THREE.DoubleSide});
-    const pulse=new THREE.Mesh(pGeo,pMat);
-    pulse.position.copy(pos);pulse.lookAt(0,0,0);
-    pulse.userData={baseOpacity:.5,phase:Math.random()*Math.PI*2};
-    scene.add(pulse);
+  const dotMeshes=[];
+  cities.forEach(c=>{
+    const pos=latLonTo3D(c.lat,c.lon);
+    const dot=new THREE.Mesh(new THREE.SphereGeometry(c.size,8,8),new THREE.MeshBasicMaterial({color:c.color}));
+    dot.position.copy(pos);dot.userData={basePos:pos.clone(),phase:Math.random()*Math.PI*2};
+    scene.add(dot);dotMeshes.push(dot);
+    // pulse ring
+    const pr=new THREE.Mesh(new THREE.RingGeometry(c.size*1.5,c.size*2.2,16),new THREE.MeshBasicMaterial({color:c.color,transparent:true,opacity:.4,side:THREE.DoubleSide}));
+    pr.position.copy(pos);pr.lookAt(0,0,0);pr.userData={isPulse:true,phase:Math.random()*Math.PI*2};
+    scene.add(pr);
   });
 
-  /* Great circle arcs between key points */
-  function addArc(p1,p2,color=0xc9a96e,opacity=.4){
-    const v1=latLonTo3D(...p1),v2=latLonTo3D(...p2);
-    const pts=[];const segs=60;
-    for(let i=0;i<=segs;i++){
-      const t=i/segs;
+  /* Arc paths */
+  const arcDefs=[
+    {p1:[51.5,-.12],p2:[40.7,-74],color:0xc9a96e},
+    {p1:[51.5,-.12],p2:[48.8,2.35],color:0x7b9fc4},
+    {p1:[52.4,-1.5],p2:[53.5,-2.2],color:0xc9a96e},
+    {p1:[51.5,-.12],p2:[35.6,139.7],color:0x4a9c78},
+    {p1:[40.7,-74],p2:[37.8,-122.4],color:0x4a9c78},
+    {p1:[51.5,-.12],p2:[1.35,103.8],color:0xd4954a},
+    {p1:[48.8,2.35],p2:[52.5,13.4],color:0x7b9fc4},
+  ];
+
+  /* Build arc geometry + particle system */
+  const arcGroups=[];
+  arcDefs.forEach(def=>{
+    const v1=latLonTo3D(...def.p1,1.03),v2=latLonTo3D(...def.p2,1.03);
+    const pts=[];
+    for(let i=0;i<=80;i++){
+      const t=i/80;
       const v=new THREE.Vector3().lerpVectors(v1,v2,t);
-      v.normalize().multiplyScalar(1.04+Math.sin(t*Math.PI)*.08);
+      v.normalize().multiplyScalar(1.035+Math.sin(t*Math.PI)*.12);
       pts.push(v);
     }
+    // arc tube
     const curve=new THREE.CatmullRomCurve3(pts);
-    const arcGeo=new THREE.TubeGeometry(curve,60,.0025,4,false);
-    const arcMat=new THREE.MeshBasicMaterial({color,transparent:true,opacity});
-    scene.add(new THREE.Mesh(arcGeo,arcMat));
-  }
-  addArc([51.5,-.12],[40.7,-74],0xc9a96e,.5);
-  addArc([51.5,-.12],[48.8,2.35],0x7b9fc4,.4);
-  addArc([52.4,-1.5],[53.5,-2.2],0xc9a96e,.6);
-  addArc([51.5,-.12],[35.6,139.7],0x4a9c78,.25);
-  addArc([40.7,-74],[37.8,-122.4],0x4a9c78,.3);
+    const tubeMat=new THREE.MeshBasicMaterial({color:def.color,transparent:true,opacity:.2});
+    scene.add(new THREE.Mesh(new THREE.TubeGeometry(curve,80,.0018,4,false),tubeMat));
+    // particle along arc
+    const pGeo=new THREE.SphereGeometry(.006,6,6);
+    const pMat=new THREE.MeshBasicMaterial({color:def.color,transparent:true,opacity:.9});
+    const particle=new THREE.Mesh(pGeo,pMat);
+    particle.userData={curve,t:Math.random(),speed:.0018+Math.random()*.001,color:def.color};
+    scene.add(particle);arcGroups.push(particle);
+  });
 
   /* Lights */
-  scene.add(new THREE.AmbientLight(0xffffff,.3));
-  const dLight=new THREE.DirectionalLight(0xc9a96e,.8);dLight.position.set(2,1,3);scene.add(dLight);
-  const dLight2=new THREE.DirectionalLight(0x7b9fc4,.4);dLight2.position.set(-2,-1,-2);scene.add(dLight2);
+  scene.add(new THREE.AmbientLight(0xffffff,.25));
+  const dl1=new THREE.DirectionalLight(0xc9a96e,.9);dl1.position.set(3,2,4);scene.add(dl1);
+  const dl2=new THREE.DirectionalLight(0x7b9fc4,.35);dl2.position.set(-3,-1,-2);scene.add(dl2);
+  const pl=new THREE.PointLight(0x4a9c78,.4,6);pl.position.set(-1,1,2);scene.add(pl);
 
-  /* Mouse drag */
-  let isDragging=false,prevMouse={x:0,y:0},rotY=0,rotX=0,velX=0,velY=0;
-  canvas.addEventListener('mousedown',e=>{isDragging=true;prevMouse={x:e.clientX,y:e.clientY};velX=velY=0});
-  window.addEventListener('mouseup',()=>isDragging=false);
+  /* Drag */
+  let isDragging=false,prevMouse={x:0,y:0},rotY=.4,rotX=0,velX=0,velY=0;
+  canvas.addEventListener('mousedown',e=>{isDragging=true;prevMouse={x:e.clientX,y:e.clientY};velX=velY=0;canvas.style.cursor='grabbing'});
+  window.addEventListener('mouseup',()=>{isDragging=false;canvas.style.cursor='grab'});
   window.addEventListener('mousemove',e=>{
     if(!isDragging)return;
     const dx=e.clientX-prevMouse.x,dy=e.clientY-prevMouse.y;
-    velX=dx*.003;velY=dy*.003;
-    rotY+=velX;rotX+=velY;
-    rotX=Math.max(-.8,Math.min(.8,rotX));
+    velX=dx*.003;velY=dy*.0025;rotY+=velX;rotX=Math.max(-.7,Math.min(.7,rotX+velY));
     prevMouse={x:e.clientX,y:e.clientY};
   });
-
-  /* Touch */
   let prevTouch=null;
   canvas.addEventListener('touchstart',e=>{prevTouch=e.touches[0];velX=velY=0},{passive:true});
   canvas.addEventListener('touchmove',e=>{
-    if(!prevTouch)return;
-    const t=e.touches[0];const dx=t.clientX-prevTouch.clientX,dy=t.clientY-prevTouch.clientY;
-    velX=dx*.003;velY=dy*.003;
-    rotY+=velX;rotX+=velY;rotX=Math.max(-.8,Math.min(.8,rotX));prevTouch=t;
+    if(!prevTouch)return;const t=e.touches[0];
+    velX=(t.clientX-prevTouch.clientX)*.003;velY=(t.clientY-prevTouch.clientY)*.0025;
+    rotY+=velX;rotX=Math.max(-.7,Math.min(.7,rotX+velY));prevTouch=t;
   },{passive:true});
   canvas.addEventListener('touchend',()=>prevTouch=null);
 
-  let t=0;
+  let tick=0;
   function animate(){
-    requestAnimationFrame(animate);t+=.008;
-    if(!isDragging){velX*=.95;velY*=.95;rotY+=velX||.004;rotX+=velY;}
-    globe.rotation.y=rotY;globe.rotation.x=rotX;
-    wire.rotation.y=rotY;wire.rotation.x=rotX;
-    ring.rotation.y=rotY+.3;ring.rotation.x=rotX;
-    /* pulse rings */
+    requestAnimationFrame(animate);tick+=.007;
+    if(!isDragging){velX*=.94;velY*=.94;rotY+=velX+.0035;rotX+=velY;}
+    const rot=new THREE.Euler(rotX,rotY,0);
+    globe.rotation.copy(rot);ring.rotation.copy(rot);
+
+    /* rotate city dots + pulse rings with globe */
     scene.children.forEach(c=>{
-      if(c.userData.phase!==undefined){
+      if(c.userData.isPulse){
+        c.rotation.copy(rot);
         const ph=c.userData.phase;
-        c.material.opacity=.15+.4*(.5+.5*Math.sin(t*2+ph));
-        const s=1+.3*(.5+.5*Math.sin(t*2+ph));
-        c.scale.setScalar(s);
-        c.rotation.y=rotY;c.rotation.x=rotX;
+        c.material.opacity=.1+.35*(.5+.5*Math.sin(tick*1.8+ph));
+        const s=1+.45*(.5+.5*Math.sin(tick*1.8+ph));c.scale.setScalar(s);
+      }
+      if(c.userData.basePos){
+        const pos=c.userData.basePos.clone().applyEuler(rot);
+        c.position.copy(pos);
       }
     });
-    /* datapoints rotate with globe */
-    scene.children.forEach(c=>{
-      if(c.userData.phase===undefined&&c.geometry&&c.geometry.type==='SphereGeometry'&&c!==globe&&c.geometry.parameters&&c.geometry.parameters.widthSegments===8){
-        c.rotation.y=rotY;c.rotation.x=rotX;
-      }
+
+    /* animate particles along arcs */
+    arcGroups.forEach(p=>{
+      p.userData.t=(p.userData.t+p.userData.speed)%1;
+      const pos=p.userData.curve.getPoint(p.userData.t);
+      pos.applyEuler(rot);
+      p.position.copy(pos);
+      // fade in/out at ends
+      const alpha=Math.sin(p.userData.t*Math.PI);
+      p.material.opacity=alpha*.9+.05;
     });
+
     renderer.render(scene,camera);
   }
   animate();
 
   window.addEventListener('resize',()=>{
-    const nW=canvas.parentElement.offsetWidth||600;
+    const nW=canvas.parentElement.offsetWidth||900;
     renderer.setSize(nW,H);camera.aspect=nW/H;camera.updateProjectionMatrix();
   });
 })();
