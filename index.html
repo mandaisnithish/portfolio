@@ -2,797 +2,446 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <title>Nithish Kaliannan Ananth · Data Scientist</title>
 <meta name="description" content="Data scientist working on decision-focused analytics. BSc Data Science, First Class. Currently an engineer intern working on test and measurement software. Open to graduate roles in the UK."/>
 <meta name="color-scheme" content="dark"/>
+<meta name="theme-color" content="#121314"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Martian+Mono:wght@400;500&family=Schibsted+Grotesk:wght@600;700;800&display=swap" rel="stylesheet"/>
 <style>
-/* ═══════════════════════════════════════════════
-   TOKENS — one source of truth.
-   Every colour used anywhere (CSS *and* canvas)
-   is declared here and read back via getComputedStyle.
-   ═══════════════════════════════════════════════ */
+/* Tokens. Every colour used in CSS, the canvas charts and the 3D chip is declared here. */
 :root{
-  --bg:#0c0d0e;
-  --bg-raised:#111315;
-  --bg-inset:#161819;
+  --bg:#121314;
+  --bg-raised:#18191b;
+  --bg-sunk:#0d0e0f;
+  --panel:rgba(18,19,20,.95);
+  --line:#2c2f33;
+  --line-strong:#43474d;
 
-  --gold:#c9a96e;          /* primary accent */
-  --slate:#7b9fc4;         /* secondary / comparison series */
-  --sage:#4a9c78;          /* positive outcome */
-  --amber:#d4954a;         /* caution / highlight */
-  --rose:#b07a8a;          /* tertiary series */
-  --alert:#d44a4a;         /* failure / cost */
+  --text:#ecebe8;
+  --text-2:#b8b9bb;
+  --text-3:#8e9196;
 
-  --gold-wash:rgba(201,169,110,.06);
-  --gold-line:rgba(201,169,110,.14);
-  --gold-line-strong:rgba(201,169,110,.30);
+  --copper:#d98c55;
+  --copper-hi:#e8a678;
+  --copper-ink:#121314;
 
-  --text:#e6dfd4;
-  --text-2:#a89f93;
-  --text-3:#6c717a;
+  --data-blue:#7aa6dc;
+  --data-orange:#f08046;
+  --data-mid:#2b2f35;
 
-  --surface:rgba(17,19,21,.72);
-  --surface-solid:#111315;
-  --hairline:rgba(201,169,110,.10);
+  /* silicon tones for the chip */
+  --si-die:#262b31;
+  --si-cpu:#3a4250;
+  --si-sram:#33404e;
+  --si-npu:#2f3946;
+  --si-cache:#3a4250;
+  --si-rom:#353c46;
+  --si-pad:#6b6f75;
+  --si-lid:#8b8f95;
+  --si-sub:#1c1d1f;
 
-  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-  --sans:'Outfit',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --display:'Syne',var(--sans);
+  --mono:'Martian Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'Atkinson Hyperlegible Next','Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --display:'Schibsted Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;
 
   --ease:cubic-bezier(.16,1,.3,1);
-
-  --shell:min(1180px,100% - 5rem);
-  --gap:clamp(1rem,2vw,1.5rem);
-  --section-y:clamp(4.5rem,9vw,8rem);
+  --shell:min(1280px,100% - 2.5rem);
+  --col:min(640px,46vw);
+  --bar-h:3.5rem;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-html{scroll-behavior:smooth;scroll-padding-top:5rem}
-
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--bar-h) + 1rem)}
 body{
-  background:var(--bg);
-  color:var(--text);
-  font:300 100%/1.7 var(--sans);
-  overflow-x:hidden;
+  background:var(--bg);color:var(--text);
+  font:400 1.0625rem/1.65 var(--sans);
   -webkit-font-smoothing:antialiased;
+  caret-color:var(--copper);
+  scrollbar-color:var(--line-strong) var(--bg-sunk);
 }
-
-/* ── Keyboard access ── */
-:focus-visible{
-  outline:2px solid var(--gold);
-  outline-offset:3px;
-  border-radius:3px;
-}
+::selection{background:var(--copper);color:var(--copper-ink)}
+a{color:inherit;text-underline-offset:.22em;text-decoration-thickness:1px}
+:focus-visible{outline:2px solid var(--copper);outline-offset:3px;border-radius:1px}
 .skip{
   position:absolute;left:1rem;top:-4rem;z-index:300;
-  background:var(--gold);color:#0c0d0e;font:500 .85rem var(--sans);
-  padding:.6rem 1.1rem;border-radius:5px;text-decoration:none;
-  transition:top .18s var(--ease);
+  background:var(--copper);color:var(--copper-ink);font:700 .9rem var(--sans);
+  padding:.6rem 1.1rem;text-decoration:none;transition:top .18s var(--ease);
 }
 .skip:focus{top:1rem}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-/* ═══════════ TYPE SCALE ═══════════
-   Tracking is size-specific: large display text gets
-   negative tracking, body sits near zero, small mono
-   text gets a positive bump for legibility. */
-h1,h2,h3,h4{font-family:var(--display);font-weight:800;text-wrap:balance}
+h1,h2,h3{font-family:var(--display);font-weight:700;text-wrap:balance;letter-spacing:-.02em;line-height:1.1}
+h2{font-size:clamp(1.75rem,3vw,2.5rem);font-weight:800;letter-spacing:-.03em}
+h3{font-size:1.15rem;letter-spacing:-.012em}
+p{max-width:68ch}
+strong{font-weight:700;color:var(--text)}
+.out-val,.fi-val,.cm-cell b,.role-when,.metrics,.pad-val{font-variant-numeric:tabular-nums}
+.lede{color:var(--text-2);margin-bottom:2rem}
 
-.t-display{
-  font-size:clamp(2.9rem,7.5vw,6.2rem);
-  line-height:.94;
-  letter-spacing:-.038em;
-  font-optical-sizing:auto;
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;min-height:2.875rem;
+  padding:.7rem 1.35rem;text-decoration:none;
+  font:700 .95rem var(--sans);border:1px solid transparent;cursor:pointer;
+  transition:background-color .2s,border-color .2s,color .2s;
 }
-.t-section{
-  font-size:clamp(1.9rem,4vw,2.9rem);
-  line-height:1.08;
-  letter-spacing:-.026em;
-}
-.t-card{
-  font-size:1.05rem;
-  line-height:1.3;
-  letter-spacing:-.012em;
-  font-weight:700;
-}
-p{line-height:1.85}
-strong{color:var(--text);font-weight:500}
+.btn-copper{background:var(--copper);color:var(--copper-ink)}
+.btn-copper:hover{background:var(--copper-hi)}
+.btn-line{border-color:var(--line-strong);color:var(--text);background:var(--bg)}
+.btn-line:hover{border-color:var(--copper);color:var(--copper)}
 
-.eyebrow{
-  font:500 .68rem/1 var(--mono);
-  letter-spacing:.26em;            /* positive tracking, small size */
-  text-transform:uppercase;
-  color:var(--gold);
-  display:flex;align-items:center;gap:.7rem;
-  margin-bottom:.9rem;
+/* ═════ THE CHIP (fixed scene behind the page) ═════ */
+.scene{position:fixed;inset:0;z-index:0;width:100%;height:100%;overflow:hidden;background:var(--bg)}
+.scene canvas{display:block;width:100%;height:100%}
+.fallback{display:none;position:absolute;top:50%;left:25%;width:min(42vw,560px);transform:translate(-50%,-50%)}
+.no-3d .scene canvas{display:none}
+.no-3d .fallback{display:block}
+@media(max-width:999px){.fallback{left:50%;top:27%;width:min(80vw,420px)}}
+.fallback text{font-family:var(--mono);font-size:11px;fill:var(--text-2)}
+.chip-tip{
+  position:fixed;z-index:50;pointer-events:none;
+  font:400 .75rem var(--mono);color:var(--text);background:var(--bg-sunk);
+  border:1px solid var(--copper);padding:.3rem .55rem;white-space:nowrap;
+  transform:translate(14px,14px);
 }
-.eyebrow::before{content:'';width:26px;height:1px;background:var(--gold);flex:none}
+.chip-tip b{color:var(--copper);font-weight:500}
 
-.grad{
-  background:linear-gradient(115deg,var(--gold),var(--slate));
-  -webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;color:transparent;
-}
-h2 em{font-style:normal}
-
-.lede{color:var(--text-2);font-size:.95rem;max-width:52ch;margin-bottom:3rem}
-
-/* ═══════════ LAYOUT ═══════════ */
+main,footer{position:relative;z-index:1}
 .shell{width:var(--shell);margin-inline:auto}
-section{position:relative;z-index:2;padding-block:var(--section-y)}
-section + section{border-top:1px solid rgba(201,169,110,.05)}
 
-/* ── Persistent background ── */
-#bgCanvas{position:fixed;inset:0;z-index:0;opacity:.22;pointer-events:none}
-.grid-bg{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:
-    linear-gradient(rgba(201,169,110,.022) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(201,169,110,.022) 1px,transparent 1px);
-  background-size:84px 84px;
-  -webkit-mask-image:radial-gradient(ellipse 72% 72% at 50% 38%,#000,transparent);
-  mask-image:radial-gradient(ellipse 72% 72% at 50% 38%,#000,transparent);
-}
-.sec-glow{position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity 1.3s var(--ease)}
-section.in-view > .sec-glow{opacity:1}
-#about   > .sec-glow{background:radial-gradient(ellipse 78% 68% at 68% 50%,rgba(123,159,196,.045),transparent 70%)}
-#work    > .sec-glow{background:radial-gradient(ellipse 70% 60% at 22% 50%,rgba(201,169,110,.045),transparent 70%)}
-#projects> .sec-glow{background:radial-gradient(ellipse 84% 70% at 60% 40%,rgba(201,169,110,.035),transparent 70%)}
-#skills  > .sec-glow{background:radial-gradient(ellipse 70% 60% at 40% 60%,rgba(123,159,196,.04),transparent 70%)}
-
-/* ── Ambient marginalia ── */
-.amb{
-  position:absolute;pointer-events:none;z-index:1;user-select:none;
-  font:400 .72rem/1.6 var(--mono);letter-spacing:.04em;
-  max-width:23ch;color:rgba(201,169,110,.13);
-  animation:drift 20s ease-in-out infinite;
-}
-.amb.slate{color:rgba(123,159,196,.14)}
-.amb.sage{color:rgba(74,156,120,.12)}
-@keyframes drift{
-  0%,100%{transform:translate3d(0,0,0)}
-  33%{transform:translate3d(5px,-12px,0)}
-  66%{transform:translate3d(-4px,7px,0)}
-}
-@media(max-width:1000px){.amb{display:none}}
-
-/* ═══════════ NAV ═══════════ */
-nav{
+/* ═════ BOND-PAD BAR ═════ */
+.bar{
   position:fixed;inset:0 0 auto;z-index:100;
   display:flex;align-items:center;justify-content:space-between;gap:1rem;
-  padding:1rem clamp(1.25rem,3vw,2.5rem);
-  background:rgba(12,13,14,.72);
-  backdrop-filter:blur(24px) saturate(150%);
-  -webkit-backdrop-filter:blur(24px) saturate(150%);
-  border-bottom:1px solid transparent;
-  transition:background .3s var(--ease),border-color .3s,padding .3s var(--ease);
+  padding:env(safe-area-inset-top,0px) max(1.25rem,env(safe-area-inset-right)) 0 max(1.25rem,env(safe-area-inset-left));
+  height:calc(var(--bar-h) + env(safe-area-inset-top,0px));
+  background:var(--bg);border-bottom:1px solid var(--line);
 }
-nav.scrolled{background:rgba(12,13,14,.94);border-bottom-color:var(--hairline);padding-block:.7rem}
-.wordmark{font:500 .8rem var(--mono);letter-spacing:.14em;color:var(--gold);text-decoration:none}
-.navlinks{display:flex;gap:1.9rem;list-style:none}
-.navlinks a{
-  font:400 .7rem var(--mono);letter-spacing:.13em;text-transform:uppercase;
-  color:var(--text-3);text-decoration:none;position:relative;padding-block:.25rem;
-  transition:color .2s;
+.wordmark{font:500 .8rem var(--mono);color:var(--text);text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem}
+.wordmark::before{content:'';width:.7rem;height:.7rem;border:1px solid var(--copper);background:linear-gradient(var(--copper),var(--copper)) center/40% 40% no-repeat}
+.pads{display:flex;list-style:none;gap:.15rem}
+.pads a{
+  display:flex;align-items:center;gap:.5rem;min-height:2.75rem;padding:0 .7rem;
+  font:400 .75rem var(--mono);color:var(--text-2);text-decoration:none;transition:color .2s;
 }
-.navlinks a::after{
-  content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--gold);
-  transform:scaleX(0);transform-origin:left;transition:transform .25s var(--ease);
-}
-.navlinks a:hover{color:var(--gold)}
-.navlinks a:hover::after,.navlinks a[aria-current="true"]::after{transform:scaleX(1)}
-.navlinks a[aria-current="true"]{color:var(--text)}
-@media(max-width:920px){.navlinks{display:none}}
+.pads a::before{content:'';width:.55rem;height:.55rem;border:1px solid var(--line-strong);flex:none;transition:background-color .2s,border-color .2s}
+.pads a:hover{color:var(--text)}
+.pads a:hover::before{border-color:var(--copper)}
+.pads a[aria-current="true"]{color:var(--text)}
+.pads a[aria-current="true"]::before{background:var(--copper);border-color:var(--copper)}
+.pads .short{display:none}
+.bar .btn{min-height:2.375rem;padding:.4rem 1rem;font-size:.85rem}
 
-/* ═══════════ BUTTONS ═══════════ */
-.btn{
-  display:inline-flex;align-items:center;gap:.5rem;
-  padding:.78rem 1.7rem;border-radius:6px;text-decoration:none;
-  font:500 .88rem var(--sans);letter-spacing:.01em;border:1px solid transparent;
-  transition:transform .22s var(--ease),box-shadow .22s var(--ease),
-             background-color .22s,border-color .22s,color .22s;
-}
-.btn-primary{
-  background:var(--gold);color:#0c0d0e;font-weight:600;
-  box-shadow:0 3px 22px rgba(201,169,110,.16);
-}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 9px 30px rgba(201,169,110,.26);background:#d4b67c}
-.btn-primary:active{transform:translateY(0) scale(.985)}
-.btn-ghost{border-color:var(--gold-line);color:var(--text);background:rgba(201,169,110,.03)}
-.btn-ghost:hover{transform:translateY(-2px);border-color:var(--gold);color:var(--gold);background:var(--gold-wash)}
-.btn-ghost:active{transform:translateY(0) scale(.985)}
-.btn-nav{padding:.45rem 1.1rem;font:400 .72rem var(--mono);letter-spacing:.07em;
-  border-color:var(--gold-line);color:var(--gold);border-radius:4px}
-.btn-nav:hover{background:var(--gold-wash);border-color:var(--gold)}
-
-/* ═══════════ REVEAL ═══════════ */
-.rev{opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
-.rev.shown{opacity:1;transform:none}
-.rev-1.shown{transition-delay:.07s}
-.rev-2.shown{transition-delay:.14s}
-.rev-3.shown{transition-delay:.21s}
-
-/* ═══════════ HERO ═══════════ */
-#hero{
-  min-height:min(100svh,900px);
-  display:flex;align-items:center;
-  padding-block:8rem 5rem;
-  border-top:0;
-}
-#heroCanvas{position:absolute;inset:0;z-index:0;pointer-events:none}
-.hero-grid{
-  position:relative;z-index:2;
-  display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
-  gap:clamp(2rem,5vw,4.5rem);align-items:center;
-}
-@media(max-width:940px){.hero-grid{grid-template-columns:1fr}}
-
-.status{
-  display:inline-flex;align-items:center;gap:.55rem;
-  font:400 .68rem var(--mono);letter-spacing:.16em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:1.9rem;
-  padding:.4rem 1rem;border:1px solid var(--gold-line);border-radius:99px;
-  background:var(--gold-wash);
-}
-.pip{width:5px;height:5px;border-radius:50%;background:var(--gold);flex:none;animation:pulse 2.4s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.68)}}
-
-.hero-name{margin-bottom:.7rem}
-.hero-role{
-  font:600 clamp(1rem,2vw,1.35rem)/1.4 var(--display);
-  letter-spacing:-.01em;color:var(--text-2);margin-bottom:1.4rem;
-}
-.hero-role span{color:var(--text-3)}
-.hero-stmt{color:var(--text-2);font-size:1rem;max-width:50ch;margin-bottom:2.2rem}
-.hero-actions{display:flex;gap:.85rem;flex-wrap:wrap}
-
-.hero-stats{display:grid;gap:.75rem}
-.stat{
-  display:flex;align-items:center;gap:1rem;
-  padding:.85rem 1.2rem;border-radius:10px;
-  background:var(--surface);border:1px solid var(--hairline);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  position:relative;overflow:hidden;
-  transition:border-color .3s,transform .3s var(--ease);
-}
-.stat::before{content:'';position:absolute;inset:0 auto 0 0;width:2px;
-  background:linear-gradient(var(--gold),var(--slate))}
-.stat:hover{border-color:var(--gold-line-strong);transform:translateX(3px)}
-.stat-num{
-  font:800 1.6rem/1 var(--display);letter-spacing:-.03em;
-  color:var(--gold);min-width:3.2rem;font-variant-numeric:tabular-nums;
-}
-.stat-txt{font:400 .72rem/1.45 var(--mono);color:var(--text-3)}
-.stat-txt b{display:block;color:var(--gold);font-weight:400;font-size:.66rem;margin-top:.2rem}
-
-/* ═══════════ ABOUT ═══════════ */
-.about{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,4vw,3.5rem);align-items:start}
-@media(max-width:900px){.about{grid-template-columns:1fr}}
-.about p{color:var(--text-2);font-size:.96rem;margin-bottom:1.05rem}
-.inline-link{
-  color:var(--gold);text-decoration:none;font:400 .82rem var(--mono);
-  border-bottom:1px solid var(--gold-line);transition:border-color .2s,color .2s;
-}
-.inline-link:hover{border-bottom-color:var(--gold);color:#d9bd85}
-
-.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
-@media(max-width:520px){.card-grid{grid-template-columns:1fr}}
-.card{
-  background:var(--surface);border:1px solid var(--hairline);border-radius:11px;
-  padding:1.35rem;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  transition:border-color .3s,transform .32s var(--ease),box-shadow .32s var(--ease);
-}
-.card:hover{border-color:var(--gold-line-strong);transform:translateY(-3px);
-  box-shadow:0 14px 40px rgba(0,0,0,.32)}
-.card h3{font-size:.9rem;font-weight:700;margin-bottom:.35rem;letter-spacing:-.008em}
-.card p{font-size:.79rem;line-height:1.6;color:var(--text-3);margin:0}
-.card-mark{
-  font:500 .62rem var(--mono);letter-spacing:.18em;text-transform:uppercase;
-  color:var(--gold);display:block;margin-bottom:.6rem;
+@media(max-width:860px){
+  .pads{
+    position:fixed;inset:auto 0 0;z-index:100;justify-content:space-around;gap:0;
+    background:var(--bg);border-top:1px solid var(--line);
+    padding:0 .25rem env(safe-area-inset-bottom,0px);
+  }
+  .pads li{flex:1}
+  .pads a{flex-direction:column;justify-content:center;gap:.3rem;min-height:3.5rem;padding:0 .2rem;font-size:.6875rem;text-align:center}
+  .pads .long{display:none}
+  .pads .short{display:inline}
+  body{padding-bottom:calc(3.6rem + env(safe-area-inset-bottom,0px))}
 }
 
-/* ═══════════ TIMELINE ═══════════ */
-.timeline{position:relative;padding-left:1.9rem}
-.timeline::before{content:'';position:absolute;left:0;top:.5rem;bottom:2rem;width:1px;
-  background:linear-gradient(var(--gold),var(--slate),transparent)}
-.role{position:relative;margin-bottom:3.4rem;padding-left:2.2rem}
-.role:last-child{margin-bottom:0}
-.role-dot{
-  position:absolute;left:-1.9rem;top:.45rem;width:9px;height:9px;border-radius:50%;
-  background:var(--gold);transform:translateX(50%);
-  box-shadow:0 0 0 0 rgba(201,169,110,.35);animation:ring 3s var(--ease) infinite;
-}
-.role:nth-child(2) .role-dot{animation-delay:.5s}
-.role:nth-child(3) .role-dot{animation-delay:1s}
-@keyframes ring{0%{box-shadow:0 0 0 0 rgba(201,169,110,.35)}70%{box-shadow:0 0 0 8px rgba(201,169,110,0)}100%{box-shadow:0 0 0 0 rgba(201,169,110,0)}}
-.role-when{font:400 .68rem var(--mono);letter-spacing:.09em;color:var(--gold);margin-bottom:.4rem}
-.role-title{font-size:1.18rem;font-weight:700;letter-spacing:-.018em;margin-bottom:.2rem}
-.role-org{font-size:.88rem;color:var(--text-3);margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
-.tag-sector{
-  color:var(--slate);background:rgba(123,159,196,.1);padding:.14rem .55rem;border-radius:3px;
-  font:400 .7rem var(--mono);letter-spacing:.04em;
-}
-.bullets{list-style:none;display:grid;gap:.55rem}
-.bullets li{position:relative;padding-left:1.15rem;color:var(--text-2);font-size:.89rem;line-height:1.7}
-.bullets li::before{content:'→';position:absolute;left:0;top:.1rem;color:var(--gold);font-size:.75rem}
-
-.pills{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.95rem}
-.pill{
-  font:400 .68rem var(--mono);letter-spacing:.04em;padding:.26rem .68rem;border-radius:3px;
-  background:rgba(74,156,120,.07);border:1px solid rgba(74,156,120,.18);color:var(--sage);
-}
-.pill.tool{background:rgba(201,169,110,.05);border-color:var(--gold-line);color:var(--gold)}
-
-/* ═══════════ PROJECTS ═══════════ */
-.proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
-@media(max-width:1000px){.proj-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:720px){.proj-grid{grid-template-columns:1fr}}
-.proj{
-  background:var(--surface);border:1px solid var(--hairline);border-radius:12px;
-  padding:1.6rem;position:relative;overflow:hidden;
-  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-  transition:border-color .32s,box-shadow .32s var(--ease),transform .32s var(--ease);
-}
-.proj:hover{border-color:var(--gold-line-strong);transform:translateY(-3px);
-  box-shadow:0 18px 52px rgba(0,0,0,.36)}
-.proj-lead{grid-column:span 2;background:linear-gradient(140deg,rgba(201,169,110,.05),rgba(123,159,196,.04))}
-@media(max-width:1000px){.proj-lead{grid-column:span 2}}
-@media(max-width:720px){.proj-lead{grid-column:span 1}}
-.proj-kind{font:400 .64rem var(--mono);letter-spacing:.18em;text-transform:uppercase;
-  color:var(--text-3);margin-bottom:.7rem}
-.proj h3{font-size:1.08rem;line-height:1.32;letter-spacing:-.015em;margin-bottom:.7rem;font-weight:700}
-.proj-lead h3{font-size:1.3rem}
-.block{margin-bottom:1rem}
-.block:last-of-type{margin-bottom:0}
-.block-label{
-  display:block;font:500 .64rem var(--mono);letter-spacing:.16em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:.35rem;
-}
-.block p{font-size:.85rem;line-height:1.72;color:var(--text-2);margin:0}
-.proj .block + .block{margin-top:1rem}
-.metrics{display:flex;flex-wrap:wrap;gap:.45rem;margin:1rem 0 .8rem}
-.metric{
-  font:400 .68rem var(--mono);padding:.24rem .62rem;border-radius:3px;
-  background:var(--gold-wash);border:1px solid var(--gold-line);color:var(--gold);
-}
-.stack{display:flex;flex-wrap:wrap;gap:.35rem}
-.stack span{
-  font:300 .7rem var(--sans);padding:.2rem .55rem;border-radius:3px;
-  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-3);
+/* ═════ COLUMN LAYOUT: the chip on the left, reading on the right ═════ */
+.col{width:var(--col);margin-left:auto}
+.panel-col{background:var(--panel);border:1px solid var(--line);padding:clamp(1.25rem,2.6vw,2.25rem)}
+@media(max-width:999px){
+  :root{--col:100%}
 }
 
-/* ═══════════ CHART FRAME ═══════════ */
-.chart{
-  position:relative;width:100%;height:150px;margin:.9rem 0 1.1rem;
-  border-radius:9px;overflow:hidden;
-  background:rgba(9,10,11,.7);border:1px solid rgba(201,169,110,.08);
-  transition:border-color .4s;
-}
-.chart.drawn{border-color:var(--gold-line)}
-.chart canvas{position:absolute;inset:0;width:100%;height:100%}
-.chart-name{
-  position:absolute;top:.5rem;left:.75rem;z-index:2;pointer-events:none;
-  font:400 .6rem var(--mono);letter-spacing:.11em;text-transform:uppercase;
-  color:rgba(201,169,110,.5);
-}
-.chart-note{
-  position:absolute;top:.5rem;right:.75rem;z-index:2;pointer-events:none;
-  font:400 .58rem var(--mono);color:rgba(123,159,196,.45);
-}
-.proj-lead .chart{height:172px}
-.role .chart{height:158px}
+/* Hero */
+.hero{min-height:100svh;display:flex;align-items:center;padding-block:calc(var(--bar-h) + 2rem) 3rem}
+.hero .shell{display:block}
+.hero h1{font-size:clamp(2.6rem,5.2vw,4.75rem);font-weight:800;letter-spacing:-.035em;line-height:.98;margin-bottom:.9rem}
+.hero-role{font:600 clamp(1.05rem,1.6vw,1.25rem)/1.4 var(--display);color:var(--text-2);margin-bottom:1rem}
+.hero-stmt{color:var(--text-2);margin-bottom:1.5rem}
+.hero-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:2rem}
+.hero-meta{display:flex;align-items:center;gap:.55rem;font:400 .75rem var(--mono);color:var(--text);margin:-.5rem 0 1.25rem}
+.hero-meta::before{content:'';width:.5rem;height:.5rem;background:var(--copper);flex:none}
 
-/* Illustrative-data disclosure */
-.synthetic{
-  display:inline-flex;align-items:center;gap:.4rem;
-  font:400 .62rem var(--mono);letter-spacing:.09em;color:var(--text-3);
-  border:1px dashed rgba(168,159,147,.22);border-radius:3px;
-  padding:.18rem .5rem;margin-bottom:.9rem;
+.testpads{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+.testpads li{background:var(--bg-raised);padding:.85rem 1rem;display:grid;grid-template-columns:auto 1fr;gap:.15rem .75rem;align-items:baseline}
+.testpads li::before{content:'';grid-row:1/3;align-self:start;margin-top:.35rem;width:.7rem;height:.7rem;border:1px solid var(--copper)}
+.pad-val{font:700 1.5rem/1.1 var(--display);letter-spacing:-.02em}
+.pad-lab{grid-column:2;font-size:.875rem;line-height:1.35;color:var(--text-2)}
+.pad-src{font:400 .75rem var(--mono);color:var(--text-3);margin-top:.6rem}
+@media(max-width:999px){
+  .hero{min-height:0;padding-top:calc(var(--bar-h) + 24svh)}
+  /* phones: the proof comes before the prose, so a 30-second skim sees name, results and actions */
+  .hero .col{background:var(--panel);border:1px solid var(--line);padding:1.1rem;display:flex;flex-direction:column}
+  .hero h1{font-size:clamp(2.2rem,10vw,2.6rem);margin-bottom:.6rem}
+  .hero-role{font-size:1rem;margin-bottom:.75rem}
+  .testpads{order:1}
+  .testpads{margin-bottom:1rem}
+  .hero-actions{order:2;margin-bottom:1.25rem}
+  .hero-stmt{order:3;margin-bottom:0}
+  .pad-src{order:4;margin-top:1rem}
+  .testpads li{padding:.65rem .75rem}
+  .pad-val{font-size:1.25rem}
+  .pad-lab{font-size:.8125rem}
 }
-.synthetic::before{content:'◇';color:var(--text-3)}
 
-/* ═══════════ SKILLS ═══════════ */
-.skill-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1.5rem,3vw,2.4rem);margin-bottom:2.6rem}
-@media(max-width:860px){.skill-cols{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){.skill-cols{grid-template-columns:1fr}}
-.skill-head{
-  font:500 .64rem var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
-  margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--hairline);
-}
-.skill-list{list-style:none;display:grid;gap:.62rem}
-.skill-list li{
-  display:flex;justify-content:space-between;align-items:baseline;gap:1rem;
-  font-size:.86rem;color:var(--text-2);
-}
-.level{
-  font:400 .66rem var(--mono);letter-spacing:.08em;color:var(--text-3);
-  border:1px solid rgba(168,159,147,.16);border-radius:3px;padding:.1rem .45rem;flex:none;
-}
-.level.core{color:var(--gold);border-color:var(--gold-line)}
-.level.working{color:var(--slate);border-color:rgba(123,159,196,.22)}
+/* Layers */
+.layer{padding-top:62vh}
+.layer:last-of-type{padding-bottom:30vh}
+@media(max-width:999px){.layer{padding-top:58svh}}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem 1rem;flex-wrap:wrap;margin-bottom:1rem}
+.blk{font:400 .75rem var(--mono);color:var(--text-3);white-space:nowrap}
+.blk b{font-weight:500;color:var(--copper)}
 
-.panel{
-  background:var(--surface);border:1px solid var(--hairline);border-radius:11px;padding:1.35rem;
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-}
-.panel-title{
-  font:500 .64rem var(--mono);letter-spacing:.16em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:1rem;
-}
-.two-up{display:grid;grid-template-columns:1.35fr 1fr;gap:var(--gap);margin-bottom:2.4rem}
-@media(max-width:860px){.two-up{grid-template-columns:1fr}}
+.about-copy p{color:var(--text-2);margin-bottom:1.1rem}
+.reflexes{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:1.5rem}
+@media(max-width:560px){.reflexes{grid-template-columns:1fr}}
+.reflexes article{background:var(--bg-raised);padding:1.1rem}
+.reflexes h3{font-size:1rem;margin-bottom:.35rem}
+.reflexes p{font-size:.9rem;line-height:1.55;color:var(--text-2)}
+.text-link{color:var(--copper);font-weight:700}
+.ext{width:.7em;height:.7em;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:square;vertical-align:baseline;margin-left:.15em}
+.text-link:hover{color:var(--copper-hi)}
 
-.fi-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.6rem}
-.fi-name{font:400 .68rem var(--mono);color:var(--text-3);width:8.5rem;flex:none;text-align:right}
-.fi-track{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.05);overflow:hidden}
-.fi-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--slate),var(--gold));
-  width:0;transition:width 1.2s var(--ease)}
-.fi-val{font:400 .66rem var(--mono);color:var(--text-3);width:2.4rem;font-variant-numeric:tabular-nums}
-.footnote{margin-top:.9rem;font:400 .72rem/1.6 var(--mono);color:var(--text-2)}
+/* Experience */
+.axis{margin-bottom:2.5rem;border:1px solid var(--line);background:var(--bg-sunk);padding:1rem 1rem .9rem}
+.axis-row{display:grid;grid-template-columns:8.5rem minmax(0,1fr);gap:.75rem;align-items:center;min-height:2rem}
+.axis-row > span:first-child{font-size:.875rem;color:var(--text-2);line-height:1.3}
+.axis-track{position:relative;height:1rem}
+.axis-track::before{content:'';position:absolute;inset:50% 0 auto;height:1px;background:var(--line)}
+.axis-bar{position:absolute;top:0;bottom:0;background:var(--data-blue)}
+.axis-bar.now{background:var(--copper)}
+.axis-ticks{position:relative;height:1.4rem;margin-top:.35rem}
+.axis-ticks span{position:absolute;top:0;font:400 .75rem var(--mono);color:var(--text-3);transform:translateX(-50%)}
+.axis-ticks span:first-child{transform:none}
+.axis-ticks::before{content:'';position:absolute;left:0;right:0;top:-.3rem;height:1px;background:var(--line-strong)}
+@media(max-width:560px){.axis-row{grid-template-columns:minmax(0,1fr);gap:.25rem;margin-bottom:.5rem}}
 
-.cm-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
-.cm-cell{
-  aspect-ratio:1;border-radius:5px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:2px;
-  opacity:0;transform:scale(.9);
-  transition:opacity .5s var(--ease),transform .5s var(--ease);
+.roles{display:grid;gap:2.5rem}
+.role-meta{display:flex;flex-wrap:wrap;gap:.25rem .9rem;align-items:baseline;margin-bottom:.4rem}
+.role-when{font:400 .75rem var(--mono);color:var(--text-2)}
+.role-org{font-size:.95rem;color:var(--text-2)}
+.tag{font:400 .75rem var(--mono);color:var(--data-blue)}
+.role h3{font-size:1.3rem;margin-bottom:.75rem}
+.bullets{list-style:none;display:grid;gap:.6rem}
+.bullets li{position:relative;padding-left:1.2rem;color:var(--text-2);font-size:.98rem;line-height:1.6}
+.bullets li::before{content:'';position:absolute;left:0;top:.62em;width:.45rem;height:.45rem;border:1px solid var(--copper)}
+.pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1rem}
+.pills span{font:400 .75rem var(--mono);color:var(--text-2);border:1px solid var(--line);padding:.25rem .55rem}
+
+/* Charts */
+.chart{position:relative;width:100%;height:190px;margin:.25rem 0 .75rem;border:1px solid var(--line);background:var(--bg-sunk)}
+.chart canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.chart-cap{display:flex;justify-content:space-between;gap:.25rem 1rem;flex-wrap:wrap;font:400 .75rem/1.5 var(--mono);color:var(--text-3);margin-bottom:.4rem}
+.chart-cap b{font-weight:500;color:var(--text-2)}
+.synthetic{font:400 .75rem/1.5 var(--mono);color:var(--text-3);margin-bottom:1rem}
+.synthetic::before{content:'≈ '}
+
+/* Projects */
+.proj{border-top:1px solid var(--line);padding-top:2rem;margin-top:2rem}
+.proj:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.kind{font:400 .75rem var(--mono);color:var(--text-3);margin:-.6rem 0 1rem}
+.proj h3{font-size:clamp(1.25rem,2vw,1.55rem);letter-spacing:-.022em;margin-bottom:1rem}
+.block h4{font:500 .75rem var(--mono);color:var(--copper);margin-bottom:.35rem}
+.block p{font-size:.95rem;line-height:1.65;color:var(--text-2)}
+.block + .block{margin-top:1.2rem}
+.metrics{display:flex;flex-wrap:wrap;gap:.4rem;margin:1.4rem 0 .75rem}
+.metrics span{font:400 .75rem var(--mono);color:var(--text);border:1px solid var(--copper);padding:.3rem .6rem}
+.stack{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:1rem}
+.stack span{font-size:.8125rem;color:var(--text-3);padding:.1rem .45rem;border:1px solid var(--line)}
+
+.chart.arch{height:auto;min-height:170px;padding:1rem;display:flex;flex-direction:column;justify-content:center;gap:.45rem}
+.arch-lbl{font:400 .75rem var(--mono);color:var(--text-3)}
+.arch-row{display:flex;align-items:center;margin-bottom:.55rem}
+.node{font:400 .75rem/1.3 var(--mono);color:var(--text-2);border:1px solid var(--line-strong);background:var(--bg-raised);padding:.4rem .55rem;white-space:nowrap}
+.node small{display:block;font-size:.75rem;color:var(--text-3)}
+.node.hot{border-color:var(--copper);color:var(--text)}
+.node-stack{display:flex;flex-direction:column;gap:.3rem}
+.wire{flex:1;min-width:.9rem;max-width:2.5rem;height:1px;background:var(--line-strong)}
+.wire.hot{background:var(--copper)}
+@media(max-width:560px){
+  .arch-row{flex-direction:column;align-items:flex-start}
+  .wire{flex:none;width:1px;min-width:0;height:.8rem;margin-left:1.25rem}
+  .node-stack{flex-direction:row}
 }
-.panel.shown .cm-cell{opacity:1;transform:none}
-.panel.shown .cm-cell:nth-child(2){transition-delay:.08s}
-.panel.shown .cm-cell:nth-child(3){transition-delay:.16s}
-.panel.shown .cm-cell:nth-child(4){transition-delay:.24s}
-.cm-cell b{font:800 1.35rem/1 var(--display);font-variant-numeric:tabular-nums}
-.cm-cell span{font:400 .58rem var(--mono);color:var(--text-3)}
-.cm-good{background:rgba(74,156,120,.14)} .cm-good b{color:var(--sage)}
-.cm-bad{background:rgba(212,74,74,.12)}   .cm-bad b{color:#e0736f}
 
-.chips{display:flex;flex-wrap:wrap;gap:.45rem}
-.chip{
-  font:400 .7rem var(--mono);letter-spacing:.03em;padding:.38rem .75rem;border-radius:4px;
-  background:var(--surface);border:1px solid var(--hairline);color:var(--text-3);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  transition:color .22s,border-color .22s,background-color .22s,transform .22s var(--ease);
-}
-.chip:hover{color:var(--gold);border-color:var(--gold-line-strong);background:var(--gold-wash);transform:translateY(-2px)}
+/* Skills */
+.skill-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem;margin-bottom:1.75rem}
+@media(max-width:700px){.skill-cols{grid-template-columns:minmax(0,1fr)}}
+.skill-head{font:500 .75rem var(--mono);color:var(--text-2);padding-bottom:.45rem;margin-bottom:.5rem;border-bottom:1px solid var(--line-strong)}
+.skill-list{list-style:none}
+.skill-list li{display:flex;justify-content:space-between;align-items:baseline;gap:.75rem;font-size:.9rem;color:var(--text-2);padding:.3rem 0;border-bottom:1px solid var(--line);line-height:1.35}
+.level{font:400 .75rem var(--mono);flex:none;color:var(--text-3)}
+.level.core{color:var(--copper)}
+.level.working{color:var(--data-blue)}
+.gap-note{color:var(--text-2);margin-bottom:2rem}
+.sub{border:1px solid var(--line);background:var(--bg-raised);padding:1.15rem;margin-top:1rem}
+.sub h3{font-size:1rem;margin-bottom:.35rem}
+.fi-row{display:grid;grid-template-columns:8.5rem minmax(0,1fr) 2.6rem;align-items:center;gap:.65rem;margin-bottom:.5rem}
+.fi-name{font:400 .75rem var(--mono);color:var(--text-2);text-align:right;overflow-wrap:anywhere}
+.fi-track{display:block;height:.85rem;background:var(--bg-sunk);border:1px solid var(--line)}
+.fi-fill{display:block;height:100%;width:0;background:var(--data-orange);transition:width 1s var(--ease)}
+.fi-val{font:500 .75rem var(--mono);color:var(--text)}
+@media(max-width:480px){.fi-row{grid-template-columns:minmax(0,1fr) 2.6rem}.fi-name{grid-column:1/-1;text-align:left}}
+.footnote{margin-top:.9rem;font-size:.9rem;line-height:1.6;color:var(--text-2)}
+.cm-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;max-width:22rem}
+.cm-cell{padding:.9rem .75rem;display:flex;flex-direction:column;gap:.15rem;color:var(--text)}
+.cm-cell b{font:700 1.45rem/1 var(--display);letter-spacing:-.02em}
+.cm-cell span{font:400 .75rem var(--mono)}
+.cm-tn{background:rgba(122,166,220,.42)} .cm-tp{background:rgba(122,166,220,.32)}
+.cm-fp{background:rgba(240,128,70,.24)} .cm-fn{background:rgba(240,128,70,.38)}
 
-/* ═══════════ VIZ SECTIONS ═══════════ */
-.viz-head{margin-bottom:2.6rem;max-width:56ch}
-.viz-head h2{font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.1;letter-spacing:-.024em;margin-bottom:.55rem}
-.viz-head p{color:var(--text-3);font-size:.9rem}
+/* Education */
+.edu + .edu{border-top:1px solid var(--line);padding-top:1.5rem;margin-top:1.5rem}
+.edu h3{margin-bottom:.25rem}
+.edu-org{font-size:.95rem;color:var(--text-2);margin-bottom:.7rem}
+.badges{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.8rem}
+.badges span{font:400 .75rem var(--mono);padding:.2rem .5rem;border:1px solid var(--line-strong);color:var(--text)}
+.badges span.hot{border-color:var(--copper);color:var(--copper)}
+.edu p{color:var(--text-2);font-size:.95rem}
 
-#globe-canvas{width:100%;height:clamp(300px,42vw,440px);display:block;border-radius:14px;cursor:grab;touch-action:pan-y}
-#globe-canvas:active{cursor:grabbing}
-.globe-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap);margin-top:2.2rem}
-@media(max-width:960px){.globe-cards{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.globe-cards{grid-template-columns:1fr}}
-.gcard{
-  background:var(--surface);border:1px solid var(--hairline);border-radius:10px;padding:1.1rem 1.3rem;
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  transition:border-color .3s,transform .3s var(--ease);
-}
-.gcard:hover{border-color:var(--gold-line-strong);transform:translateY(-3px)}
-.gcard-label{font:400 .62rem var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem}
-.gcard-val{font:800 1.35rem/1.1 var(--display);letter-spacing:-.02em;color:var(--text);margin-bottom:.3rem}
-.gcard p{font-size:.79rem;line-height:1.58;color:var(--text-3)}
+/* Contact */
+.contact h2{font-size:clamp(2rem,3.8vw,3rem)}
+.contact-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.contact-addr{color:var(--text-2)}
+.contact-addr a{color:var(--text)}
 
-.flow-wrap{position:relative;height:clamp(260px,34vw,340px)}
-.flow-wrap canvas{width:100%;height:100%;display:block}
-.legend{display:flex;gap:1.6rem;flex-wrap:wrap;margin-top:1rem;
-  font:400 .68rem var(--mono);letter-spacing:.05em;color:var(--text-3)}
-.legend span{display:flex;align-items:center;gap:.5rem}
-.legend i{width:8px;height:8px;border-radius:50%;display:block}
-
-.split{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(1.5rem,4vw,3rem);align-items:center}
-@media(max-width:900px){.split{grid-template-columns:1fr}}
-#scatterCanvas,#radarCanvas{width:100%;height:clamp(300px,36vw,380px);display:block}
-.callout{
-  padding:1rem 1.25rem;border-radius:8px;border-left:3px solid var(--gold);
-  background:rgba(201,169,110,.04);margin-bottom:.9rem;
-}
-.callout:last-child{margin-bottom:0}
-.callout.b2{border-left-color:var(--slate);background:rgba(123,159,196,.04)}
-.callout.b3{border-left-color:var(--sage);background:rgba(74,156,120,.04)}
-.callout h3{font-size:.94rem;font-weight:700;letter-spacing:-.01em;margin-bottom:.3rem}
-.callout p{font-size:.81rem;line-height:1.62;color:var(--text-3)}
-.radar-copy p{color:var(--text-2);font-size:.92rem;margin-bottom:1rem}
-
-#impactCanvas{width:100%;height:clamp(280px,32vw,320px);display:block}
-.switcher{display:flex;gap:.6rem;margin-top:1.2rem;align-items:center;flex-wrap:wrap}
-.switch{
-  font:400 .7rem var(--mono);letter-spacing:.07em;padding:.44rem 1rem;border-radius:4px;
-  border:1px solid var(--gold-line);background:transparent;color:var(--gold);cursor:pointer;
-  transition:background-color .22s,border-color .22s,transform .18s var(--ease);
-}
-.switch:hover{background:var(--gold-wash);border-color:var(--gold)}
-.switch:active{transform:scale(.97)}
-.switch[aria-pressed="true"]{background:rgba(201,169,110,.14);border-color:var(--gold);color:var(--text)}
-.switch-hint{font:400 .65rem var(--mono);color:var(--text-3)}
-
-/* ═══════════ THINKING ═══════════ */
-.think-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);max-width:62rem}
-@media(max-width:820px){.think-grid{grid-template-columns:1fr}}
-.think{
-  background:var(--surface);border:1px solid var(--hairline);border-radius:12px;padding:1.7rem;
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-}
-.think h3{
-  font:500 .64rem var(--mono);letter-spacing:.17em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:.85rem;
-}
-.think p{color:var(--text-2);font-size:.89rem;line-height:1.78}
-.think p + p{margin-top:.7rem;color:var(--text-3);font-size:.82rem}
-
-/* ═══════════ EDUCATION ═══════════ */
-.edu-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
-@media(max-width:820px){.edu-grid{grid-template-columns:1fr}}
-.edu{
-  background:var(--surface);border:1px solid var(--hairline);border-radius:12px;padding:1.9rem;
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  transition:border-color .3s,transform .32s var(--ease);
-}
-.edu:hover{border-color:var(--gold-line-strong);transform:translateY(-3px)}
-.edu h3{font-size:1.05rem;font-weight:700;letter-spacing:-.014em;margin-bottom:.25rem}
-.edu-org{font-size:.88rem;color:var(--text-3);margin-bottom:.75rem}
-.badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.9rem}
-.badge{font:400 .66rem var(--mono);padding:.2rem .6rem;border-radius:3px}
-.badge.gold{background:var(--gold-wash);color:var(--gold);border:1px solid var(--gold-line)}
-.badge.slate{background:rgba(123,159,196,.08);color:var(--slate);border:1px solid rgba(123,159,196,.2)}
-.edu p{font-size:.84rem;line-height:1.68;color:var(--text-3)}
-
-/* ═══════════ CONTACT ═══════════ */
-#contact{text-align:center;background:radial-gradient(ellipse 68% 58% at 50% 0%,rgba(201,169,110,.06),transparent 70%)}
-.contact-inner{max-width:44rem;margin-inline:auto}
-.contact-inner h2{font-size:clamp(2rem,4.6vw,3.2rem);line-height:1.1;letter-spacing:-.03em;margin-bottom:1.1rem}
-.contact-inner .lede{margin-inline:auto;margin-bottom:2.2rem}
-.contact-actions{display:flex;justify-content:center;gap:.85rem;flex-wrap:wrap;margin-bottom:2.4rem}
-.contact-links{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;
-  padding-top:2rem;border-top:1px solid var(--hairline)}
-.contact-links a{
-  color:var(--text-3);text-decoration:none;font:400 .8rem var(--mono);
-  transition:color .22s,transform .22s var(--ease);
-}
-.contact-links a:hover{color:var(--gold);transform:translateY(-2px)}
-.status.open{color:var(--sage);border-color:rgba(74,156,120,.2);background:rgba(74,156,120,.06)}
-.status.open .pip{background:var(--sage)}
-
-footer{
-  position:relative;z-index:2;padding:1.8rem 0;border-top:1px solid var(--hairline);
-  font:400 .68rem var(--mono);color:var(--text-3);background:rgba(9,10,11,.92);
-}
+footer{background:var(--bg);border-top:1px solid var(--line);padding:1.5rem 0;font:400 .75rem var(--mono);color:var(--text-3)}
 .footer-inner{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 
-/* ═══════════════════════════════════════════════
-   ACCESSIBILITY PREFERENCES
-   Reduced motion keeps meaning, drops travel.
-   ═══════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto}
-  *,*::before,*::after{
-    animation-duration:.001ms!important;
-    animation-iteration-count:1!important;
-    transition-duration:.001ms!important;
-  }
-  /* keep comprehension-carrying fades, drop displacement */
-  .rev,.cm-cell,.gcard,.callout{opacity:1!important;transform:none!important;transition:opacity .2s ease!important}
-  .btn:hover,.card:hover,.proj:hover,.edu:hover,.chip:hover,.stat:hover,
-  .gcard:hover,.contact-links a:hover{transform:none!important}
-  .amb,.pip,.role-dot{animation:none!important}
-  #bgCanvas,#heroCanvas{display:none}
-  .fi-fill{transition:none!important}
-}
-@media (prefers-reduced-transparency: reduce){
-  nav,.stat,.card,.proj,.panel,.chip,.gcard,.think,.edu{
-    backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
-    background:var(--surface-solid)!important;
-  }
-  nav{background:#0c0d0e!important}
+  *,*::before,*::after{transition-duration:.01ms!important;animation:none!important}
 }
 @media (prefers-contrast: more){
-  :root{
-    --text-2:#d3ccc1;--text-3:#a29a90;
-    --hairline:rgba(201,169,110,.4);
-    --gold-line:rgba(201,169,110,.5);
-    --surface:#111315;
-  }
-  nav,.stat,.card,.proj,.panel,.chip,.gcard,.think,.edu{
-    backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
-  }
-  .amb{display:none}
-  #bgCanvas,.grid-bg{opacity:0}
+  :root{--text-2:#d8d8d6;--text-3:#bdbec0;--line:#555a61;--line-strong:#767b83;--panel:#121314}
 }
 @media print{
-  #bgCanvas,.grid-bg,.amb,nav,#heroCanvas,.chart,#globe-canvas,.flow-wrap,
-  #scatterCanvas,#radarCanvas,#impactCanvas,.switcher{display:none!important}
-  body{background:#fff;color:#000}
-  section{padding-block:1.5rem;break-inside:avoid}
-  .rev{opacity:1!important;transform:none!important}
+  .scene,.bar,.pads,.chart,.skip,.chip-tip{display:none!important}
+  body{background:#fff;color:#000;padding:0}
+  .layer,.hero{padding:1rem 0;min-height:0}
+  .col{width:100%}
+  .panel-col,.hero .col{background:#fff;border-color:#999}
+  *{color:#000!important}
 }
 </style>
+<script>
+/* Mark JS on, and fall back to the flat floorplan if the 3D module never reports in. */
+document.documentElement.classList.add('js');
+setTimeout(function(){ if(!window.__chipReady) document.documentElement.classList.add('no-3d'); }, 6000);
+</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
-<canvas id="bgCanvas" aria-hidden="true"></canvas>
-<div class="grid-bg" aria-hidden="true"></div>
+<div class="scene" aria-hidden="true">
+  <canvas id="chip"></canvas>
+  <svg class="fallback" viewBox="0 0 400 400">
+    <rect x="0" y="0" width="400" height="400" fill="#1c1d1f"/>
+    <rect x="20" y="20" width="360" height="360" fill="#262b31" stroke="#43474d"/>
+    <rect x="34" y="40" width="144" height="130" fill="#3a4250" stroke="#43474d"/><text x="44" y="60">CPU · about</text>
+    <rect x="200" y="40" width="160" height="130" fill="#33404e" stroke="#43474d"/><text x="210" y="60">SRAM · experience</text>
+    <rect x="34" y="190" width="200" height="164" fill="#2f3946" stroke="#43474d"/><text x="44" y="210">NPU · projects</text>
+    <rect x="250" y="190" width="110" height="86" fill="#3a4250" stroke="#43474d"/><text x="258" y="210">CACHE</text>
+    <rect x="250" y="288" width="110" height="66" fill="#353c46" stroke="#43474d"/><text x="258" y="308">ROM</text>
+    <text x="34" y="372">NKA-2026 · NITHISH KALIANNAN ANANTH</text>
+  </svg>
+</div>
+<div class="chip-tip" id="chip-tip" hidden></div>
 
-<nav id="nav">
-  <a href="#hero" class="wordmark">NKA</a>
-  <ul class="navlinks">
-    <li><a href="#about">About</a></li>
-    <li><a href="#work">Experience</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#thinking">How I think</a></li>
-    <li><a href="#skills">Skills</a></li>
-  </ul>
-  <a href="#contact" class="btn btn-nav">Open to roles</a>
-</nav>
+<header class="bar">
+  <a href="#input" class="wordmark" aria-label="Nithish Kaliannan Ananth, back to top">NKA</a>
+  <nav aria-label="Sections">
+    <ul class="pads">
+      <li><a href="#about">About</a></li>
+      <li><a href="#work"><span class="long">Experience</span><span class="short">Work</span></a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#education"><span class="long">Education</span><span class="short">Study</span></a></li>
+    </ul>
+  </nav>
+  <a href="#contact" class="btn btn-copper">Contact</a>
+</header>
 
 <main id="main">
 
-<!-- ═══════════ HERO ═══════════ -->
-<section id="hero">
-  <canvas id="heroCanvas" aria-hidden="true"></canvas>
-
-  <div class="amb" style="top:16%;right:3%" aria-hidden="true">late deliveries tracked departure timing, not distance. the fix was scheduling</div>
-  <div class="amb slate" style="top:62%;right:2%;animation-delay:6s" aria-hidden="true">the output isn't the model, it's the decision the model enables</div>
-  <div class="amb sage" style="bottom:14%;left:1%;animation-delay:11s" aria-hidden="true">three routes, 61% of missed SLAs. a targeted fix, not a fleet overhaul</div>
-
-  <div class="shell hero-grid">
-    <div>
-      <p class="status"><span class="pip" aria-hidden="true"></span>Graduated July 2026 · Open to graduate roles · UK</p>
-      <h1 class="t-display hero-name">Nithish<br><span class="grad">Kaliannan Ananth</span></h1>
-      <p class="hero-role">Data Scientist <span>·</span> Decision focused analytics <span>·</span> Business intelligence</p>
+<section id="input" class="hero" data-key="0" aria-labelledby="h-name">
+  <div class="shell">
+    <div class="col">
+      <h1 id="h-name">Nithish Kaliannan Ananth</h1>
+      <p class="hero-role">Data Scientist · Decision-focused analytics · Business intelligence</p>
+      <p class="hero-meta">Graduated July 2026 · Open to graduate roles · London</p>
       <p class="hero-stmt">Most operational decisions get made on instinct or on a report that was already stale when it arrived. I find where that's happening, build the analysis that exposes the real pattern, and translate it into something a person can act on.</p>
       <div class="hero-actions">
-        <a href="#projects" class="btn btn-primary">See the work</a>
-        <a href="mailto:nithish9195@gmail.com" class="btn btn-ghost">Get in touch</a>
+        <a href="#projects" class="btn btn-line">See the work</a>
+        <a href="https://linkedin.com/in/nithishka" target="_blank" rel="noopener" class="btn btn-line">LinkedIn <svg class="ext" viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2h6v6M10 2 2 10"/></svg></a>
       </div>
-    </div>
-
-    <div class="hero-stats" aria-label="Outcomes from the AGS Roadways placement">
-      <div class="stat">
-        <span class="stat-num" data-count="8" data-suffix="%">0%</span>
-        <span class="stat-txt">Operating cost reduction<b>from one fuel × load finding</b></span>
-      </div>
-      <div class="stat">
-        <span class="stat-num" data-count="3">0</span>
-        <span class="stat-txt">Routes causing<b>61% of missed SLAs</b></span>
-      </div>
-      <div class="stat">
-        <span class="stat-num" data-count="5" data-suffix="h">0h</span>
-        <span class="stat-txt">Weekly hours returned<b>from manual reporting</b></span>
-      </div>
-      <div class="stat">
-        <span class="stat-num" data-count="15" data-suffix="%">0%</span>
-        <span class="stat-txt">Lower forecast error<b>than the manual baseline</b></span>
-      </div>
+      <ul class="testpads" aria-label="Outcomes from the AGS Roadways placement">
+        <li><span class="pad-val">−15%</span><span class="pad-lab">delivery ETA error (MAE) vs the manual baseline</span></li>
+        <li><span class="pad-val">−8%</span><span class="pad-lab">operating cost, from one fuel × load finding</span></li>
+        <li><span class="pad-val">61%</span><span class="pad-lab">of missed SLAs traced to 3 routes</span></li>
+        <li><span class="pad-val">5 h</span><span class="pad-lab">a week returned from manual reporting</span></li>
+      </ul>
+      <p class="pad-src">test pads · AGS Roadways, Jan–Sep 2025</p>
     </div>
   </div>
 </section>
 
-<!-- ═══════════ ABOUT ═══════════ -->
-<section id="About">
-  <div class="sec-glow" aria-hidden="true"></div>
-  <div class="amb" style="top:8%;right:3%;animation-delay:4s" aria-hidden="true">first question: what would change if this analysis didn't exist?</div>
-  <div class="amb slate" style="bottom:12%;right:4%;animation-delay:9s" aria-hidden="true">the reading is not the measurement. something physical happened first</div>
-
-  <div class="shell">
-    <p class="eyebrow">About</p>
-    <h2 class="t-section rev">Most data scientists<br>never meet <em class="grad">the instrument.</em></h2>
-    <p class="lede rev rev-1">I&#8217;ve spent this year on the other end of the cable.</p>
-
-    <div class="about">
-      <div class="rev">
-        <p>I came out of a <strong>BSc in Data Science</strong> at Coventry with First Class Honours and the Course Director&#8217;s Award, then did something slightly off script: I took an engineering job. I&#8217;ve spent this year building test and measurement software, and learning the hardware side properly alongside it.</p>
-        <p>That&#8217;s the difference, and it&#8217;s a small one that compounds. Most analysts inherit a dataset and take it at face value. I&#8217;ve been watching where a reading actually comes from, and how many ways it can quietly be wrong before it reaches a spreadsheet. You get suspicious of clean data in a useful way.</p>
-        <p>The habit underneath both jobs is the same: <strong>start with the decision, not the data.</strong> I want to know what someone will do differently before I write a line of code, because a model that changes nobody's mind is an expensive way to be right.</p>
-        <p style="margin-top:1.2rem"><a class="inline-link" href="https://linkedin.com/in/nithishka" target="_blank" rel="noopener">linkedin.com/in/nithishka &#8594;</a></p>
-      </div>
-
-      <div class="card-grid rev rev-1">
-        <article class="card">
-          <span class="card-mark">Reflex</span>
-          <h3>Ask what changes</h3>
-          <p>If I can&#8217;t say what someone will do differently with the answer, the question isn&#8217;t scoped yet. That conversation happens before any code.</p>
-        </article>
-        <article class="card">
-          <span class="card-mark">Reflex</span>
-          <h3>Distrust the tidy number</h3>
-          <p>Every measurement has a physical path behind it. Knowing that path is usually faster than debugging the model that consumed it.</p>
-        </article>
-        <article class="card">
-          <span class="card-mark">Reflex</span>
-          <h3>Say the trade off out loud</h3>
-          <p>Recall against precision, accuracy against interpretability. I&#8217;d rather argue about the cost ratio than quietly pick a default and hope.</p>
-        </article>
-        <article class="card">
-          <span class="card-mark">Reflex</span>
-          <h3>Lead with the implication</h3>
-          <p>&#8220;departure_hour scores 0.67&#8221; tells a logistics director nothing. &#8220;You&#8217;re losing more time to scheduling than to distance&#8221; tells them where to look.</p>
-        </article>
-      </div>
+<section id="about" class="layer" data-key="1" aria-labelledby="h-about">
+  <div class="shell"><div class="col panel-col">
+    <div class="panel-head"><h2 id="h-about" tabindex="-1">Most data scientists never meet the instrument.</h2><span class="blk"><b>CPU</b> · about</span></div>
+    <p class="lede">I&#8217;ve spent this year on the other end of the cable.</p>
+    <div class="about-copy">
+      <p>I came out of a <strong>BSc in Data Science</strong> at Coventry with First Class Honours and the Course Director&#8217;s Award, then did something slightly off script: I took an engineering job. I&#8217;ve spent this year building test and measurement software, and learning the hardware side properly alongside it.</p>
+      <p>That&#8217;s the difference, and it&#8217;s a small one that compounds. Most analysts inherit a dataset and take it at face value. I&#8217;ve been watching where a reading actually comes from, and how many ways it can quietly be wrong before it reaches a spreadsheet. You get suspicious of clean data in a useful way.</p>
+      <p>The habit underneath both jobs is the same: <strong>start with the decision, not the data.</strong> I want to know what someone will do differently before I write a line of code, because a model that changes nobody's mind is an expensive way to be right.</p>
+      <p><a class="text-link" href="https://linkedin.com/in/nithishka" target="_blank" rel="noopener">linkedin.com/in/nithishka <svg class="ext" viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2h6v6M10 2 2 10"/></svg></a></p>
     </div>
-  </div>
+    <div class="reflexes">
+      <article><h3>Ask what changes</h3><p>If I can&#8217;t say what someone will do differently with the answer, the question isn&#8217;t scoped yet. That conversation happens before any code.</p></article>
+      <article><h3>Distrust the tidy number</h3><p>Every measurement has a physical path behind it. Knowing that path is usually faster than debugging the model that consumed it.</p></article>
+      <article><h3>Say the trade-off out loud</h3><p>Recall against precision, accuracy against interpretability. I&#8217;d rather argue about the cost ratio than quietly pick a default and hope.</p></article>
+      <article><h3>Lead with the implication</h3><p>&#8220;departure_hour scores 0.67&#8221; tells a logistics director nothing. &#8220;You&#8217;re losing more time to scheduling than to distance&#8221; tells them where to look.</p></article>
+    </div>
+  </div></div>
 </section>
 
-<!-- ═══════════ EXPERIENCE ═══════════ -->
-<section id="work">
-  <div class="sec-glow" aria-hidden="true"></div>
-  <div class="amb" style="top:9%;right:3%;animation-delay:2s" aria-hidden="true">SLA failures cluster Mon/Thu AM. not random, not weather</div>
-  <div class="amb sage" style="bottom:16%;right:2%;animation-delay:8s" aria-hidden="true">recommendation: stagger the 07:00–09:00 departure window across routes</div>
+<section id="work" class="layer" data-key="2" aria-labelledby="h-work">
+  <div class="shell"><div class="col panel-col">
+    <div class="panel-head"><h2 id="h-work" tabindex="-1">Where decisions changed because of the work.</h2><span class="blk"><b>SRAM</b> · experience</span></div>
+    <p class="lede">Real roles, patterns that weren't visible before, and what followed.</p>
 
-  <div class="shell">
-    <p class="eyebrow">Experience</p>
-    <h2 class="t-section rev">Where decisions <em class="grad">changed</em> because of the work.</h2>
-    <p class="lede rev rev-1">Real roles, patterns that weren't visible before, and what followed.</p>
+    <figure class="axis" aria-labelledby="axis-cap">
+      <figcaption id="axis-cap" class="vh">Timeline from 2023 to 2026: McDonald's from January 2023 to June 2026, AGS Roadways from January to September 2025, Students' Union representative from September 2025 to June 2026, and EECL from July 2026 to now.</figcaption>
+      <div class="axis-row"><span>McDonald's</span><span class="axis-track"><span class="axis-bar" style="left:0%;width:87.5%"></span></span></div>
+      <div class="axis-row"><span>AGS Roadways</span><span class="axis-track"><span class="axis-bar" style="left:50%;width:18.75%"></span></span></div>
+      <div class="axis-row"><span>Students' Union</span><span class="axis-track"><span class="axis-bar" style="left:66.7%;width:20.8%"></span></span></div>
+      <div class="axis-row"><span>EECL</span><span class="axis-track"><span class="axis-bar now" style="left:87.5%;width:10.4%"></span></span></div>
+      <div class="axis-row" aria-hidden="true"><span></span><span class="axis-ticks"><span style="left:0">2023</span><span style="left:25%">2024</span><span style="left:50%">2025</span><span style="left:75%">2026</span></span></div>
+    </figure>
 
-    <div class="timeline">
-
-      <article class="role rev">
-        <span class="role-dot" aria-hidden="true"></span>
-        <p class="role-when">Jul 2026 – Present</p>
-        <h3 class="role-title">Engineer Intern</h3>
-        <p class="role-org">EECL, European Engineering &amp; Consultancy <span class="tag-sector">Engineering</span></p>
+    <div class="roles">
+      <article class="role">
+        <div class="role-meta"><span class="role-when">Jul 2026 – now</span><span class="tag">Engineering</span></div>
+        <h3>Engineer Intern</h3>
+        <p class="role-org" style="margin:-.5rem 0 .75rem">EECL, European Engineering &amp; Consultancy</p>
         <ul class="bullets">
-          <li>Building <strong>test and measurement software</strong> : instrument control from the user interface down to the embedded Linux target it runs on.</li>
+          <li>Building <strong>test and measurement software</strong>: instrument control from the user interface down to the embedded Linux target it runs on.</li>
           <li>Learning the hardware side properly alongside it: soldering theory, materials, PCB fabrication and inspection to <strong>IPC-A-610</strong>, plus the measurement theory behind the instruments themselves.</li>
           <li>Finding that a data background transfers to an engineering floor mostly through one habit: working out which measurement answers the question before trusting the number it returns.</li>
         </ul>
-        <div class="pills">
-          <span class="pill tool">Python</span>
-          <span class="pill tool">Embedded Linux</span>
-          <span class="pill tool">Instrument control</span>
-          <span class="pill tool">IPC-A-610</span>
-        </div>
+        <div class="pills"><span>Python</span><span>Embedded Linux</span><span>Instrument control</span><span>IPC-A-610</span></div>
       </article>
 
-      <article class="role rev">
-        <span class="role-dot" aria-hidden="true"></span>
-        <p class="role-when">Jan 2025 – Sep 2025 · 9 months</p>
-        <h3 class="role-title">Data Scientist</h3>
-        <p class="role-org">AGS Roadways <span class="tag-sector">Logistics &amp; transport</span></p>
-
-        <div class="chart" data-chart="ags">
-          <canvas aria-hidden="true"></canvas>
-          <span class="chart-name">ETA forecast · actual vs predicted</span>
-          <span class="chart-note">24 weeks</span>
-        </div>
-        <p class="synthetic">Illustrative reconstruction. Underlying data is confidential</p>
-
-        <ul class="bullets">
-          <li>Built an end-to-end <strong>supervised forecasting pipeline</strong> (Python, scikit-learn, XGBoost) over 10,000+ logistics records, cutting delivery ETA error by <strong>15% MAE</strong> against the manual heuristic baseline through feature engineering, cross-validation and hyperparameter tuning.</li>
-          <li>Used <strong>SHAP attribution</strong> and multivariate EDA to surface a non-obvious root cause: departure hour predicted SLA failure better than route distance, and a fuel type × vehicle load interaction drove <strong>23% higher cost per trip</strong> on heavy diesel routes. Neither was visible in aggregate reporting; together they led to an <strong>8% operating cost reduction</strong>.</li>
-          <li>Shipped four <strong>Power BI dashboards</strong> (DAX, SQL ETL) replacing a five-hour manual Excel cycle, giving leadership live SLA compliance, route efficiency and fuel spend, and returning <strong>five analyst hours a week</strong>.</li>
-          <li>Presented the root cause analysis directly to logistics management, translating SHAP values into operational recommendations that isolated three routes behind <strong>61% of SLA failures</strong>, with prioritised remediation acted on the following quarter.</li>
-        </ul>
-        <div class="pills">
-          <span class="pill">↓15% MAE</span>
-          <span class="pill">↓8% operating cost</span>
-          <span class="pill">5h/week returned</span>
-          <span class="pill">10K+ records</span>
-          <span class="pill tool">Python · scikit-learn · XGBoost</span>
-          <span class="pill tool">SHAP</span>
-          <span class="pill tool">Power BI · DAX · SQL</span>
-        </div>
-      </article>
-
-      <article class="role rev">
-        <span class="role-dot" aria-hidden="true"></span>
-        <p class="role-when">Sep 2025 – Jun 2026</p>
-        <h3 class="role-title">Student Representative</h3>
-        <p class="role-org">Coventry University Students' Union <span class="tag-sector">Academic</span></p>
-
-        <div class="chart" data-chart="themes">
-          <canvas aria-hidden="true"></canvas>
-          <span class="chart-name">Feedback themes · priority vs frequency</span>
-          <span class="chart-note">Bubble size = actionability</span>
-        </div>
-        <p class="synthetic">Chart is an illustrative reconstruction of the prioritisation framework</p>
-
+      <article class="role">
+        <div class="role-meta"><span class="role-when">Sep 2025 – Jun 2026</span><span class="tag">Academic</span></div>
+        <h3>Student Representative</h3>
+        <p class="role-org" style="margin:-.5rem 0 .75rem">Coventry University Students' Union</p>
+        <p class="chart-cap"><b>Feedback themes · priority vs frequency</b><span>size = actionability</span></p>
+        <div class="chart" data-chart="themes"><canvas role="img" aria-label="Bubble chart of five feedback themes. Assessment clarity ranks highest on both priority and frequency, then feedback timing, resource access, lecture pacing and module content."></canvas></div>
+        <p class="synthetic">Illustrative reconstruction of the prioritisation framework</p>
         <ul class="bullets">
           <li>Collected and structured qualitative feedback from 80+ students, converting unstructured complaints into a <strong>prioritised theme framework</strong> ranked by frequency and actionability, then took the top three issues to faculty with specific evidence rather than a summary.</li>
           <li>Acted as the bridge between students and academic staff, turning high-volume, ambiguous feedback into a <strong>priority matrix</strong> so faculty could spend limited response capacity on the highest-impact issues first.</li>
@@ -800,386 +449,112 @@ footer{
         </ul>
       </article>
 
-      <article class="role rev">
-        <span class="role-dot" aria-hidden="true"></span>
-        <p class="role-when">Jan 2023 – Jun 2026 · 3+ years</p>
-        <h3 class="role-title">Engagement Champion</h3>
-        <p class="role-org">McDonald's <span class="tag-sector">Operations</span></p>
+      <article class="role">
+        <div class="role-meta"><span class="role-when">Jan 2025 – Sep 2025 · 9 months</span><span class="tag">Logistics &amp; transport</span></div>
+        <h3>Data Scientist</h3>
+        <p class="role-org" style="margin:-.5rem 0 .75rem">AGS Roadways</p>
+        <p class="chart-cap"><b>ETA forecast · actual vs predicted</b><span>24 weeks</span></p>
+        <div class="chart" data-chart="ags"><canvas role="img" aria-label="Line chart over 24 weeks: predicted delivery times track actual times closely, mostly within a quarter of an hour."></canvas></div>
+        <p class="synthetic">Illustrative reconstruction. Underlying data is confidential</p>
+        <ul class="bullets">
+          <li>Built a <strong>supervised forecasting pipeline</strong> (Python, scikit-learn, XGBoost) over 10,000+ logistics records, cutting delivery ETA error by <strong>15% MAE</strong> against the manual baseline.</li>
+          <li>Used <strong>SHAP</strong> and multivariate EDA to find what aggregate reporting hid: departure hour predicted SLA failure better than route distance, and a fuel type × load interaction drove 23% higher cost per trip on heavy diesel routes. Together they led to an <strong>8% operating cost reduction</strong>.</li>
+          <li>Shipped four <strong>Power BI dashboards</strong> (DAX, SQL ETL) that replaced a five-hour manual Excel cycle and returned five analyst hours a week.</li>
+          <li>Presented the root cause to logistics management: three routes behind <strong>61% of SLA failures</strong>, with remediation acted on the following quarter. <a class="text-link" href="#case-ags">Read the case study ↓</a></li>
+        </ul>
+        <div class="pills"><span>Python · scikit-learn · XGBoost</span><span>SHAP</span><span>Power BI · DAX · SQL</span></div>
+      </article>
+
+      <article class="role">
+        <div class="role-meta"><span class="role-when">Jan 2023 – Jun 2026 · 3+ years</span><span class="tag">Operations</span></div>
+        <h3>Engagement Champion</h3>
+        <p class="role-org" style="margin:-.5rem 0 .75rem">McDonald's</p>
         <ul class="bullets">
           <li>Maintained KPI datasets for service time, order accuracy and throughput in a high-volume operational environment, keeping the data clean enough to be worth deciding on.</li>
           <li>Analysed operational metrics to identify performance trends and turn them into recommendations that fed measurable process changes.</li>
           <li>Reported to management stakeholders regularly in a fast-moving setting, which is where I learned to lead with the implication rather than the finding.</li>
         </ul>
       </article>
-
     </div>
-  </div>
+  </div></div>
 </section>
 
-<!-- ═══════════ PROJECTS ═══════════ -->
-<section id="projects">
-  <div class="sec-glow" aria-hidden="true"></div>
-  <div class="amb slate" style="top:6%;right:3%;animation-delay:3s" aria-hidden="true">choose recall over precision when a miss costs more than a false alarm</div>
+<section id="projects" class="layer" data-key="3" aria-labelledby="h-projects">
+  <div class="shell"><div class="col panel-col">
+    <div class="panel-head"><h2 id="h-projects" tabindex="-1">Work that changed a decision.</h2><span class="blk"><b>NPU</b> · projects</span></div>
+    <p class="lede">Problem, reasoning, insight, and what happened differently as a result. Where a chart appears it&#8217;s an illustrative reconstruction, built to show the shape of a result rather than exported from the original run.</p>
 
-  <div class="shell">
-    <p class="eyebrow">Projects</p>
-    <h2 class="t-section rev">Work that <em class="grad">changed</em> a decision.</h2>
-    <p class="lede rev rev-1">Problem, reasoning, insight, and what happened differently as a result. Where a chart appears it’s an illustrative reconstruction, built to show the shape of a result rather than exported from the original run.</p>
+    <article class="proj" id="case-ags">
+      <h3>Late deliveries weren't a route problem. They were a scheduling problem.</h3>
+      <p class="kind">Case study · AGS Roadways</p>
+      <p class="chart-cap"><b>Late rate by departure hour</b><span>07:00–09:00 = peak failure window</span></p>
+      <div class="chart" data-chart="hours" style="height:220px"><canvas role="img" aria-label="Bar chart of late-delivery rate by departure hour from 05:00 to 18:00. Rates peak at 38, 52 and 61 percent for 07:00, 08:00 and 09:00 departures, and stay between 8 and 30 percent at other hours."></canvas></div>
+      <div class="block"><h4>The problem, as it was being solved</h4><p>AGS attributed late deliveries to route complexity and vehicle availability, and optimised accordingly. Dispatchers estimated ETAs from accumulated experience with no formal method, so there was no way to tell whether delays were structural or random, or which part of the operation was producing them.</p></div>
+      <div class="block"><h4>Approach, and why</h4><p>EDA came before modelling, specifically to find out what the data actually tracked versus what people assumed it tracked. Gradient boosting over simple regression, because trip characteristics interact non-linearly. A heavy load matters more on some routes, in some weather. The configuration was chosen for interpretability on purpose: the goal wasn't accuracy alone, it was being able to explain an output to a dispatcher who had to trust it.</p></div>
+      <div class="block"><h4>What it found</h4><p>Departure hour explained late deliveries better than route distance, which pointed at congestion rather than route complexity. A fuel type × vehicle load interaction showed diesel on heavy loads running 23% more expensive per trip. Three routes accounted for 61% of SLA failures, not because they were hard but because they were consistently scheduled into the peak congestion window.</p></div>
+      <div class="block"><h4>The trade-off</h4><p>Recall over raw accuracy, because a missed late-delivery pattern costs more than a false alarm. The decision threshold moved from the default 0.5 down to 0.42, accepting more false positives to catch more real operational failures.</p></div>
+      <div class="block"><h4>What changed</h4><p>Management shifted attention from route optimisation to departure scheduling. The fuel finding became a procurement question. Forecast error fell 15%, operating costs 8%. Four Power BI dashboards replaced the weekly Excel summary, built around exception flags rather than averages so a manager scanning for thirty seconds sees what needs attention, and leadership stopped making Monday decisions against a spreadsheet built the previous Thursday.</p></div>
+      <div class="metrics"><span>↓15% forecast error</span><span>↓8% operating cost</span><span>3 routes → 61% of failures</span><span>Decision: scheduling, not routing</span></div>
+      <div class="stack"><span>Python</span><span>scikit-learn</span><span>XGBoost</span><span>Pandas</span><span>SHAP</span><span>Power BI</span><span>DAX</span><span>SQL</span></div>
+    </article>
 
-    <div class="proj-grid">
-
-      <article class="proj proj-lead rev">
-        <p class="proj-kind">Case study · AGS Roadways</p>
-        <h3>Late deliveries weren't a route problem. They were a scheduling problem.</h3>
-
-        <div class="chart" data-chart="hours">
-          <canvas aria-hidden="true"></canvas>
-          <span class="chart-name">Late rate by departure hour</span>
-          <span class="chart-note">07:00–09:00 = peak failure window</span>
-        </div>
-
-        <div class="block">
-          <span class="block-label">The problem, as it was being solved</span>
-          <p>AGS attributed late deliveries to route complexity and vehicle availability, and optimised accordingly. Dispatchers estimated ETAs from accumulated experience with no formal method, so there was no way to tell whether delays were structural or random, or which part of the operation was producing them.</p>
-        </div>
-
-        <div class="block">
-          <span class="block-label">Approach, and why</span>
-          <p>EDA came before modelling, specifically to find out what the data actually tracked versus what people assumed it tracked. Gradient boosting over simple regression, because trip characteristics interact non-linearly. A heavy load matters more on some routes, in some weather. The configuration was chosen for interpretability on purpose: the goal wasn't accuracy alone, it was being able to explain an output to a dispatcher who had to trust it.</p>
-        </div>
-
-        <div class="block">
-          <span class="block-label">What it found</span>
-          <p>Departure hour explained late deliveries better than route distance, which pointed at congestion rather than route complexity. A fuel type × vehicle load interaction showed diesel on heavy loads running 23% more expensive per trip. Three routes accounted for 61% of SLA failures, not because they were hard but because they were consistently scheduled into the peak congestion window.</p>
-        </div>
-
-        <div class="block">
-          <span class="block-label">The trade-off</span>
-          <p>Recall over raw accuracy, because a missed late-delivery pattern costs more than a false alarm. The decision threshold moved from the default 0.5 down to 0.42, accepting more false positives to catch more real operational failures.</p>
-        </div>
-
-        <div class="block">
-          <span class="block-label">What changed</span>
-          <p>Management shifted attention from route optimisation to departure scheduling. The fuel finding became a procurement question. Forecast error fell 15%, operating costs 8%, and leadership stopped making Monday decisions against a spreadsheet built the previous Thursday.</p>
-        </div>
-
-        <div class="metrics">
-          <span class="metric">↓15% forecast error</span>
-          <span class="metric">↓8% operating cost</span>
-          <span class="metric">3 routes → 61% of failures</span>
-          <span class="metric">Decision: scheduling, not routing</span>
-        </div>
-        <div class="stack"><span>Python</span><span>scikit-learn</span><span>XGBoost</span><span>Pandas</span><span>SHAP</span><span>Power BI</span></div>
-      </article>
-
-      <article class="proj rev rev-1">
-        <p class="proj-kind">Current work</p>
-        <h3>An instrument you drive from a browser</h3>
-
-        <div class="block">
-          <span class="block-label">What it is</span>
-          <p>Control software for laboratory test equipment: a single-page web interface over a Python backend, running on an embedded Linux board so the instrument is usable on its own without a laptop attached.</p>
-        </div>
-
-        <div class="block">
-          <span class="block-label">The architectural decision</span>
-          <p>The first version talked to the hardware directly from the browser. That put the transport in the wrong place. One tab held the port, so one tab held the instrument, and nothing worked across a network. Moving that layer behind the backend meant the browser stopped being a driver and became a client, which is what made multiple users and network access possible at all.</p>
-        </div>
-
-        <div class="block">
-          <span class="block-label">What it taught me</span>
-          <p>Shared hardware needs an ownership model, not just an interface. Most of the hard problems were concurrency: who holds a resource, what happens when a reading fails mid-run, how a second user is told no. I wrote an architecture reference and reviewed my own code against it, because those failure modes only surface once you have to describe the system to someone else.</p>
-        </div>
-
-        <div class="metrics"><span class="metric">Embedded Linux</span><span class="metric">Multi-user</span><span class="metric">Instrument control</span></div>
-        <div class="stack"><span>Python</span><span>Flask</span><span>JavaScript</span><span>Plotly</span><span>Linux</span></div>
-      </article>
-
-      <article class="proj rev rev-2">
-        <p class="proj-kind">Sequence modelling</p>
-        <h3>When to trust a forecast</h3>
-
-        <div class="chart" data-chart="lstm">
-          <canvas aria-hidden="true"></canvas>
-          <span class="chart-name">Prediction vs actual</span>
-          <span class="chart-note">Shaded = uncertainty band</span>
-        </div>
-
-        <div class="block">
-          <span class="block-label">The question</span>
-          <p>Can a model learn anything meaningful in a market defined by noise, and if it can, when should you believe it?</p>
-        </div>
-        <div class="block">
-          <span class="block-label">Approach</span>
-          <p>An LSTM, because price at any moment depends on recent history in a way plain regression can't hold. Rolling momentum and volatility features were added less to improve the headline number than to give the model a sense of market regime, which changed how it behaved under high volatility.</p>
-        </div>
-        <div class="block">
-          <span class="block-label">What it found</span>
-          <p>Prediction intervals widened sharply during regime shifts, which is the correct behaviour. A model that admits uncertainty honestly is more useful than one that projects false confidence, and that's the finding I'd actually defend.</p>
-        </div>
-
-        <div class="metrics"><span class="metric">LSTM</span><span class="metric">Uncertainty-aware</span></div>
-        <div class="stack"><span>TensorFlow</span><span>Keras</span><span>NumPy</span><span>Matplotlib</span></div>
-      </article>
-
-      <article class="proj rev">
-        <p class="proj-kind">Imbalanced classification</p>
-        <h3>The cost of being wrong</h3>
-
-        <div class="chart" data-chart="roc">
-          <canvas aria-hidden="true"></canvas>
-          <span class="chart-name">ROC · fraud classifier</span>
-          <span class="chart-note">Marker = threshold 0.42</span>
-        </div>
-
-        <div class="block">
-          <span class="block-label">The real problem</span>
-          <p>A model optimised for accuracy on an imbalanced dataset predicts "not fraud" almost every time and still scores 99%. That isn't a detector, it's a rubber stamp.</p>
-        </div>
-        <div class="block">
-          <span class="block-label">Approach</span>
-          <p>SMOTE for the 97:3 class imbalance, not because it’s standard but because without it the model never learns what fraud looks like. XGBoost because the signal lives in interactions between transaction size, time of day and merchant category that logistic regression flattens out.</p>
-        </div>
-        <div class="block">
-          <span class="block-label">The trade-off, stated</span>
-          <p>Threshold dropped from 0.5 to 0.42, deliberately accepting more false positives to cut false negatives. Whether that's the right call depends entirely on the cost ratio in the specific business, which is the part worth arguing about. SHAP made each flag explainable to the reviewer who had to action it.</p>
-        </div>
-
-        <div class="metrics"><span class="metric">Recall-weighted</span><span class="metric">Threshold 0.42</span><span class="metric">Per-flag SHAP</span></div>
-        <div class="stack"><span>XGBoost</span><span>SHAP</span><span>SMOTE</span><span>scikit-learn</span></div>
-      </article>
-
-      <article class="proj rev rev-1">
-        <p class="proj-kind">Business intelligence</p>
-        <h3>Replacing gut feel with a live view</h3>
-
-        <div class="chart" data-chart="sla">
-          <canvas aria-hidden="true"></canvas>
-          <span class="chart-name">SLA compliance · before vs after</span>
-          <span class="chart-note">Dashed = manual reporting era</span>
-        </div>
-
-        <div class="block">
-          <span class="block-label">The problem it solved</span>
-          <p>Leadership made weekly operational calls from a manually compiled Excel summary prepared five hours before the meeting. It was already out of date by the time anyone read it, with no way to catch an emerging issue before it compounded.</p>
-        </div>
-        <div class="block">
-          <span class="block-label">Approach</span>
-          <p>Four connected Power BI dashboards across route efficiency, SLA compliance, fuel spend and team KPIs. The important design decision was surfacing exception flags rather than averages, so a manager scanning for thirty seconds sees what needs attention instead of what's normal.</p>
-        </div>
-        <div class="block">
-          <span class="block-label">What changed</span>
-          <p>Five analyst hours returned each week, but the real shift was decisions moving from memory and intuition to a current picture of the operation.</p>
-        </div>
-
-        <div class="metrics"><span class="metric">Live visibility</span><span class="metric">↓5h/week</span><span class="metric">Exception-first design</span></div>
-        <div class="stack"><span>Power BI</span><span>DAX</span><span>SQL</span><span>ETL</span></div>
-      </article>
-
-      <article class="proj rev rev-2">
-        <p class="proj-kind">Risk scoring</p>
-        <h3>A probability isn't a reason</h3>
-
-        <div class="chart" data-chart="pr">
-          <canvas aria-hidden="true"></canvas>
-          <span class="chart-name">Precision–recall</span>
-          <span class="chart-note">Gold = ensemble · slate = logistic baseline</span>
-        </div>
-
-        <div class="block">
-          <span class="block-label">Why interpretability was the requirement</span>
-          <p>In credit decisions a score alone isn't actionable. An officer needs to know <em>why</em> a customer is high risk, because a decline without a reason isn't defensible to the customer or the regulator.</p>
-        </div>
-        <div class="block">
-          <span class="block-label">Approach</span>
-          <p>An XGBoost and logistic regression ensemble: the first for predictive strength, the second for the calibration that makes a 0.7 mean roughly 70%. SHAP was built into the output so every prediction arrived with its top three drivers in language a reviewer could read.</p>
-        </div>
-        <div class="block">
-          <span class="block-label">What it found</span>
-          <p>Churn and default shared leading indicators: customers showing early churn signals were around three times more likely to default within 90 days. That cross-signal only appeared once both models existed side by side.</p>
-        </div>
-
-        <div class="metrics"><span class="metric">Calibrated output</span><span class="metric">Per-decision reasons</span><span class="metric">Cross-model signal</span></div>
-        <div class="stack"><span>XGBoost</span><span>SHAP</span><span>scikit-learn</span><span>Python</span></div>
-      </article>
-
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════ HOW I THINK ═══════════ -->
-<section id="thinking">
-  <div class="amb" style="top:11%;right:4%;animation-delay:3s" aria-hidden="true">if the insight doesn't change a decision, it isn't finished yet</div>
-
-  <div class="shell">
-    <p class="eyebrow">How I think</p>
-    <h2 class="t-section rev">The reasoning <em class="grad">behind</em> the work.</h2>
-    <p class="lede rev rev-1">The process matters as much as the output.</p>
-
-    <div class="think-grid">
-      <article class="think rev">
-        <h3>On ambiguous problems</h3>
-        <p>I start by asking what decision the analysis is meant to support, before touching the data. If I can't say what someone would do differently based on the output, the problem isn't scoped yet.</p>
-        <p>At AGS, "why are deliveries late?" turned out to be two questions: a scheduling one and a procurement one. Answering both meant separating them rather than treating it as one modelling task.</p>
-      </article>
-      <article class="think rev rev-1">
-        <h3>On model choice</h3>
-        <p>The simplest model that answers the question, not the most impressive one. If a logistic regression gives a decision-maker enough confidence to act, XGBoost is complexity nobody asked for.</p>
-        <p>I move to something heavier when the problem genuinely calls for it, for non-linear interactions or temporal dependence, and when I can explain why to the person who'll use it.</p>
-      </article>
-      <article class="think rev rev-2">
-        <h3>On evaluating success</h3>
-        <p>A good validation metric is necessary and not sufficient. Does it reflect what the decision-maker cares about? Optimising accuracy when the real concern is recall is a common and expensive mistake.</p>
-        <p>The harder question: did anyone act differently? If the output sits in a report that changes no behaviour, the numbers didn't save it.</p>
-      </article>
-      <article class="think rev rev-3">
-        <h3>On communicating insight</h3>
-        <p>Lead with the implication, not the finding. "Departure hour has an importance of 0.67" tells a logistics director nothing. "You're losing more time to scheduling than to route length" tells them where to look.</p>
-        <p>And make the uncertainty explicit. A recommendation with honest bounds is worth more than a confident one that hides how much the model doesn't know.</p>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════ VIZ: GLOBE ═══════════ -->
-<section id="globe-section">
-  <div class="shell">
-    <div class="viz-head">
-      <p class="eyebrow">Data in context</p>
-      <h2>Every insight lives in a <em class="grad">real operation</em></h2>
-      <p>Analysis doesn't happen in a notebook. It happens where business, geography and timing meet. Drag to rotate.</p>
-    </div>
-    <canvas id="globe-canvas" role="img" aria-label="Rotating globe marking the locations connected to this work. The same figures are listed below."></canvas>
-    <div class="globe-cards">
-      <div class="gcard">
-        <p class="gcard-label">Delivery network</p>
-        <p class="gcard-val">10,000+ trips</p>
-        <p>Analysed across routes and depots, isolating the three routes behind 61% of SLA failures, a pattern invisible in aggregate reporting.</p>
+    <article class="proj">
+      <h3>An instrument you drive from a browser</h3>
+      <p class="kind">Current work</p>
+      <p class="chart-cap"><b>Where the transport layer sits</b><span>before → after</span></p>
+      <div class="chart arch" role="img" aria-label="Before: one browser tab talks to the instrument directly and holds the port. After: several browsers talk to a Python backend on an embedded Linux board, which owns the instrument.">
+        <p class="arch-lbl">before · one tab holds the port</p>
+        <div class="arch-row" aria-hidden="true"><span class="node">browser tab</span><span class="wire"></span><span class="node">instrument</span></div>
+        <p class="arch-lbl">after · the backend owns the hardware</p>
+        <div class="arch-row" aria-hidden="true"><span class="node-stack"><span class="node">browser</span><span class="node">browser</span></span><span class="wire"></span><span class="node hot">Python backend<small>embedded Linux</small></span><span class="wire hot"></span><span class="node">instrument</span></div>
       </div>
-      <div class="gcard">
-        <p class="gcard-label">Scheduling window</p>
-        <p class="gcard-val">07:00 – 09:00</p>
-        <p>The departure window that explained late deliveries better than route distance. A scheduling fix, not a routing overhaul.</p>
-      </div>
-      <div class="gcard">
-        <p class="gcard-label">Cost reduction</p>
-        <p class="gcard-val">8% operating</p>
-        <p>From surfacing the fuel type × vehicle load interaction, a procurement insight that weekly reporting couldn’t show.</p>
-      </div>
-      <div class="gcard">
-        <p class="gcard-label">Time returned</p>
-        <p class="gcard-val">5 hrs / week</p>
-        <p>Previously spent compiling Excel reports that were stale on arrival. Replaced by dashboards answering the same questions live.</p>
-      </div>
-    </div>
-  </div>
+      <div class="block"><h4>What it is</h4><p>Control software for laboratory test equipment: a single-page web interface over a Python backend, running on an embedded Linux board so the instrument is usable on its own without a laptop attached.</p></div>
+      <div class="block"><h4>The architectural decision</h4><p>The first version talked to the hardware directly from the browser. That put the transport in the wrong place. One tab held the port, so one tab held the instrument, and nothing worked across a network. Moving that layer behind the backend meant the browser stopped being a driver and became a client, which is what made multiple users and network access possible at all.</p></div>
+      <div class="block"><h4>What it taught me</h4><p>Shared hardware needs an ownership model, not just an interface. Most of the hard problems were concurrency: who holds a resource, what happens when a reading fails mid-run, how a second user is told no. I wrote an architecture reference and reviewed my own code against it, because those failure modes only surface once you have to describe the system to someone else.</p></div>
+      <div class="stack"><span>Python</span><span>Flask</span><span>JavaScript</span><span>Plotly</span><span>Linux</span></div>
+    </article>
+
+    <article class="proj">
+      <h3>When to trust a forecast</h3>
+      <p class="kind">Sequence modelling</p>
+      <p class="chart-cap"><b>Prediction vs actual</b><span>shaded = uncertainty band</span></p>
+      <div class="chart" data-chart="lstm"><canvas role="img" aria-label="Price series with a forecast section; the forecast's uncertainty band widens as it moves further ahead."></canvas></div>
+      <div class="block"><h4>The question</h4><p>Can a model learn anything meaningful in a market defined by noise, and if it can, when should you believe it?</p></div>
+      <div class="block"><h4>Approach</h4><p>An LSTM, because price at any moment depends on recent history in a way plain regression can't hold. Rolling momentum and volatility features were added less to improve the headline number than to give the model a sense of market regime, which changed how it behaved under high volatility.</p></div>
+      <div class="block"><h4>What it found</h4><p>Prediction intervals widened sharply during regime shifts, which is the correct behaviour. A model that admits uncertainty honestly is more useful than one that projects false confidence, and that's the finding I'd actually defend.</p></div>
+      <div class="stack"><span>TensorFlow</span><span>Keras</span><span>NumPy</span><span>Matplotlib</span></div>
+    </article>
+
+    <article class="proj">
+      <h3>The cost of being wrong</h3>
+      <p class="kind">Imbalanced classification</p>
+      <p class="chart-cap"><b>ROC · fraud classifier</b><span>marker = threshold 0.42</span></p>
+      <div class="chart" data-chart="roc"><canvas role="img" aria-label="ROC curve rising steeply toward the top left, with the operating point at threshold 0.42 marked: recall 0.85, precision 0.91."></canvas></div>
+      <div class="block"><h4>The real problem</h4><p>A model optimised for accuracy on an imbalanced dataset predicts "not fraud" almost every time and still scores 99%. That isn't a detector, it's a rubber stamp.</p></div>
+      <div class="block"><h4>Approach</h4><p>SMOTE for the 97:3 class imbalance, not because it&#8217;s standard but because without it the model never learns what fraud looks like. XGBoost because the signal lives in interactions between transaction size, time of day and merchant category that logistic regression flattens out.</p></div>
+      <div class="block"><h4>The trade-off, stated</h4><p>Threshold dropped from 0.5 to 0.42, deliberately accepting more false positives to cut false negatives. Whether that's the right call depends entirely on the cost ratio in the specific business, which is the part worth arguing about. SHAP made each flag explainable to the reviewer who had to action it.</p></div>
+      <div class="stack"><span>XGBoost</span><span>SHAP</span><span>SMOTE</span><span>scikit-learn</span></div>
+    </article>
+
+    <article class="proj">
+      <h3>A probability isn't a reason</h3>
+      <p class="kind">Risk scoring</p>
+      <p class="chart-cap"><b>Precision–recall</b><span>orange = ensemble · blue = logistic baseline</span></p>
+      <div class="chart" data-chart="pr"><canvas role="img" aria-label="Precision-recall curves: the ensemble holds higher precision than the logistic regression baseline at every recall level."></canvas></div>
+      <div class="block"><h4>Why interpretability was the requirement</h4><p>In credit decisions a score alone isn't actionable. An officer needs to know <em>why</em> a customer is high risk, because a decline without a reason isn't defensible to the customer or the regulator.</p></div>
+      <div class="block"><h4>Approach</h4><p>An XGBoost and logistic regression ensemble: the first for predictive strength, the second for the calibration that makes a 0.7 mean roughly 70%. SHAP was built into the output so every prediction arrived with its top three drivers in language a reviewer could read.</p></div>
+      <div class="block"><h4>What it found</h4><p>Churn and default shared leading indicators: customers showing early churn signals were around three times more likely to default within 90 days. That cross-signal only appeared once both models existed side by side.</p></div>
+      <div class="stack"><span>XGBoost</span><span>SHAP</span><span>scikit-learn</span><span>Python</span></div>
+    </article>
+  </div></div>
 </section>
 
-<!-- ═══════════ VIZ: FLOW ═══════════ -->
-<section id="flow-section">
-  <div class="shell">
-    <div class="viz-head">
-      <p class="eyebrow">Decision flow</p>
-      <h2>From data to <em class="grad">action</em></h2>
-      <p>How analytical work turns into a business decision, shown as how much each phase contributes to clarity, insight and action taken.</p>
-    </div>
-    <div class="flow-wrap">
-      <canvas id="flowCanvas" role="img" aria-label="Line chart showing problem clarity, insight depth and decision action rising across six project phases, with action lagging until the synthesis phase."></canvas>
-    </div>
-    <div class="legend">
-      <span><i style="background:#c9a96e"></i>Problem clarity</span>
-      <span><i style="background:#7b9fc4"></i>Insight depth</span>
-      <span><i style="background:#4a9c78"></i>Decision action</span>
-    </div>
-    <p class="synthetic" style="margin-top:1rem">Conceptual model of the process, not measured data</p>
-  </div>
-</section>
-
-<!-- ═══════════ VIZ: SCATTER ═══════════ -->
-<section id="scatter-section">
-  <div class="shell">
-    <div class="viz-head">
-      <p class="eyebrow">Trade-off thinking</p>
-      <h2>Every model choice is a <em class="grad">trade-off</em></h2>
-      <p>Accuracy against interpretability: the decision that shapes applied work most and appears in portfolios least.</p>
-    </div>
-    <div class="split">
-      <canvas id="scatterCanvas" role="img" aria-label="Scatter plot placing model families by interpretability against accuracy. Logistic regression is most interpretable, LSTM least; XGBoost sits in the middle of both axes."></canvas>
-      <div>
-        <div class="callout">
-          <h3>Why not always reach for XGBoost?</h3>
-          <p>A model at 94% that nobody trusts is worth less than one at 87% a logistics director will actually act on. Interpretability is a feature, not a concession.</p>
-        </div>
-        <div class="callout b2">
-          <h3>When complexity earns its place</h3>
-          <p>An LSTM for price sequences: linear models fundamentally can't hold temporal memory. The complexity is justified by the structure of the problem, not by wanting to look clever.</p>
-        </div>
-        <div class="callout b3">
-          <h3>The fraud detection middle ground</h3>
-          <p>XGBoost because the signal lives in interactions linear models miss, with SHAP layered on so every flag stays explainable to the human reviewing it.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════ VIZ: RADAR ═══════════ -->
-<section id="radar-section">
-  <div class="shell">
-    <div class="viz-head">
-      <p class="eyebrow">Where I've invested</p>
-      <h2>Depth, and the <em class="grad">deliberate gaps</em></h2>
-      <p>A self-assessment of where my attention has gone, including where it hasn’t.</p>
-    </div>
-    <div class="split">
-      <canvas id="radarCanvas" role="img" aria-label="Radar chart of six self-assessed areas: problem framing and stakeholder communication strongest, MLOps and deployment weakest. Values are listed in the text alongside."></canvas>
-      <div class="radar-copy">
-        <p>Most portfolios show technical depth in isolation. What separates a useful analyst from a competent one is framing the problem correctly, communicating uncertainty honestly, and turning an output into something someone can act on.</p>
-        <p>The shape above is a <strong>self-assessment, not a benchmark</strong>. It reflects where I’ve deliberately invested attention. The visible gap in MLOps and deployment is a real one: my focus has been the analytical work that precedes deployment rather than the infrastructure that follows it. That's the honest read, and it's the first thing I'd want to close in a first role.</p>
-        <ul class="skill-list" style="margin-top:1.4rem">
-          <li>Problem framing <span class="level core">Strongest</span></li>
-          <li>Stakeholder communication <span class="level core">Strong</span></li>
-          <li>ML modelling <span class="level core">Strong</span></li>
-          <li>Statistical thinking <span class="level working">Solid</span></li>
-          <li>Data engineering <span class="level working">Solid</span></li>
-          <li>MLOps &amp; deployment <span class="level working">Developing</span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════ VIZ: IMPACT ═══════════ -->
-<section id="impact-section">
-  <div class="shell">
-    <div class="viz-head">
-      <p class="eyebrow">Project impact</p>
-      <h2>Value <em class="grad">delivered</em></h2>
-      <p>The measurable outcomes, grouped by what they moved.</p>
-    </div>
-    <canvas id="impactCanvas" role="img" aria-label="Horizontal bar chart of project outcomes for the selected metric. Values are described in the surrounding text."></canvas>
-    <div class="switcher" role="group" aria-label="Choose a metric">
-      <button class="switch" data-metric="cost" aria-pressed="true">Cost reduction</button>
-      <button class="switch" data-metric="time" aria-pressed="false">Time saved</button>
-      <button class="switch" data-metric="acc" aria-pressed="false">Accuracy gain</button>
-      <span class="switch-hint">Select a metric to redraw</span>
-    </div>
-    <p class="synthetic" style="margin-top:1rem">Figures from the AGS Roadways placement and personal projects</p>
-  </div>
-</section>
-
-<!-- ═══════════ SKILLS ═══════════ -->
-<section id="skills">
-  <div class="sec-glow" aria-hidden="true"></div>
-  <div class="amb sage" style="top:8%;right:2%;animation-delay:6s" aria-hidden="true">success = the stakeholder acts differently because of the analysis</div>
-
-  <div class="shell">
-    <p class="eyebrow">Skills</p>
-    <h2 class="t-section rev">Tools in <em class="grad">context.</em></h2>
-    <p class="lede rev rev-1">Chosen for fit rather than familiarity. Levels are self-assessed and described in words, because a percentage on a skill bar means whatever the person drawing it wants it to mean.</p>
-
+<section id="skills" class="layer" data-key="4" aria-labelledby="h-skills">
+  <div class="shell"><div class="col panel-col">
+    <div class="panel-head"><h2 id="h-skills" tabindex="-1">Tools in context.</h2><span class="blk"><b>CACHE</b> · skills</span></div>
+    <p class="lede">Chosen for fit rather than familiarity. Levels are self-assessed and described in words, because a percentage on a skill bar means whatever the person drawing it wants it to mean.</p>
     <div class="skill-cols">
-      <div class="rev">
+      <div>
         <p class="skill-head">Machine learning</p>
         <ul class="skill-list">
           <li>scikit-learn <span class="level core">Core</span></li>
@@ -1189,7 +564,7 @@ footer{
           <li>TensorFlow / Keras <span class="level working">Working</span></li>
         </ul>
       </div>
-      <div class="rev rev-1">
+      <div>
         <p class="skill-head">Data engineering</p>
         <ul class="skill-list">
           <li>Python · Pandas · NumPy <span class="level core">Core</span></li>
@@ -1197,9 +572,10 @@ footer{
           <li>SQL <span class="level core">Core</span></li>
           <li>EDA &amp; root cause analysis <span class="level core">Core</span></li>
           <li>ETL pipeline design <span class="level working">Working</span></li>
+          <li>MLOps &amp; deployment <span class="level">Developing</span></li>
         </ul>
       </div>
-      <div class="rev rev-2">
+      <div>
         <p class="skill-head">Analysis &amp; BI</p>
         <ul class="skill-list">
           <li>Matplotlib / Seaborn <span class="level core">Core</span></li>
@@ -1210,81 +586,61 @@ footer{
         </ul>
       </div>
     </div>
+    <p class="gap-note">The visible gap is MLOps and deployment, and it&#8217;s a real one. My focus has been the analytical work that comes before deployment rather than the infrastructure that follows it. It&#8217;s the first thing I&#8217;d want to close in a first role.</p>
 
-    <div class="two-up">
-      <div class="panel rev">
-        <p class="panel-title">What actually drove delivery time</p>
-        <div class="fi-row"><span class="fi-name">route_distance</span><span class="fi-track"><span class="fi-fill" data-w="88%"></span></span><span class="fi-val">0.88</span></div>
-        <div class="fi-row"><span class="fi-name">fuel_type</span><span class="fi-track"><span class="fi-fill" data-w="73%"></span></span><span class="fi-val">0.73</span></div>
-        <div class="fi-row"><span class="fi-name">departure_hour</span><span class="fi-track"><span class="fi-fill" data-w="67%"></span></span><span class="fi-val">0.67</span></div>
-        <div class="fi-row"><span class="fi-name">vehicle_load</span><span class="fi-track"><span class="fi-fill" data-w="54%"></span></span><span class="fi-val">0.54</span></div>
-        <div class="fi-row"><span class="fi-name">weather_code</span><span class="fi-track"><span class="fi-fill" data-w="39%"></span></span><span class="fi-val">0.39</span></div>
-        <p class="footnote">Distance ranks highest but isn’t a lever, because you can’t shorten the route. departure_hour is the highest-ranked feature anyone can actually change, which is why the recommendation was scheduling rather than routing.</p>
-      </div>
-
-      <div class="panel rev rev-1" id="cm-panel">
-        <p class="panel-title">Fraud classifier · what each error costs</p>
-        <div class="cm-grid">
-          <div class="cm-cell cm-good"><b>9,412</b><span>True negative</span></div>
-          <div class="cm-cell cm-bad"><b>47</b><span>False positive</span></div>
-          <div class="cm-cell cm-bad"><b>83</b><span>False negative</span></div>
-          <div class="cm-cell cm-good"><b>458</b><span>True positive</span></div>
-        </div>
-        <p class="footnote">Recall 0.85 · Precision 0.91. 47 false alarms cost a reviewer a minute each; 83 missed cases cost real money. The threshold sits at 0.42 to shift errors toward the cheaper kind.</p>
-      </div>
+    <div class="sub" id="fi-panel">
+      <h3>ETA model · what drove delivery time</h3>
+      <p class="chart-cap"><span>feature importance</span></p>
+      <div class="fi-row"><span class="fi-name">route_distance</span><span class="fi-track"><span class="fi-fill" data-w="88%"></span></span><span class="fi-val">0.88</span></div>
+      <div class="fi-row"><span class="fi-name">fuel_type</span><span class="fi-track"><span class="fi-fill" data-w="73%"></span></span><span class="fi-val">0.73</span></div>
+      <div class="fi-row"><span class="fi-name">departure_hour</span><span class="fi-track"><span class="fi-fill" data-w="67%"></span></span><span class="fi-val">0.67</span></div>
+      <div class="fi-row"><span class="fi-name">vehicle_load</span><span class="fi-track"><span class="fi-fill" data-w="54%"></span></span><span class="fi-val">0.54</span></div>
+      <div class="fi-row"><span class="fi-name">weather_code</span><span class="fi-track"><span class="fi-fill" data-w="39%"></span></span><span class="fi-val">0.39</span></div>
+      <p class="footnote">Distance drives how long a trip takes, but you can&#8217;t shorten the route. departure_hour is the highest-ranked feature anyone can change, and for whether a delivery missed its SLA it was the stronger predictor of the two. That&#8217;s why the recommendation was scheduling rather than routing.</p>
     </div>
 
-    <div class="chips rev">
-      <span class="chip">Python</span><span class="chip">SQL</span><span class="chip">scikit-learn</span>
-      <span class="chip">XGBoost</span><span class="chip">TensorFlow</span><span class="chip">SHAP</span>
-      <span class="chip">Pandas</span><span class="chip">NumPy</span><span class="chip">Power BI</span>
-      <span class="chip">DAX</span><span class="chip">Matplotlib</span><span class="chip">Seaborn</span>
-      <span class="chip">SMOTE</span><span class="chip">LSTM</span><span class="chip">NLP</span>
-      <span class="chip">Git</span><span class="chip">Azure</span><span class="chip">A/B testing</span>
+    <div class="sub">
+      <h3>Fraud classifier · what each error costs</h3>
+      <p class="chart-cap"><span>confusion matrix</span><span>blue = correct · orange = error</span></p>
+      <div class="cm-grid">
+        <div class="cm-cell cm-tn"><b>9,412</b><span>true negative</span></div>
+        <div class="cm-cell cm-fp"><b>47</b><span>false positive</span></div>
+        <div class="cm-cell cm-fn"><b>83</b><span>false negative</span></div>
+        <div class="cm-cell cm-tp"><b>458</b><span>true positive</span></div>
+      </div>
+      <p class="footnote">Recall 0.85 · Precision 0.91. 47 false alarms cost a reviewer a minute each; 83 missed cases cost real money. The threshold sits at 0.42 to shift errors toward the cheaper kind.</p>
     </div>
-  </div>
+  </div></div>
 </section>
 
-<!-- ═══════════ EDUCATION ═══════════ -->
-<section id="education">
-  <div class="shell">
-    <p class="eyebrow">Education</p>
-    <h2 class="t-section rev">Academic <em class="grad">foundation.</em></h2>
-    <div class="edu-grid rev rev-1">
-      <article class="edu">
-        <h3>BSc (Hons) Data Science</h3>
-        <p class="edu-org">Coventry University · 2022–2026</p>
-        <div class="badges">
-          <span class="badge gold">First Class Honours</span>
-          <span class="badge slate">Course Director's Award for Endeavour</span>
-        </div>
-        <p>Statistical modelling, machine learning, deep learning, data engineering, NLP, computer vision and business analytics. Final year focused on applied ML and production pipeline design.</p>
-      </article>
-      <article class="edu">
-        <h3>Currently learning</h3>
-        <p class="edu-org">On the job, and on my own time</p>
-        <div class="badges"><span class="badge gold">Ongoing</span></div>
-        <p>Electronics manufacturing fundamentals: soldering theory, materials, PCB fabrication and IPC-A-610 inspection. Alongside that: MLOps and deployment, which is the gap I named above and the one I’m actively closing.</p>
-      </article>
-    </div>
-  </div>
+<section id="education" class="layer" data-key="5" aria-labelledby="h-edu">
+  <div class="shell"><div class="col panel-col">
+    <div class="panel-head"><h2 id="h-edu" tabindex="-1">Academic foundation.</h2><span class="blk"><b>ROM</b> · education</span></div>
+    <article class="edu">
+      <h3>BSc (Hons) Data Science</h3>
+      <p class="edu-org">Coventry University · 2022–2026</p>
+      <div class="badges"><span class="hot">First Class Honours</span><span>Course Director's Award for Endeavour</span></div>
+      <p>Statistical modelling, machine learning, deep learning, data engineering, NLP, computer vision and business analytics. Final year focused on applied ML and production pipeline design.</p>
+    </article>
+    <article class="edu">
+      <h3>Currently learning</h3>
+      <p class="edu-org">On the job, and on my own time</p>
+      <div class="badges"><span>Ongoing</span></div>
+      <p>Electronics manufacturing fundamentals: soldering theory, materials, PCB fabrication and IPC-A-610 inspection. Alongside that: MLOps and deployment, which is the gap I named above and the one I&#8217;m actively closing.</p>
+    </article>
+  </div></div>
 </section>
 
-<!-- ═══════════ CONTACT ═══════════ -->
-<section id="contact">
-  <div class="shell contact-inner">
-    <p class="status open"><span class="pip" aria-hidden="true"></span>Open to graduate roles · UK-based</p>
-    <h2 class="rev">Let's build something<br><em class="grad">worth measuring.</em></h2>
-    <p class="lede rev rev-1">If you're building a team that needs someone who asks the right question before picking a model, and can explain the answer to a room that doesn’t code, I’d like to talk. Open to data science, ML engineering, analytics and software engineering roles.</p>
-    <div class="contact-actions rev rev-2">
-      <a href="mailto:nithish9195@gmail.com" class="btn btn-primary">Send a message</a>
-      <a href="https://linkedin.com/in/nithishka" target="_blank" rel="noopener" class="btn btn-ghost">LinkedIn ↗</a>
+<section id="contact" class="layer contact" data-key="6" aria-labelledby="h-contact">
+  <div class="shell"><div class="col panel-col">
+    <div class="panel-head"><h2 id="h-contact" tabindex="-1">Let's build something worth measuring.</h2><span class="blk"><b>I/O</b> · contact</span></div>
+    <p class="lede">If you're building a team that needs someone who asks the right question before picking a model, and can explain the answer to a room that doesn&#8217;t code, I&#8217;d like to talk. Open to data science, ML engineering, analytics and software engineering roles, based in London.</p>
+    <div class="contact-actions">
+      <a href="mailto:nithish9195@gmail.com" class="btn btn-copper">Send a message</a>
+      <a href="https://linkedin.com/in/nithishka" target="_blank" rel="noopener" class="btn btn-line">LinkedIn <svg class="ext" viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2h6v6M10 2 2 10"/></svg></a>
     </div>
-    <div class="contact-links">
-      <a href="mailto:nithish9195@gmail.com">nithish9195@gmail.com</a>
-      <a href="https://linkedin.com/in/nithishka" target="_blank" rel="noopener">linkedin.com/in/nithishka</a>
-    </div>
-  </div>
+    <p class="contact-addr">Email: <a href="mailto:nithish9195@gmail.com">nithish9195@gmail.com</a></p>
+  </div></div>
 </section>
 
 </main>
@@ -1295,1105 +651,491 @@ footer{
     <span>Decision-focused analytics · London, UK</span>
   </div>
 </footer>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+
+<!-- Page behaviour: navigation, charts, feature bars (works without the 3D module) -->
 <script>
 (function(){
 'use strict';
-
-/* ═══════════════════════════════════════════════
-   0 · PREFERENCES + SHARED HELPERS
-   One motion query, watched live. One palette,
-   read from CSS custom properties so the canvas
-   and the stylesheet can never drift apart.
-   ═══════════════════════════════════════════════ */
 const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
 let REDUCE = motionQuery.matches;
+motionQuery.addEventListener('change', e => { REDUCE = e.matches; });
 
 const css = getComputedStyle(document.documentElement);
 const token = n => css.getPropertyValue(n).trim();
-
-/* hex → [r,g,b] so canvas code can build rgba() from the same tokens */
-function rgb(hex){
-  const h = hex.replace('#','');
-  const f = h.length === 3 ? h.split('').map(c=>c+c).join('') : h;
-  return [parseInt(f.slice(0,2),16),parseInt(f.slice(2,4),16),parseInt(f.slice(4,6),16)];
-}
+const rgb = hex => { const h = hex.replace('#',''); return [0,2,4].map(i => parseInt(h.slice(i,i+2),16)); };
 const C = {
-  gold : rgb(token('--gold')  || '#c9a96e'),
-  slate: rgb(token('--slate') || '#7b9fc4'),
-  sage : rgb(token('--sage')  || '#4a9c78'),
-  amber: rgb(token('--amber') || '#d4954a'),
-  rose : rgb(token('--rose')  || '#b07a8a'),
-  alert: rgb(token('--alert') || '#d44a4a'),
-  text3: [108,113,122]
+  blue: rgb(token('--data-blue')), orange: rgb(token('--data-orange')), mid: rgb(token('--data-mid')),
+  copper: rgb(token('--copper')), text: rgb(token('--text')), text2: rgb(token('--text-2')),
+  text3: rgb(token('--text-3')), line: rgb(token('--line'))
 };
 const rgba = (c,a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+const mix = (a,b,t) => a.map((v,i) => Math.round(v + (b[i]-v)*t));
+const easeOut = t => 1 - Math.pow(1-t,3);
+const MONO = token('--mono');
 
-const easeOutCubic = t => 1 - Math.pow(1-t,3);
-const easeOutQuart = t => 1 - Math.pow(1-t,4);
-
-/* Crisp canvas on HiDPI, capped at 2x so we don't shade 9M pixels */
 function fitCanvas(canvas,w,h){
   const dpr = Math.min(devicePixelRatio || 1, 2);
-  canvas.width  = Math.round(w*dpr);
-  canvas.height = Math.round(h*dpr);
-  const ctx = canvas.getContext('2d');
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  return ctx;
+  canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr);
+  const ctx = canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return ctx;
 }
-
-/* A render loop that only runs while its element is on screen AND the
-   tab is visible AND motion is allowed. This is the single fix for the
-   three loops that previously ran forever. */
-function gatedLoop(el, step, opts){
-  const o = opts || {};
-  let onScreen = false, running = false, raf = 0;
-  const allowed = () => onScreen && !document.hidden && !(REDUCE && !o.ignoreMotion);
-
-  function frame(t){
-    if(!allowed()){ running = false; return; }
-    step(t);
-    raf = requestAnimationFrame(frame);
-  }
-  function sync(){
-    if(allowed()){
-      if(!running){ running = true; raf = requestAnimationFrame(frame); }
-    } else {
-      running = false;
-      cancelAnimationFrame(raf);
-      if(o.onPause) o.onPause();
-    }
-  }
-  new IntersectionObserver(es => { onScreen = es[0].isIntersecting; sync(); },
-                           {threshold:0}).observe(el);
-  document.addEventListener('visibilitychange', sync);
-  motionQuery.addEventListener('change', sync);
-  return { sync, isOn: allowed };
-}
-
-/* Fire a callback the first time an element scrolls into view */
 function onFirstView(el, fn, threshold){
-  const io = new IntersectionObserver(es => {
-    if(es[0].isIntersecting){ io.disconnect(); fn(); }
-  }, {threshold: threshold == null ? 0.2 : threshold, rootMargin:'0px 0px 80px 0px'});
+  const io = new IntersectionObserver(es => { if(es[0].isIntersecting){ io.disconnect(); fn(); } }, {threshold: threshold == null ? .2 : threshold});
   io.observe(el);
 }
 
-motionQuery.addEventListener('change', e => { REDUCE = e.matches; });
-
-/* ═══════════════════════════════════════════════
-   1 · NAV STATE
-   ═══════════════════════════════════════════════ */
-const nav = document.getElementById('nav');
-const navLinks = [...document.querySelectorAll('.navlinks a')];
-
-let ticking = false;
-addEventListener('scroll', () => {
-  if(ticking) return;
-  ticking = true;
-  requestAnimationFrame(() => {
-    nav.classList.toggle('scrolled', scrollY > 40);
-    ticking = false;
-  });
-}, {passive:true});
-
-/* Mark the section currently occupying the upper viewport */
-const sectionsForNav = navLinks
-  .map(a => document.querySelector(a.getAttribute('href')))
-  .filter(Boolean);
-if(sectionsForNav.length){
-  const navIO = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if(!e.isIntersecting) return;
-      navLinks.forEach(a => a.removeAttribute('aria-current'));
-      const match = navLinks.find(a => a.getAttribute('href') === '#'+e.target.id);
-      if(match) match.setAttribute('aria-current','true');
-    });
-  }, {rootMargin:'-20% 0px -70% 0px'});
-  sectionsForNav.forEach(s => navIO.observe(s));
-}
-
-/* ═══════════════════════════════════════════════
-   2 · SCROLL REVEALS + SECTION GLOWS
-   ═══════════════════════════════════════════════ */
-const revealIO = new IntersectionObserver(entries => {
+/* Section tracking: bond pads light, number keys 1–5 jump */
+const links = [...document.querySelectorAll('.pads a')];
+const sections = [...document.querySelectorAll('main > section')];
+const spy = new IntersectionObserver(entries => {
   entries.forEach(e => {
-    if(e.isIntersecting){ e.target.classList.add('shown'); revealIO.unobserve(e.target); }
+    if(!e.isIntersecting) return;
+    links.forEach(a => a.getAttribute('href') === '#'+e.target.id ? a.setAttribute('aria-current','true') : a.removeAttribute('aria-current'));
   });
-}, {threshold:0.12, rootMargin:'0px 0px -40px 0px'});
-document.querySelectorAll('.rev').forEach(el => revealIO.observe(el));
+}, {rootMargin:'-45% 0px -50% 0px'});
+document.querySelectorAll('main .panel-col').forEach(p => spy.observe(p.closest('section')));
 
-const glowIO = new IntersectionObserver(entries => {
-  entries.forEach(e => e.target.classList.toggle('in-view', e.isIntersecting));
-}, {threshold:0.05});
-document.querySelectorAll('section:has(> .sec-glow)').forEach(s => glowIO.observe(s));
+addEventListener('keydown', e => {
+  if(e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
+  if(e.target.closest('input,textarea,select,[contenteditable]')) return;
+  const i = '12345'.indexOf(e.key);
+  if(i < 0 || !links[i]) return;
+  const target = document.querySelector(links[i].getAttribute('href'));
+  if(!target) return;
+  e.preventDefault();
+  const panel = target.querySelector('.panel-col') || target;
+  panel.scrollIntoView({behavior: REDUCE ? 'auto' : 'smooth', block:'start'});
+  const h = target.querySelector('h2'); if(h) h.focus({preventScroll:true});
+});
 
-/* Confusion-matrix cells stagger in with their panel */
-const cmPanel = document.getElementById('cm-panel');
-if(cmPanel) onFirstView(cmPanel, () => cmPanel.classList.add('shown'), 0.3);
+/* Feature bars */
+const fiPanel = document.getElementById('fi-panel');
+if(fiPanel) onFirstView(fiPanel, () => fiPanel.querySelectorAll('.fi-fill').forEach((b,i) => setTimeout(() => { b.style.width = b.dataset.w; }, REDUCE ? 0 : i*90)), .3);
 
-/* ═══════════════════════════════════════════════
-   3 · COUNTERS + FEATURE BARS
-   ═══════════════════════════════════════════════ */
-const heroSection = document.getElementById('hero');
-if(heroSection){
-  onFirstView(heroSection, () => {
-    document.querySelectorAll('[data-count]').forEach(el => {
-      const target = +el.dataset.count;
-      const suffix = el.dataset.suffix || '';
-      if(REDUCE){ el.textContent = target + suffix; return; }
-      const start = performance.now(), dur = 900;
-      (function step(now){
-        const p = easeOutCubic(Math.min((now-start)/dur, 1));
-        el.textContent = Math.round(target*p) + suffix;
-        if(p < 1) requestAnimationFrame(step);
-      })(performance.now());
-    });
-  }, 0.25);
-}
-
-const fiPanel = document.querySelector('.fi-row')?.closest('.panel');
-if(fiPanel){
-  onFirstView(fiPanel, () => {
-    document.querySelectorAll('.fi-fill').forEach((bar,i) => {
-      setTimeout(() => { bar.style.width = bar.dataset.w; }, REDUCE ? 0 : i*110 + 150);
-    });
-  }, 0.35);
-}
-
-/* ═══════════════════════════════════════════════
-   4 · AMBIENT BACKGROUND FIELD  (gated)
-   ═══════════════════════════════════════════════ */
-(function backgroundField(){
-  const canvas = document.getElementById('bgCanvas');
-  if(!canvas) return;
-  let W = 0, H = 0, ctx = null;
-  const nodes = Array.from({length:52}, () => ({
-    x: Math.random(), y: Math.random(),
-    vx: (Math.random()-.5)*0.00016, vy: (Math.random()-.5)*0.00016
-  }));
-
-  function size(){
-    W = innerWidth; H = innerHeight;
-    ctx = fitCanvas(canvas, W, H);
-  }
-  size();
-  addEventListener('resize', size, {passive:true});
-
-  gatedLoop(document.body, () => {
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = rgba(C.slate, .34);
-    for(const n of nodes){
-      n.x += n.vx; n.y += n.vy;
-      if(n.x < 0 || n.x > 1) n.vx *= -1;
-      if(n.y < 0 || n.y > 1) n.vy *= -1;
-      ctx.beginPath();
-      ctx.arc(n.x*W, n.y*H, 1.2, 0, Math.PI*2);
-      ctx.fill();
-    }
-  });
-})();
-
-/* ═══════════════════════════════════════════════
-   5 · HERO CONSTELLATION  (gated, pointer-aware)
-   ═══════════════════════════════════════════════ */
-(function heroField(){
-  const canvas = document.getElementById('heroCanvas');
-  const host = document.getElementById('hero');
-  if(!canvas || !host) return;
-
-  let W = 0, H = 0, ctx = null, px = -999, py = -999;
-  let nodes = [];
-
-  function size(){
-    W = host.offsetWidth; H = host.offsetHeight;
-    ctx = fitCanvas(canvas, W, H);
-    const count = Math.round(Math.min(80, Math.max(28, W/16)));
-    nodes = Array.from({length:count}, () => ({
-      x: Math.random()*W, y: Math.random()*H,
-      vx: (Math.random()-.5)*.34, vy: (Math.random()-.5)*.34,
-      r: Math.random()*1.5 + .7
-    }));
-  }
-  size();
-  addEventListener('resize', size, {passive:true});
-
-  /* Only fine pointers get the cursor tether — no hover on touch */
-  if(matchMedia('(pointer:fine)').matches){
-    host.addEventListener('pointermove', e => {
-      const r = canvas.getBoundingClientRect();
-      px = e.clientX - r.left; py = e.clientY - r.top;
-    }, {passive:true});
-    host.addEventListener('pointerleave', () => { px = py = -999; }, {passive:true});
-  }
-
-  const LINK = 130;
-  gatedLoop(host, () => {
-    ctx.clearRect(0,0,W,H);
-
-    for(const n of nodes){
-      n.x += n.vx; n.y += n.vy;
-      if(n.x < 0 || n.x > W) n.vx *= -1;
-      if(n.y < 0 || n.y > H) n.vy *= -1;
-    }
-    ctx.fillStyle = rgba(C.gold, .5);
-    for(const n of nodes){
-      ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI*2); ctx.fill();
-    }
-    for(let i=0;i<nodes.length;i++){
-      const a = nodes[i];
-      for(let j=i+1;j<nodes.length;j++){
-        const b = nodes[j];
-        const dx = a.x-b.x, dy = a.y-b.y, d = Math.hypot(dx,dy);
-        if(d >= LINK) continue;
-        const alpha = (1 - d/LINK) * .2;
-        const g = ctx.createLinearGradient(a.x,a.y,b.x,b.y);
-        g.addColorStop(0, rgba(C.gold, alpha));
-        g.addColorStop(1, rgba(C.slate, alpha));
-        ctx.strokeStyle = g; ctx.lineWidth = .7;
-        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
-      }
-      const dm = Math.hypot(a.x-px, a.y-py);
-      if(dm < 110){
-        ctx.strokeStyle = rgba(C.gold, (1 - dm/110)*.28);
-        ctx.lineWidth = .7;
-        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(px,py); ctx.stroke();
-      }
-    }
-  });
-})();
-
-/* ═══════════════════════════════════════════════
-   6 · INLINE CHART ENGINE
-   Each .chart draws once when scrolled into view,
-   redraws on resize, and renders its final frame
-   instantly under reduced motion.
-   ═══════════════════════════════════════════════ */
-
-function axisGrid(ctx,x,y,w,h,rows,fmt,minV,maxV){
-  ctx.textAlign = 'right';
-  ctx.font = '8px ' + token('--mono');
+/* Charts */
+const F = px => px + 'px ' + MONO;
+function grid(ctx,x,y,w,h,rows,fmt,minV,maxV){
+  ctx.textAlign='right'; ctx.font=F(11);
   for(let i=0;i<=rows;i++){
     const gy = y + i*(h/rows);
-    ctx.strokeStyle = 'rgba(255,255,255,.04)';
-    ctx.lineWidth = .7;
-    ctx.beginPath(); ctx.moveTo(x,gy); ctx.lineTo(x+w,gy); ctx.stroke();
-    if(fmt){
-      ctx.fillStyle = rgba(C.text3,.7);
-      ctx.fillText(fmt(maxV - (i/rows)*(maxV-minV)), x-5, gy+3);
-    }
+    ctx.strokeStyle = rgba(C.line,1); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x,gy+.5); ctx.lineTo(x+w,gy+.5); ctx.stroke();
+    if(fmt){ ctx.fillStyle = rgba(C.text3,1); ctx.fillText(fmt(maxV - (i/rows)*(maxV-minV)), x-6, gy+4); }
   }
 }
-
-/* Two-series line chart with fill, used by three panels */
-function dualLine(ctx,W,H,p,cfg){
-  const {a,b,ca,cb,labelA,labelB,ticks,dashA,floor} = cfg;
-  const padL=44, padR=14, padT=30, padB=32;
-  const gW = W-padL-padR, gH = H-padT-padB;
-  const all = a.concat(b);
-  const minV = floor != null ? floor : Math.min(...all)*.94;
-  const maxV = Math.max(...all)*1.06;
-  const n = a.length;
-  const sx = i => padL + (i/(n-1))*gW;
-  const sy = v => padT + gH - ((v-minV)/(maxV-minV))*gH;
-
-  ctx.clearRect(0,0,W,H);
-  axisGrid(ctx,padL,padT,gW,gH,4,v=>v.toFixed(0),minV,maxV);
-
-  ctx.textAlign='center'; ctx.fillStyle=rgba(C.text3,.65);
-  ctx.font = '8px ' + token('--mono');
-  ticks.forEach((t,i)=>{ if(i%2===0) ctx.fillText(t, sx(i), H-padB+13); });
-
-  const last = Math.max(1, Math.round(p*(n-1)));
-  [[a,ca,dashA],[b,cb,false]].forEach(([data,col,dash])=>{
-    ctx.beginPath(); ctx.moveTo(padL, padT+gH);
-    for(let i=0;i<=last;i++) ctx.lineTo(sx(i), sy(data[i]));
-    ctx.lineTo(sx(last), padT+gH); ctx.closePath();
-    ctx.fillStyle = rgba(col,.06); ctx.fill();
-
-    ctx.beginPath();
-    for(let i=0;i<=last;i++){ i ? ctx.lineTo(sx(i),sy(data[i])) : ctx.moveTo(sx(i),sy(data[i])); }
-    ctx.setLineDash(dash ? [5,3] : []);
-    ctx.strokeStyle = rgba(col,.88); ctx.lineWidth = 2; ctx.lineJoin='round';
-    ctx.stroke(); ctx.setLineDash([]);
-
-    ctx.beginPath(); ctx.arc(sx(last), sy(data[last]), 3.2, 0, Math.PI*2);
-    ctx.fillStyle = rgba(col,1); ctx.fill();
+function legend(ctx,x,y,items){
+  ctx.textAlign='left'; ctx.font=F(11); let cx = x;
+  items.forEach(([label,col,dash]) => {
+    ctx.strokeStyle = rgba(col,1); ctx.lineWidth = 2; ctx.setLineDash(dash ? [4,3] : []);
+    ctx.beginPath(); ctx.moveTo(cx,y-4); ctx.lineTo(cx+14,y-4); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = rgba(C.text2,1); ctx.fillText(label, cx+20, y);
+    cx += 20 + ctx.measureText(label).width + 18;
   });
-
-  ctx.textAlign='left'; ctx.font = '9px ' + token('--mono');
-  ctx.fillStyle = rgba(ca,.85); ctx.fillText('— '+labelA, padL, padT-11);
-  ctx.fillStyle = rgba(cb,.85); ctx.fillText('— '+labelB, padL + Math.max(96, W*.34), padT-11);
 }
-
+function line(ctx,pts,col,w,dash){
+  ctx.beginPath(); pts.forEach(([x,y],i) => i ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
+  ctx.setLineDash(dash || []); ctx.strokeStyle = rgba(col,1); ctx.lineWidth = w; ctx.lineJoin='round'; ctx.stroke(); ctx.setLineDash([]);
+}
 const CHARTS = {
-
   ags(ctx,W,H,p){
     const actual = [2.4,2.1,2.8,2.5,3.1,2.9,2.3,2.6,2.9,3.2,2.7,2.4,2.8,2.6,3.0,2.4,2.2,2.7,2.5,2.9,2.3,2.6,2.8,2.5];
     const pred = actual.map((v,i)=> +(v - .14 + .08*Math.sin(i*.9)).toFixed(2));
-    dualLine(ctx,W,H,p,{
-      a:actual, b:pred, ca:C.gold, cb:C.slate,
-      labelA:'Actual ETA (hrs)', labelB:'Predicted',
-      ticks: actual.map((_,i)=>'W'+(i+1))
-    });
+    const padL=44,padR=14,padT=30,padB=26,gW=W-padL-padR,gH=H-padT-padB,minV=1.8,maxV=3.4,n=actual.length;
+    const sx=i=>padL+(i/(n-1))*gW, sy=v=>padT+gH-((v-minV)/(maxV-minV))*gH;
+    ctx.clearRect(0,0,W,H); grid(ctx,padL,padT,gW,gH,4,v=>v.toFixed(1)+'h',minV,maxV);
+    ctx.textAlign='center'; ctx.font=F(11); ctx.fillStyle=rgba(C.text3,1);
+    [0,6,12,18,23].forEach(i => ctx.fillText('wk '+(i+1), sx(i), H-8));
+    const last = Math.max(1, Math.round(p*(n-1)));
+    line(ctx, actual.slice(0,last+1).map((v,i)=>[sx(i),sy(v)]), C.blue, 2);
+    line(ctx, pred.slice(0,last+1).map((v,i)=>[sx(i),sy(v)]), C.orange, 2, [5,3]);
+    legend(ctx, padL, 16, [['actual ETA',C.blue],['predicted',C.orange,true]]);
   },
-
-  sla(ctx,W,H,p){
-    const before = [74,72,76,71,73,75,70,72,74,73,71,69];
-    const after  = [74,72,76,71,73,91,93,92,94,95,93,96];
-    dualLine(ctx,W,H,p,{
-      a:before, b:after, ca:C.slate, cb:C.sage, dashA:true, floor:60,
-      labelA:'Manual reporting', labelB:'Live dashboards',
-      ticks:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-    });
-    if(p > .85){
-      ctx.textAlign='center'; ctx.font = '9px ' + token('--mono');
-      ctx.fillStyle = rgba(C.sage,.6);
-      ctx.fillText('dashboards live →', 44 + (5/11)*(W-58), 16);
-    }
-  },
-
   hours(ctx,W,H,p){
-    const hours = ['05','06','07','08','09','10','11','12','13','14','15','16','17','18'];
-    const rate  = [8,10,38,52,61,22,15,12,14,18,20,25,30,22];
-    const padL=10, padR=10, padT=26, padB=26;
-    const gW = W-padL-padR, gH = H-padT-padB;
-    const maxV = Math.max(...rate), bw = gW/rate.length - 4;
-
-    ctx.clearRect(0,0,W,H);
-    axisGrid(ctx,padL,padT,gW,gH,4,null);
-
+    const hours=['05','06','07','08','09','10','11','12','13','14','15','16','17','18'];
+    const rate=[8,10,38,52,61,22,15,12,14,18,20,25,30,22];
+    const padL=40,padR=10,padT=24,padB=26,gW=W-padL-padR,gH=H-padT-padB,maxV=70,slot=gW/rate.length,bw=Math.max(6,slot-6);
+    ctx.clearRect(0,0,W,H); grid(ctx,padL,padT,gW,gH,7,v=>Math.round(v)+'%',0,maxV);
     rate.forEach((v,i)=>{
-      const col = v > 35 ? C.alert : v > 20 ? C.amber : C.sage;
-      const x = padL + i*(gW/rate.length) + 2;
-      const bh = (v/maxV)*gH*p, y = padT+gH-bh;
-      if(i>=2 && i<=4){ ctx.fillStyle = rgba(C.alert,.06); ctx.fillRect(x-2,padT,bw+4,gH); }
-      const g = ctx.createLinearGradient(0,y,0,y+bh);
-      g.addColorStop(0, rgba(col,.9)); g.addColorStop(1, rgba(col,.28));
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.roundRect ? ctx.roundRect(x,y,bw,bh,2) : ctx.rect(x,y,bw,bh);
-      ctx.fill();
-      ctx.textAlign='center'; ctx.font = '8px ' + token('--mono');
-      ctx.fillStyle = rgba(C.text3,.85);
-      ctx.fillText(hours[i], x+bw/2, H-padB+12);
-      if(p > .55){
-        ctx.fillStyle = rgba(col,.85);
-        ctx.fillText(v+'%', x+bw/2, y-4);
-      }
+      const x=padL+i*slot+(slot-bw)/2, bh=(v/maxV)*gH*p, y=padT+gH-bh;
+      ctx.fillStyle=`rgb(${mix(C.mid,C.orange,Math.min(1,v/61)).join(',')})`; ctx.fillRect(x,y,bw,bh);
+      ctx.textAlign='center'; ctx.font=F(11); ctx.fillStyle=rgba(C.text3,1);
+      if(slot>26||i%2===0) ctx.fillText(hours[i], x+bw/2, H-8);
+      if(p>.6&&slot>30){ ctx.fillStyle=rgba(C.text,1); ctx.fillText(v+'%', x+bw/2, y-5); }
     });
+    const x0=padL+2*slot, x1=padL+5*slot;
+    ctx.strokeStyle=rgba(C.copper,1); ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    [x0,x1].forEach(x=>{ ctx.beginPath(); ctx.moveTo(x+.5,padT); ctx.lineTo(x+.5,padT+gH); ctx.stroke(); }); ctx.setLineDash([]);
+    ctx.textAlign='left'; ctx.font=F(11); ctx.fillStyle=rgba(C.copper,1); ctx.fillText('07:00–09:00', x0+6, 14);
   },
-
   themes(ctx,W,H,p){
-    const themes = [
-      {label:'Assessment clarity', f:85, pr:90, c:C.gold},
-      {label:'Feedback timing', f:72, pr:88, c:C.slate},
-      {label:'Resource access', f:68, pr:75, c:C.sage},
-      {label:'Lecture pacing', f:55, pr:60, c:C.amber},
-      {label:'Module content', f:42, pr:50, c:C.rose}
-    ];
-    const padL=42, padR=14, padT=20, padB=30;
-    const gW = W-padL-padR, gH = H-padT-padB;
-
-    ctx.clearRect(0,0,W,H);
-    ctx.strokeStyle = rgba(C.gold,.16); ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(padL,padT); ctx.lineTo(padL,padT+gH); ctx.lineTo(padL+gW,padT+gH); ctx.stroke();
-    for(let i=1;i<=4;i++){
-      ctx.strokeStyle='rgba(255,255,255,.03)'; ctx.lineWidth=.6;
-      const gy = padT+(i/4)*gH, gx = padL+(i/4)*gW;
-      ctx.beginPath(); ctx.moveTo(padL,gy); ctx.lineTo(padL+gW,gy); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(gx,padT); ctx.lineTo(gx,padT+gH); ctx.stroke();
-    }
-    ctx.font = '8px ' + token('--mono'); ctx.fillStyle = rgba(C.text3,.7);
-    ctx.textAlign='center'; ctx.fillText('frequency →', padL+gW/2, H-6);
-    ctx.save(); ctx.translate(11, padT+gH/2); ctx.rotate(-Math.PI/2);
-    ctx.fillText('priority →', 0, 0); ctx.restore();
-
+    const themes=[{label:'Assessment clarity',f:85,pr:90,a:1},{label:'Feedback timing',f:72,pr:88,a:.85},{label:'Resource access',f:68,pr:75,a:.7},{label:'Lecture pacing',f:55,pr:60,a:.5},{label:'Module content',f:42,pr:50,a:.35}];
+    const padL=34,padR=16,padT=16,padB=30,gW=W-padL-padR,gH=H-padT-padB;
+    ctx.clearRect(0,0,W,H); ctx.strokeStyle=rgba(C.line,1); ctx.lineWidth=1;
+    for(let i=0;i<=4;i++){ const gy=padT+(i/4)*gH, gx=padL+(i/4)*gW;
+      ctx.beginPath(); ctx.moveTo(padL,gy+.5); ctx.lineTo(padL+gW,gy+.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(gx+.5,padT); ctx.lineTo(gx+.5,padT+gH); ctx.stroke(); }
+    ctx.font=F(11); ctx.fillStyle=rgba(C.text3,1); ctx.textAlign='right'; ctx.fillText('frequency →', padL+gW, H-8);
+    ctx.save(); ctx.translate(14,padT); ctx.rotate(-Math.PI/2); ctx.textAlign='right'; ctx.fillText('priority →',0,0); ctx.restore();
     themes.forEach((t,i)=>{
-      const bp = Math.max(0, Math.min(1, (p - i*.1)/.9));
-      if(bp <= 0) return;
-      const x = padL + (t.f/100)*gW, y = padT + gH - (t.pr/100)*gH;
-      const r = (10 + bp*8);
-      const g = ctx.createRadialGradient(x,y,0,x,y,r*2.2);
-      g.addColorStop(0, rgba(t.c,.16)); g.addColorStop(1, rgba(t.c,0));
-      ctx.beginPath(); ctx.arc(x,y,r*2.2,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
-      ctx.beginPath(); ctx.arc(x,y,r*bp,0,Math.PI*2);
-      ctx.fillStyle = rgba(t.c,.5); ctx.fill();
-      ctx.strokeStyle = rgba(t.c,.9); ctx.lineWidth = 1.4; ctx.stroke();
-      if(bp > .7){
-        ctx.font = '8px ' + token('--sans');
-        ctx.fillStyle = rgba(t.c,.9); ctx.textAlign='center';
-        ctx.fillText(t.label, x, y + r*bp + 11);
-      }
+      const bp=Math.max(0,Math.min(1,(p-i*.1)/.9)); if(bp<=0) return;
+      const x=padL+(t.f/100)*gW, y=padT+gH-(t.pr/100)*gH, s=(8+t.a*10)*bp;
+      ctx.fillStyle=`rgb(${mix(C.mid,C.orange,t.a).join(',')})`; ctx.fillRect(x-s/2,y-s/2,s,s);
+      if(bp>.8&&W>380){ ctx.font=F(11); ctx.fillStyle=rgba(C.text2,1); ctx.textAlign='right'; ctx.fillText(t.label, x-s/2-6, y+4); }
     });
   },
-
   lstm(ctx,W,H,p){
-    const n = 58, split = 38;
-    const actual = [], pred = [], hi = [], lo = [];
-    for(let i=0;i<n;i++){
-      const v = 28000 + 3000*Math.sin(i*.18) + 1500*Math.sin(i*.37);
-      actual.push(v);
-      if(i >= split){
-        const q = v + 220*Math.sin(i*.9);
-        pred.push(q); hi.push(q + 600 + i*20); lo.push(q - 600 - i*18);
-      }
-    }
-    const padL=44, padR=14, padT=26, padB=20;
-    const gW = W-padL-padR, gH = H-padT-padB;
-    const all = actual.concat(hi, lo);
-    const minV = Math.min(...all)*.99, maxV = Math.max(...all)*1.01;
-    const sx = i => padL + (i/(n-1))*gW;
-    const sy = v => padT + gH - ((v-minV)/(maxV-minV))*gH;
-
-    ctx.clearRect(0,0,W,H);
-    axisGrid(ctx,padL,padT,gW,gH,4,v=>Math.round(v/1000)+'k',minV,maxV);
-
-    if(p > .55){
-      const end = Math.min(pred.length-1, Math.round(((p-.55)/.45)*pred.length));
-      ctx.beginPath(); ctx.moveTo(sx(split), sy(hi[0]));
-      for(let i=1;i<=end;i++) ctx.lineTo(sx(split+i), sy(hi[i]));
-      for(let i=end;i>=0;i--) ctx.lineTo(sx(split+i), sy(lo[i]));
-      ctx.closePath(); ctx.fillStyle = rgba(C.rose,.10); ctx.fill();
-
-      ctx.beginPath(); ctx.moveTo(sx(split), sy(actual[split]));
-      for(let i=0;i<=end;i++) ctx.lineTo(sx(split+i), sy(pred[i]));
-      ctx.setLineDash([5,3]); ctx.strokeStyle = rgba(C.rose,.88);
-      ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
-    }
-
-    const upto = Math.min(Math.round(p*n), split);
-    ctx.beginPath();
-    for(let i=0;i<upto;i++){ i ? ctx.lineTo(sx(i),sy(actual[i])) : ctx.moveTo(sx(i),sy(actual[i])); }
-    ctx.strokeStyle = rgba(C.gold,.88); ctx.lineWidth = 2; ctx.lineJoin='round'; ctx.stroke();
-
-    if(p > .5){
-      ctx.setLineDash([3,3]); ctx.strokeStyle='rgba(255,255,255,.1)'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(sx(split),padT); ctx.lineTo(sx(split),padT+gH); ctx.stroke();
-      ctx.setLineDash([]);
-    }
-    ctx.textAlign='left'; ctx.font = '9px ' + token('--mono');
-    ctx.fillStyle = rgba(C.gold,.85); ctx.fillText('— actual', padL, padT-10);
-    ctx.fillStyle = rgba(C.rose,.85); ctx.fillText('-- forecast', padL+64, padT-10);
+    const n=58,split=38,actual=[],pred=[],hi=[],lo=[];
+    for(let i=0;i<n;i++){ const v=28000+3000*Math.sin(i*.18)+1500*Math.sin(i*.37); actual.push(v);
+      if(i>=split){ const q=v+220*Math.sin(i*.9); pred.push(q); hi.push(q+600+(i-split)*120); lo.push(q-600-(i-split)*110); } }
+    const padL=44,padR=14,padT=30,padB=14,gW=W-padL-padR,gH=H-padT-padB;
+    const all=actual.concat(hi,lo),minV=Math.min(...all)*.99,maxV=Math.max(...all)*1.01;
+    const sx=i=>padL+(i/(n-1))*gW, sy=v=>padT+gH-((v-minV)/(maxV-minV))*gH;
+    ctx.clearRect(0,0,W,H); grid(ctx,padL,padT,gW,gH,4,v=>Math.round(v/1000)+'k',minV,maxV);
+    const upto=Math.min(Math.round(p*n),split+1);
+    line(ctx, actual.slice(0,upto).map((v,i)=>[sx(i),sy(v)]), C.blue, 2);
+    if(p>.55){ const end=Math.min(pred.length-1,Math.round(((p-.55)/.45)*(pred.length-1)));
+      ctx.beginPath(); ctx.moveTo(sx(split),sy(hi[0]));
+      for(let i=1;i<=end;i++) ctx.lineTo(sx(split+i),sy(hi[i]));
+      for(let i=end;i>=0;i--) ctx.lineTo(sx(split+i),sy(lo[i]));
+      ctx.closePath(); ctx.fillStyle=rgba(C.orange,.18); ctx.fill();
+      line(ctx, pred.slice(0,end+1).map((v,i)=>[sx(split+i),sy(v)]), C.orange, 2, [5,3]);
+      ctx.strokeStyle=rgba(C.text3,1); ctx.lineWidth=1; ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.moveTo(sx(split)+.5,padT); ctx.lineTo(sx(split)+.5,padT+gH); ctx.stroke(); ctx.setLineDash([]); }
+    legend(ctx, padL, 16, [['actual',C.blue],['forecast',C.orange,true]]);
   },
-
   roc(ctx,W,H,p){
-    const pts = [[0,0],[.015,.3],[.04,.55],[.08,.73],[.14,.84],[.22,.91],[.35,.955],[.55,.975],[.8,.99],[1,1]];
-    const pad = 26, S = Math.min(W,H) - pad*2, ox = pad, oy = pad;
-    ctx.clearRect(0,0,W,H);
-    ctx.strokeStyle = rgba(C.gold,.2); ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ox,oy+S); ctx.lineTo(ox+S,oy+S); ctx.stroke();
-    ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(255,255,255,.08)';
-    ctx.beginPath(); ctx.moveTo(ox,oy+S); ctx.lineTo(ox+S,oy); ctx.stroke(); ctx.setLineDash([]);
-
-    ctx.font = '8px ' + token('--mono'); ctx.fillStyle = rgba(C.text3,.7);
-    ctx.textAlign='center'; ctx.fillText('false positive rate →', ox+S/2, oy+S+15);
-    ctx.save(); ctx.translate(11, oy+S/2); ctx.rotate(-Math.PI/2);
-    ctx.fillText('true positive rate →',0,0); ctx.restore();
-
-    const upto = Math.max(1, Math.round(p*(pts.length-1)));
-    ctx.beginPath(); ctx.moveTo(ox, oy+S);
-    for(let i=0;i<=upto;i++) ctx.lineTo(ox+pts[i][0]*S, oy+S-pts[i][1]*S);
-    ctx.lineTo(ox+pts[upto][0]*S, oy+S); ctx.closePath();
-    ctx.fillStyle = rgba(C.sage,.05); ctx.fill();
-
-    const g = ctx.createLinearGradient(ox,oy+S,ox+S,oy);
-    g.addColorStop(0, rgba(C.gold,.6)); g.addColorStop(1, rgba(C.sage,.9));
-    ctx.beginPath();
-    for(let i=0;i<=upto;i++){
-      const [fx,fy] = pts[i];
-      i ? ctx.lineTo(ox+fx*S, oy+S-fy*S) : ctx.moveTo(ox+fx*S, oy+S-fy*S);
-    }
-    ctx.strokeStyle = g; ctx.lineWidth = 2.4; ctx.lineJoin='round'; ctx.stroke();
-
-    if(p > .7){
-      const a = (p-.7)/.3, tx = ox + .05*S, ty = oy + S - .847*S;
-      ctx.beginPath(); ctx.arc(tx,ty,7,0,Math.PI*2); ctx.fillStyle = rgba(C.gold,a*.16); ctx.fill();
-      ctx.beginPath(); ctx.arc(tx,ty,3.6,0,Math.PI*2); ctx.fillStyle = rgba(C.gold,a); ctx.fill();
-      ctx.textAlign='left'; ctx.font = '9px ' + token('--mono');
-      ctx.fillStyle = rgba(C.gold,a); ctx.fillText('threshold 0.42', tx+9, ty-4);
-      ctx.fillStyle = rgba(C.text3,a); ctx.fillText('recall 0.85 · precision 0.91', tx+9, ty+8);
-    }
+    const pts=[[0,0],[.015,.3],[.04,.55],[.08,.73],[.14,.84],[.22,.91],[.35,.955],[.55,.975],[.8,.99],[1,1]];
+    const padL=40,padB=26,padT=12,S=Math.min(W-padL-16,H-padT-padB),ox=padL,oy=padT;
+    ctx.clearRect(0,0,W,H); ctx.strokeStyle=rgba(C.line,1); ctx.lineWidth=1; ctx.strokeRect(ox+.5,oy+.5,S,S);
+    ctx.setLineDash([3,4]); ctx.beginPath(); ctx.moveTo(ox,oy+S); ctx.lineTo(ox+S,oy); ctx.stroke(); ctx.setLineDash([]);
+    ctx.font=F(11); ctx.fillStyle=rgba(C.text3,1); ctx.textAlign='center'; ctx.fillText('false positive rate', ox+S/2, oy+S+18);
+    ctx.save(); ctx.translate(14,oy+S/2); ctx.rotate(-Math.PI/2); ctx.fillText('true positive rate',0,0); ctx.restore();
+    const upto=Math.max(1,Math.round(p*(pts.length-1)));
+    line(ctx, pts.slice(0,upto+1).map(([fx,fy])=>[ox+fx*S,oy+S-fy*S]), C.blue, 2.4);
+    if(p>.7){ const tx=ox+.05*S, ty=oy+S-.847*S;
+      ctx.fillStyle=rgba(C.orange,1); ctx.fillRect(tx-4,ty-4,8,8);
+      ctx.textAlign='left'; ctx.font=F(11); ctx.fillStyle=rgba(C.text,1); ctx.fillText('threshold 0.42', tx+10, ty+16);
+      ctx.fillStyle=rgba(C.text2,1); ctx.fillText('recall 0.85 · precision 0.91', tx+10, ty+31); }
   },
-
   pr(ctx,W,H,p){
-    const xgb = [[0,1],[.08,.985],[.18,.97],[.32,.95],[.5,.92],[.65,.88],[.78,.82],[.88,.73],[.95,.61],[1,.52]];
-    const log = [[0,.95],[.2,.93],[.4,.88],[.6,.78],[.8,.62],[1,.45]];
-    const pad = 26, S = Math.min(W,H) - pad*2, ox = pad, oy = pad;
-    ctx.clearRect(0,0,W,H);
-    ctx.strokeStyle = rgba(C.gold,.2); ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ox,oy+S); ctx.lineTo(ox+S,oy+S); ctx.stroke();
-
-    ctx.font = '8px ' + token('--mono'); ctx.fillStyle = rgba(C.text3,.7);
-    ctx.textAlign='center'; ctx.fillText('recall →', ox+S/2, oy+S+15);
-    ctx.save(); ctx.translate(11, oy+S/2); ctx.rotate(-Math.PI/2);
-    ctx.fillText('precision →',0,0); ctx.restore();
-
-    const upto = Math.max(1, Math.round(p*(xgb.length-1)));
-    ctx.beginPath(); ctx.moveTo(ox, oy);
-    for(let i=0;i<=upto;i++) ctx.lineTo(ox+xgb[i][0]*S, oy+S-xgb[i][1]*S);
-    ctx.lineTo(ox+xgb[upto][0]*S, oy+S); ctx.lineTo(ox, oy+S); ctx.closePath();
-    ctx.fillStyle = rgba(C.gold,.055); ctx.fill();
-
-    ctx.beginPath();
-    for(let i=0;i<=upto;i++){
-      const [fx,fy] = xgb[i];
-      i ? ctx.lineTo(ox+fx*S, oy+S-fy*S) : ctx.moveTo(ox+fx*S, oy+S-fy*S);
-    }
-    ctx.strokeStyle = rgba(C.gold,.9); ctx.lineWidth = 2.4; ctx.lineJoin='round'; ctx.stroke();
-
-    if(p > .4){
-      const n2 = Math.max(1, Math.round(((p-.4)/.6)*(log.length-1)));
-      ctx.beginPath();
-      for(let i=0;i<=n2;i++){
-        const [fx,fy] = log[i];
-        i ? ctx.lineTo(ox+fx*S, oy+S-fy*S) : ctx.moveTo(ox+fx*S, oy+S-fy*S);
-      }
-      ctx.setLineDash([4,3]); ctx.strokeStyle = rgba(C.slate,.65);
-      ctx.lineWidth = 1.7; ctx.stroke(); ctx.setLineDash([]);
-    }
+    const xgb=[[0,1],[.08,.985],[.18,.97],[.32,.95],[.5,.92],[.65,.88],[.78,.82],[.88,.73],[.95,.61],[1,.52]];
+    const log=[[0,.95],[.2,.93],[.4,.88],[.6,.78],[.8,.62],[1,.45]];
+    const padL=40,padB=26,padT=12,S=Math.min(W-padL-16,H-padT-padB),ox=padL,oy=padT;
+    ctx.clearRect(0,0,W,H); ctx.strokeStyle=rgba(C.line,1); ctx.lineWidth=1; ctx.strokeRect(ox+.5,oy+.5,S,S);
+    ctx.font=F(11); ctx.fillStyle=rgba(C.text3,1); ctx.textAlign='center'; ctx.fillText('recall', ox+S/2, oy+S+18);
+    ctx.save(); ctx.translate(14,oy+S/2); ctx.rotate(-Math.PI/2); ctx.fillText('precision',0,0); ctx.restore();
+    const upto=Math.max(1,Math.round(p*(xgb.length-1)));
+    line(ctx, xgb.slice(0,upto+1).map(([fx,fy])=>[ox+fx*S,oy+S-fy*S]), C.orange, 2.4);
+    if(p>.4){ const n2=Math.max(1,Math.round(((p-.4)/.6)*(log.length-1)));
+      line(ctx, log.slice(0,n2+1).map(([fx,fy])=>[ox+fx*S,oy+S-fy*S]), C.blue, 1.8, [4,3]); }
   }
 };
-
-/* Drive every .chart with one observer + one resize handler */
-document.querySelectorAll('.chart').forEach(wrap => {
-  const key = wrap.dataset.chart;
-  const canvas = wrap.querySelector('canvas');
-  const draw = CHARTS[key];
+document.querySelectorAll('.chart[data-chart]').forEach(wrap => {
+  const canvas = wrap.querySelector('canvas'), draw = CHARTS[wrap.dataset.chart];
   if(!canvas || !draw) return;
-
   let drawn = false;
-
   function render(animate){
-    const rect = wrap.getBoundingClientRect();
-    const W = Math.max(rect.width, 260), H = Math.max(rect.height, 130);
+    const W = wrap.clientWidth, H = wrap.clientHeight; if(!W || !H) return;
     const ctx = fitCanvas(canvas, W, H);
-    if(!animate){ draw(ctx, W, H, 1); return; }
-    const start = performance.now(), dur = 1300;
-    (function step(now){
-      const p = easeOutCubic(Math.min((now-start)/dur, 1));
-      draw(ctx, W, H, p);
-      if(p < 1) requestAnimationFrame(step);
-    })(performance.now());
+    if(!animate){ draw(ctx,W,H,1); return; }
+    const start = performance.now();
+    (function step(now){ const p = easeOut(Math.min((now-start)/900,1)); draw(ctx,W,H,p); if(p<1) requestAnimationFrame(step); })(performance.now());
   }
+  onFirstView(wrap, () => { drawn = true; render(!REDUCE); }, .25);
+  let t; addEventListener('resize', () => { if(!drawn) return; clearTimeout(t); t = setTimeout(() => render(false), 150); }, {passive:true});
+});
+})();
+</script>
 
-  onFirstView(wrap, () => {
-    drawn = true;
-    wrap.classList.add('drawn');
-    render(!REDUCE);
-  }, 0);
+<!-- The 3D chip -->
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
-  let t;
-  addEventListener('resize', () => {
-    if(!drawn) return;
-    clearTimeout(t);
-    t = setTimeout(() => render(false), 180);
-  }, {passive:true});
+if(document.fonts) await document.fonts.ready;
+const root = document.documentElement;
+const canvas = document.getElementById('chip');
+const css = getComputedStyle(root);
+const tok = n => css.getPropertyValue(n).trim();
+const col = n => new THREE.Color(tok(n));
+const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+let REDUCE = motionQuery.matches;
+
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:'high-performance'});
+} catch(err) {
+  root.classList.add('no-3d');
+}
+if(renderer){
+window.__chipReady = true;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.setClearColor(col('--bg'), 1);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(34, 1, .1, 200);
+
+scene.add(new THREE.HemisphereLight(0xe6ebf2, 0x0b0b0c, 1.1));
+const key = new THREE.DirectionalLight(0xffffff, 2.6); key.position.set(8,14,7); scene.add(key);
+const rim = new THREE.DirectionalLight(col('--copper'), .35); rim.position.set(-12,1.2,-10); scene.add(rim);
+
+const chip = new THREE.Group(); scene.add(chip);
+const COPPER = col('--copper');
+
+function mat(c, metal=.5, rough=.45, extra={}){
+  return new THREE.MeshStandardMaterial({color: c, metalness: metal, roughness: rough, ...extra});
+}
+function box(w,h,d,material,x=0,y=0,z=0){
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), material);
+  m.position.set(x,y,z); return m;
+}
+
+/* Package and die */
+chip.add(box(13,.5,13, mat(col('--si-sub'),.1,.9), 0,-.55,0));
+const die = box(10,.3,10, mat(col('--si-die'),.25,.6), 0,-.15,0); chip.add(die);
+
+/* Label textures, drawn with the page's mono face */
+function label(lines, w, h, opts={}){
+  const scale = 256;
+  const c = document.createElement('canvas'); c.width = Math.round(w*scale); c.height = Math.round(h*scale);
+  const g = c.getContext('2d');
+  const mono = tok('--mono');
+  lines.forEach((ln, i) => {
+    g.font = `${ln.weight||500} ${ln.size*scale}px ${mono}`;
+    g.fillStyle = ln.color || '#d6d8db';
+    g.textBaseline = 'top';
+    g.fillText(ln.text, ln.x*scale, ln.y*scale);
+  });
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w,h), new THREE.MeshBasicMaterial({map:tex, transparent:true, depthWrite:false}));
+  m.rotation.x = -Math.PI/2; return m;
+}
+
+/* Floorplan blocks, one per section */
+const BLOCKS = [];
+function block(id, section, name, sub, x, z, w, d, colorVar){
+  const g = new THREE.Group(); g.position.set(x,0,z);
+  const h = .14;
+  const m = mat(col(colorVar), .2, .62, {emissive: COPPER.clone(), emissiveIntensity: 0});
+  const body = box(w,h,d,m,0,h/2,0); g.add(body);
+  const edges = new THREE.LineSegments(new THREE.EdgesGeometry(body.geometry), new THREE.LineBasicMaterial({color: tok('--line-strong')}));
+  edges.position.copy(body.position); g.add(edges);
+  const lb = label([{text:name, size:.2, x:.04, y:.04, color:'#e4e5e7'},{text:sub, size:.15, x:.04, y:.3, color:'#9a9da2', weight:400}], Math.min(w-.2, 2.4), .55);
+  lb.position.set(-w/2 + Math.min(w-.2,2.4)/2 + .1, h+.004, -d/2 + .35); g.add(lb);
+  body.userData = {id, section, name, sub};
+  chip.add(g);
+  const b = {id, section, group:g, body, edges, mat:m, w, d, h};
+  BLOCKS.push(b); return b;
+}
+const cpu   = block('cpu','about','CPU CORE','about', -2.55,-2.5, 3.6,3.3,'--si-cpu');
+const sram  = block('sram','work','SRAM','experience', 2.45,-2.5, 3.8,3.3,'--si-sram');
+const npu   = block('npu','projects','NPU ARRAY','projects', -1.75,1.6, 5.2,4.4,'--si-npu');
+const cache = block('cache','skills','CACHE','skills', 2.7,.95, 3.2,2.1,'--si-cache');
+const rom   = block('rom','education','ROM','education', 2.7,3.15, 3.2,1.5,'--si-rom');
+
+function detail(b, x, z, w, d, color, h=.06){
+  const m = box(w,h,d, mat(new THREE.Color(color),.2,.6), x, b.h+h/2, z); b.group.add(m); return m;
+}
+/* CPU: four cores, one per reflex */
+[[-.75,.35],[.75,.35],[-.75,1.15],[.75,1.15]].forEach(([x,z]) => detail(cpu, x, z, 1.3, .65, '#4a5465'));
+/* SRAM: one row per role, laid on the 2023–2026 axis */
+const months = 48, span = sram.w - .5, x0 = -span/2;
+[[0,42],[24,33],[32,42],[42,47]].forEach(([a,b2],i) => {
+  const w = ((b2-a)/months)*span, x = x0 + (a/months)*span + w/2;
+  detail(sram, x, -.2 + i*.42, w, .26, i===3 ? tok('--copper') : '#5f7894', .05);
+});
+/* NPU: five tiles, one per project (the case study is the wide one) */
+[[-1.25,-.55,2.3],[.95,-.55,1.6],[-1.55,1.15,1.6],[0,1.15,1.3],[1.4,1.15,1.3]].forEach(([x,z,w],i) => {
+  const t = detail(npu, x, z, w-.15, 1.35, i===0 ? '#4a5a6e' : '#3f4c5c', .07);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(t.geometry), new THREE.LineBasicMaterial({color: COPPER, transparent:true, opacity:.45}));
+  e.position.copy(t.position); npu.group.add(e);
+});
+/* CACHE: cells per skill, copper = core, blue = working, grey = developing */
+[[4,1,0],[4,1,1],[2,3,0]].forEach(([core,work,dev],ci) => {
+  const cells = [...Array(core).fill('#b9784b'), ...Array(work).fill('#5d7fa8'), ...Array(dev).fill('#4a4f57')];
+  cells.forEach((c,ri) => detail(cache, -1.05 + ci*1.0, -.25 + ri*.22, .8, .16, c, .04));
+});
+/* ROM: two cells, degree and current learning */
+detail(rom, -.6, .25, 1.4, .5, '#4a5465'); detail(rom, .85, .25, 1.1, .5, '#40474f');
+
+/* I/O ring: bond pads; the two contact pads are copper */
+const ioGroup = new THREE.Group(); chip.add(ioGroup);
+const padMat = mat(col('--si-pad'), .85, .3), padHot = mat(COPPER, .7, .35, {emissive: COPPER.clone(), emissiveIntensity:.15});
+const ioPads = [];
+for(let i=0;i<12;i++){
+  const t = -4.4 + i*0.8;
+  [[t,-4.72],[t,4.72],[-4.72,t],[4.72,t]].forEach(([x,z],side) => {
+    const hot = side===3 && (i===5 || i===6);
+    const p = box(.36,.05,.36, hot ? padHot : padMat, x, .025, z); ioGroup.add(p); ioPads.push(p);
+    p.userData = {id:'io', section:'contact', name:'I/O RING', sub:'contact'};
+  });
+}
+const ioBlock = {id:'io', section:'contact', group:ioGroup, body:null, mat:null};
+
+/* Copper interconnect, Manhattan-routed between blocks */
+const wireMat = mat(COPPER, .6, .35, {emissive: COPPER.clone(), emissiveIntensity:.25});
+function wire(pts){
+  for(let i=1;i<pts.length;i++){
+    const [ax,az] = pts[i-1], [bx,bz] = pts[i];
+    const len = Math.hypot(bx-ax, bz-az), t = .07;
+    chip.add(box(ax===bx ? t : len, .02, ax===bx ? len : t, wireMat, (ax+bx)/2, .01, (az+bz)/2));
+  }
+}
+/* main buses in the channels between blocks, with spurs out to the I/O ring */
+wire([[-4.3,-.74],[4.35,-.74]]);
+wire([[.98,-4.2],[.98,4.0]]);
+wire([[.55,-2.5],[.98,-2.5]]);
+wire([[.85,2.6],[.98,2.6]]);
+wire([[4.35,-.74],[4.35,-.4],[4.55,-.4]]);
+wire([[4.35,.4],[4.55,.4]]); wire([[4.3,.4],[4.35,.4]]);
+wire([[-4.3,-.74],[-4.55,-.74]]);
+wire([[.98,4.0],[.98,4.55]]);
+
+/* The name, etched along the die's bottom edge */
+const etch = label([{text:'NKA-2026 · NITHISH KALIANNAN ANANTH · DECISION-FOCUSED ANALYTICS', size:.17, x:.02, y:.06, color:'#7d8187', weight:400}], 8.4, .32);
+etch.position.set(-.1, .002, 4.15); chip.add(etch);
+
+/* The lid, which lifts on arrival */
+const lidMat = mat(col('--si-lid'), .85, .32, {transparent:true});
+const lid = box(11.4,.45,11.4, lidMat, 0,1.2,0); chip.add(lid);
+const lidMark = label([{text:'NKA', size:.6, x:.1, y:.05, color:'#55585d', weight:500},{text:'AI ACCELERATOR · 2026', size:.18, x:.12, y:.8, color:'#55585d', weight:400}], 4, 1.1);
+lidMark.position.set(-3,1.43,3.6); chip.add(lidMark);
+
+/* Camera stations, one per section: [camera position, look-at] */
+const ST = [
+  [[13,14.5,15.5],[0,-.2,0]],          // hero: the package
+  [[-1.2,9.5,5.2],[-2.55,0,-2.5]],     // about → CPU
+  [[3.8,9.5,5.2],[2.45,0,-2.5]],       // work → SRAM
+  [[-0.4,11,10.5],[-1.75,0,1.6]],      // projects → NPU
+  [[4,8.2,8.4],[2.7,0,.95]],           // skills → cache
+  [[4,7.6,9.6],[2.7,0,3.15]],          // education → ROM
+  [[9.5,8.5,6.5],[4.3,0,0]]            // contact → the I/O ring and its two copper pads
+];
+const ACTIVE = [null, cpu, sram, npu, cache, rom, ioBlock];
+
+const sections = [...document.querySelectorAll('main > section')];
+let stops = [];
+function measure(){
+  const vh = innerHeight;
+  stops = sections.map((s,i) => {
+    const panel = s.querySelector('.panel-col, .col');
+    const arrive = i===0 ? 0 : s.offsetTop + vh*.08;
+    const leave = i===0 ? vh*.2 : panel.offsetTop + s.offsetTop*0 + panel.getBoundingClientRect().height + (panel.getBoundingClientRect().top + scrollY) - panel.offsetTop - vh*.75;
+    return {arrive, leave: Math.max(arrive, leave)};
+  });
+}
+const smooth = t => t*t*(3-2*t);
+function stationAt(y){
+  for(let i=0;i<stops.length-1;i++){
+    const a = stops[i], b = stops[i+1];
+    if(y <= a.leave) return {i, t:0};
+    if(y < b.arrive) return {i, t: smooth((y - a.leave)/(b.arrive - a.leave))};
+  }
+  return {i: stops.length-1, t:0};
+}
+
+const camPos = new THREE.Vector3(18,20,22), camLook = new THREE.Vector3(0,0,0);
+const tgtPos = new THREE.Vector3(), tgtLook = new THREE.Vector3();
+const vA = new THREE.Vector3(), vB = new THREE.Vector3();
+let activeIdx = 0, hoverId = null;
+
+function targetFor(y){
+  const {i, t} = stationAt(y);
+  const a = ST[i], b = ST[Math.min(i+1, ST.length-1)];
+  tgtPos.copy(vA.fromArray(a[0])).lerp(vB.fromArray(b[0]), t);
+  tgtLook.copy(vA.fromArray(a[1])).lerp(vB.fromArray(b[1]), t);
+  /* Narrow screens crop the sides, so back the camera off to keep each block whole */
+  if(camera.aspect < 1) tgtPos.sub(tgtLook).multiplyScalar(Math.min(1.9, 1/Math.sqrt(camera.aspect))).add(tgtLook);
+  return t < .5 ? i : Math.min(i+1, ST.length-1);
+}
+
+function setActive(idx){
+  BLOCKS.forEach(b => {
+    const on = ACTIVE[idx] === b || hoverId === b.id;
+    b.mat.emissiveIntensity = on ? .07 : 0;
+    b.edges.material.color.set(on ? tok('--copper') : tok('--line-strong'));
+  });
+  padHot.emissiveIntensity = (idx === 6 || hoverId === 'io') ? .6 : .15;
+}
+
+/* Size and framing: chip on the left on wide screens, upper half on narrow ones */
+function resize(){
+  const W = innerWidth, H = innerHeight;
+  renderer.setPixelRatio(Math.min(devicePixelRatio, W < 1000 ? 1.5 : 2));
+  renderer.setSize(W, H, false);
+  camera.aspect = W/H;
+  if(W >= 1000) camera.setViewOffset(W, H, W*.2, 0, W, H);
+  else camera.setViewOffset(W, H, 0, H*.33, W, H);
+  camera.updateProjectionMatrix();
+  measure(); dirty = true;
+}
+
+/* Pointer: gentle tilt, hover to light a block, click to go to its section */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+const tip = document.getElementById('chip-tip');
+const fine = matchMedia('(pointer:fine)').matches;
+let tiltX = 0, tiltZ = 0, tiltTX = 0, tiltTZ = 0;
+const pickables = [...BLOCKS.map(b => b.body), ...ioPads];
+function overScene(target){ return !target.closest('.panel-col, .hero .col, .bar, .pads, footer, a, button'); }
+function pick(e){
+  ndc.set((e.clientX/innerWidth)*2-1, -(e.clientY/innerHeight)*2+1);
+  ray.setFromCamera(ndc, camera);
+  const hit = ray.intersectObjects(pickables, false)[0];
+  return hit ? hit.object.userData : null;
+}
+addEventListener('pointermove', e => {
+  if(fine && !REDUCE){ tiltTX = (e.clientY/innerHeight - .5)*.08; tiltTZ = (e.clientX/innerWidth - .5)*-.08; }
+  const data = overScene(e.target) ? pick(e) : null;
+  const id = data ? data.id : null;
+  if(id !== hoverId){ hoverId = id; setActive(activeIdx); dirty = true; }
+  if(data){
+    tip.hidden = false; tip.style.left = e.clientX+'px'; tip.style.top = e.clientY+'px';
+    tip.innerHTML = `<b>${data.name}</b> → ${data.sub}`;
+    document.body.style.cursor = 'pointer';
+  } else { tip.hidden = true; document.body.style.cursor = ''; }
+}, {passive:true});
+addEventListener('click', e => {
+  if(!overScene(e.target)) return;
+  const data = pick(e); if(!data) return;
+  const sec = document.getElementById(data.section); if(!sec) return;
+  (sec.querySelector('.panel-col') || sec).scrollIntoView({behavior: REDUCE ? 'auto' : 'smooth', block:'start'});
 });
 
-/* ═══════════════════════════════════════════════
-   7 · DECISION FLOW
-   ═══════════════════════════════════════════════ */
-(function flowChart(){
-  const canvas = document.getElementById('flowCanvas');
-  if(!canvas) return;
-  const wrap = canvas.parentElement;
-  const phases = ['Problem\nframing','Data\nexploration','Hypothesis\ntesting','Model\nbuilding','Insight\nsynthesis','Business\naction'];
-  const series = [
-    {data:[20,55,75,60,90,95], c:C.gold},
-    {data:[10,45,60,80,88,70], c:C.slate},
-    {data:[0,5,15,35,72,95], c:C.sage}
-  ];
-
-  function render(animate){
-    const W = wrap.offsetWidth, H = wrap.offsetHeight;
-    const ctx = fitCanvas(canvas, W, H);
-    const padL=48, padR=20, padT=24, padB=48;
-    const gW = W-padL-padR, gH = H-padT-padB;
-    const n = phases.length;
-
-    function paint(p){
-      ctx.clearRect(0,0,W,H);
-      axisGrid(ctx,padL,padT,gW,gH,4,v=>v.toFixed(0)+'%',0,100);
-
-      ctx.font = '9px ' + token('--mono'); ctx.textAlign='center';
-      phases.forEach((ph,i)=>{
-        const x = padL + (i/(n-1))*gW;
-        ctx.strokeStyle = rgba(C.text3,.22); ctx.lineWidth=.6;
-        ctx.beginPath(); ctx.moveTo(x,padT); ctx.lineTo(x,padT+gH); ctx.stroke();
-        ctx.fillStyle = rgba(C.text3,.9);
-        ph.split('\n').forEach((l,li)=> ctx.fillText(l, x, H-padB+16+li*11));
-      });
-
-      series.forEach(s=>{
-        const reach = p*(n-1);
-        const last = Math.floor(reach);
-        const frac = reach - last;
-        const pts = [];
-        for(let i=0;i<=last;i++) pts.push([padL+(i/(n-1))*gW, padT+gH-(s.data[i]/100)*gH]);
-        if(last < n-1){
-          const v = s.data[last] + frac*(s.data[last+1]-s.data[last]);
-          pts.push([padL+(reach/(n-1))*gW, padT+gH-(v/100)*gH]);
-        }
-        if(pts.length < 2) return;
-
-        ctx.beginPath(); ctx.moveTo(pts[0][0], padT+gH);
-        pts.forEach(([x,y])=>ctx.lineTo(x,y));
-        ctx.lineTo(pts[pts.length-1][0], padT+gH); ctx.closePath();
-        ctx.fillStyle = rgba(s.c,.08); ctx.fill();
-
-        ctx.beginPath();
-        pts.forEach(([x,y],i)=> i ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
-        ctx.strokeStyle = rgba(s.c,.9); ctx.lineWidth = 2.2; ctx.lineJoin='round'; ctx.stroke();
-
-        for(let i=0;i<=last;i++){
-          ctx.beginPath();
-          ctx.arc(padL+(i/(n-1))*gW, padT+gH-(s.data[i]/100)*gH, 3.2, 0, Math.PI*2);
-          ctx.fillStyle = rgba(s.c,1); ctx.fill();
-        }
-      });
-    }
-
-    if(!animate){ paint(1); return; }
-    const start = performance.now(), dur = 1600;
-    (function step(now){
-      const p = easeOutCubic(Math.min((now-start)/dur, 1));
-      paint(p);
-      if(p < 1) requestAnimationFrame(step);
-    })(performance.now());
+/* Render loop: only draws while something is moving */
+let dirty = true, lidT = REDUCE ? 1 : 0, lidStart = performance.now() + 350, last = performance.now();
+if(REDUCE){ lid.visible = false; lidMark.visible = false; }
+function frame(now){
+  const dt = Math.min(.05, (now - last)/1000); last = now;
+  const y = REDUCE ? 0 : scrollY;
+  const idx = targetFor(y);
+  if(idx !== activeIdx){ activeIdx = idx; setActive(idx); dirty = true; }
+  if(REDUCE){ camPos.copy(tgtPos); camLook.copy(tgtLook); }
+  const k = 1 - Math.exp(-dt*3.2);
+  const moving = camPos.distanceTo(tgtPos) > .002 || camLook.distanceTo(tgtLook) > .002;
+  camPos.lerp(tgtPos, k); camLook.lerp(tgtLook, k);
+  tiltX += (tiltTX - tiltX)*k; tiltZ += (tiltTZ - tiltZ)*k;
+  const tilting = Math.abs(tiltTX - tiltX) > .0005 || Math.abs(tiltTZ - tiltZ) > .0005;
+  if(!REDUCE && lidT < 1 && now > lidStart){
+    lidT = Math.min(1, (now - lidStart)/1700);
+    const e = 1 - Math.pow(1-lidT, 3);
+    lid.position.y = 1.2 + e*7; lidMark.position.y = 1.43 + e*7;
+    lidMat.opacity = 1 - e; lidMark.material.opacity = 1 - e;
+    if(lidT >= 1){ lid.visible = false; lidMark.visible = false; }
+    dirty = true;
   }
-
-  let ready = false;
-  onFirstView(wrap, () => { ready = true; render(!REDUCE); }, .25);
-  let t; addEventListener('resize', () => {
-    if(!ready) return; clearTimeout(t); t = setTimeout(()=>render(false), 180);
-  }, {passive:true});
-})();
-
-/* ═══════════════════════════════════════════════
-   8 · TRADE-OFF SCATTER
-   ═══════════════════════════════════════════════ */
-(function scatter(){
-  const canvas = document.getElementById('scatterCanvas');
-  if(!canvas) return;
-  const models = [
-    [92,87,16,C.gold, 'Logistic\nregression'],
-    [78,91,19,C.slate,'Random\nforest'],
-    [60,94,21,C.gold, 'XGBoost\n(delivery)'],
-    [42,96,18,C.amber,'XGBoost\n(fraud)'],
-    [35,93,16,C.sage, 'SHAP + XGB\n(credit)'],
-    [22,89,14,C.rose, 'LSTM\n(sequence)'],
-    [85,83,13,C.text3,'Decision\ntree']
-  ];
-
-  function render(animate){
-    const W = canvas.clientWidth, H = canvas.clientHeight;
-    const ctx = fitCanvas(canvas, W, H);
-    const padL=50, padR=20, padT=24, padB=44;
-    const gW = W-padL-padR, gH = H-padT-padB;
-
-    function paint(p){
-      ctx.clearRect(0,0,W,H);
-      ctx.strokeStyle = 'rgba(255,255,255,.04)'; ctx.lineWidth = .8;
-      for(let i=0;i<=4;i++){
-        const y = padT+i*(gH/4), x = padL+i*(gW/4);
-        ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+gW,y); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x,padT); ctx.lineTo(x,padT+gH); ctx.stroke();
-      }
-      ctx.strokeStyle = rgba(C.gold,.2); ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(padL,padT); ctx.lineTo(padL,padT+gH); ctx.lineTo(padL+gW,padT+gH); ctx.stroke();
-
-      ctx.font = '9px ' + token('--mono'); ctx.fillStyle = rgba(C.text3,.75);
-      ctx.textAlign='center';
-      ctx.fillText('less interpretable  ←→  more interpretable', padL+gW/2, H-10);
-      ctx.save(); ctx.translate(14, padT+gH/2); ctx.rotate(-Math.PI/2);
-      ctx.fillText('lower accuracy  ←→  higher accuracy', 0, 0); ctx.restore();
-      [0,25,50,75,100].forEach(v=>{
-        ctx.textAlign='center'; ctx.fillStyle = rgba(C.text3,.55);
-        ctx.fillText(v, padL+(v/100)*gW, padT+gH+14);
-        ctx.textAlign='right';
-        ctx.fillText(v+'%', padL-6, padT+gH-(v/100)*gH+3);
-      });
-
-      ctx.setLineDash([4,4]); ctx.strokeStyle = rgba(C.sage,.14);
-      ctx.fillStyle = rgba(C.sage,.04);
-      ctx.beginPath(); ctx.ellipse(padL+.55*gW, padT+.16*gH, gW*.21, gH*.19, 0, 0, Math.PI*2);
-      ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
-      ctx.font = '9px ' + token('--mono'); ctx.fillStyle = rgba(C.sage,.55);
-      ctx.textAlign='center'; ctx.fillText('workable middle', padL+.55*gW, padT+.16*gH+4);
-
-      models.forEach(([ix,acc,size,c,label],i)=>{
-        const bp = Math.max(0, Math.min(1, (p - i*.06)/.94));
-        if(bp <= 0) return;
-        const x = padL+(ix/100)*gW, y = padT+gH-(acc/100)*gH, s = size*bp;
-        const g = ctx.createRadialGradient(x,y,0,x,y,s*2.4);
-        g.addColorStop(0, rgba(c,.18)); g.addColorStop(1, rgba(c,0));
-        ctx.beginPath(); ctx.arc(x,y,s*2.4,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
-        ctx.beginPath(); ctx.arc(x,y,s,0,Math.PI*2);
-        ctx.fillStyle = rgba(c,.7); ctx.fill();
-        ctx.strokeStyle = rgba(c,1); ctx.lineWidth = 1.4; ctx.stroke();
-        if(bp > .8){
-          ctx.font = '9px ' + token('--mono'); ctx.fillStyle = rgba(c,.92); ctx.textAlign='center';
-          label.split('\n').forEach((l,li)=> ctx.fillText(l, x, y+s+12+li*10));
-        }
-      });
-    }
-
-    if(!animate){ paint(1); return; }
-    const start = performance.now(), dur = 1200;
-    (function step(now){
-      const p = easeOutQuart(Math.min((now-start)/dur, 1));
-      paint(p);
-      if(p < 1) requestAnimationFrame(step);
-    })(performance.now());
+  if(moving || tilting || dirty){
+    chip.rotation.x = tiltX; chip.rotation.z = tiltZ;
+    camera.position.copy(camPos); camera.lookAt(camLook);
+    renderer.render(scene, camera);
+    dirty = false;
   }
-
-  let ready = false;
-  onFirstView(canvas, () => { ready = true; render(!REDUCE); }, .2);
-  let t; addEventListener('resize', () => {
-    if(!ready) return; clearTimeout(t); t = setTimeout(()=>render(false), 180);
-  }, {passive:true});
-})();
-
-/* ═══════════════════════════════════════════════
-   9 · CAPABILITY RADAR
-   Single series. The invented "average analyst"
-   benchmark is gone — it compared against a number
-   that didn't come from anywhere.
-   ═══════════════════════════════════════════════ */
-(function radar(){
-  const canvas = document.getElementById('radarCanvas');
-  if(!canvas) return;
-  const axes = [
-    {label:'Problem\nframing', v:.95},
-    {label:'ML\nmodelling', v:.88},
-    {label:'Stakeholder\ncomms', v:.90},
-    {label:'Data\nengineering', v:.82},
-    {label:'Statistical\nthinking',v:.86},
-    {label:'MLOps &\ndeployment', v:.58}
-  ];
-
-  function render(animate){
-    const W = canvas.clientWidth, H = canvas.clientHeight;
-    const ctx = fitCanvas(canvas, W, H);
-    const cx = W/2, cy = H/2 + 6, R = Math.min(W,H)*.34;
-    const n = axes.length;
-    const angle = i => (i/n)*Math.PI*2 - Math.PI/2;
-    const pt = (i,f) => [cx + Math.cos(angle(i))*R*f, cy + Math.sin(angle(i))*R*f];
-
-    function paint(p){
-      ctx.clearRect(0,0,W,H);
-      [.25,.5,.75,1].forEach(f=>{
-        ctx.beginPath();
-        for(let i=0;i<n;i++){ const [x,y] = pt(i,f); i ? ctx.lineTo(x,y) : ctx.moveTo(x,y); }
-        ctx.closePath();
-        ctx.strokeStyle = `rgba(255,255,255,${f===1?.1:.05})`;
-        ctx.lineWidth = f===1 ? 1 : .6; ctx.stroke();
-      });
-      for(let i=0;i<n;i++){
-        const [x,y] = pt(i,1);
-        ctx.strokeStyle = 'rgba(255,255,255,.06)'; ctx.lineWidth = .8;
-        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
-      }
-
-      ctx.beginPath();
-      for(let i=0;i<n;i++){ const [x,y] = pt(i, axes[i].v*p); i ? ctx.lineTo(x,y) : ctx.moveTo(x,y); }
-      ctx.closePath();
-      ctx.fillStyle = rgba(C.gold,.13); ctx.fill();
-      ctx.strokeStyle = rgba(C.gold,.75); ctx.lineWidth = 2; ctx.stroke();
-
-      for(let i=0;i<n;i++){
-        const [x,y] = pt(i, axes[i].v*p);
-        ctx.beginPath(); ctx.arc(x,y,3.6,0,Math.PI*2);
-        ctx.fillStyle = rgba(C.gold,.95); ctx.fill();
-      }
-      if(p > .35){
-        ctx.font = '10px ' + token('--sans');
-        ctx.fillStyle = rgba(C.text3, Math.min(1,(p-.35)/.65));
-        ctx.textAlign = 'center';
-        for(let i=0;i<n;i++){
-          const [lx,ly] = pt(i,1.3);
-          axes[i].label.split('\n').forEach((l,li)=> ctx.fillText(l, lx, ly + li*12 - 4));
-        }
-      }
-    }
-
-    if(!animate){ paint(1); return; }
-    const start = performance.now(), dur = 1300;
-    (function step(now){
-      const p = easeOutCubic(Math.min((now-start)/dur, 1));
-      paint(p);
-      if(p < 1) requestAnimationFrame(step);
-    })(performance.now());
-  }
-
-  let ready = false;
-  onFirstView(canvas, () => { ready = true; render(!REDUCE); }, .2);
-  let t; addEventListener('resize', () => {
-    if(!ready) return; clearTimeout(t); t = setTimeout(()=>render(false), 180);
-  }, {passive:true});
-})();
-
-/* ═══════════════════════════════════════════════
-   10 · IMPACT BARS
-   ═══════════════════════════════════════════════ */
-(function impact(){
-  const canvas = document.getElementById('impactCanvas');
-  if(!canvas) return;
-  const sets = {
-    cost:{ unit:'%', title:'Cost reduction (%)', rows:[
-      ['Fuel × load finding',8,C.gold],['Route rescheduling',5.5,C.slate],
-      ['SLA failure fix',3.2,C.sage],['Reporting automation',2.1,C.amber],
-      ['Forecast vs heuristic',1.8,C.rose]]},
-    time:{ unit:'h', title:'Time saved per week (hours)', rows:[
-      ['Excel report automation',5,C.gold],['Data prep pipeline',3.6,C.slate],
-      ['EDA automation',2.1,C.sage],['Model retraining',1.4,C.amber],
-      ['KPI alerting',0.8,C.rose]]},
-    acc:{ unit:'%', title:'Accuracy gain vs baseline (%)', rows:[
-      ['Delivery forecast',15,C.gold],['Fraud detection',12,C.slate],
-      ['Credit risk score',9,C.sage],['Churn prediction',7,C.amber],
-      ['Sequence model',4,C.rose]]}
-  };
-  let current = 'cost', ready = false;
-
-  function render(key, animate){
-    const {title,rows,unit} = sets[key];
-    const W = canvas.clientWidth, H = canvas.clientHeight;
-    const ctx = fitCanvas(canvas, W, H);
-    const padL = Math.min(190, W*.42), padR = 68, padT = 34, padB = 20;
-    const gW = W-padL-padR, gH = H-padT-padB;
-    const maxV = Math.max(...rows.map(r=>r[1]));
-    const bh = Math.floor(gH/rows.length) - 8;
-
-    function paint(p){
-      ctx.clearRect(0,0,W,H);
-      ctx.font = '11px ' + token('--mono');
-      ctx.fillStyle = rgba(C.text3,.8); ctx.textAlign='left';
-      ctx.fillText(title, padL, 20);
-
-      rows.forEach(([name,val,c],i)=>{
-        const y = padT + i*(bh+8);
-        const w = (val/maxV)*gW*p;
-        const g = ctx.createLinearGradient(padL,0,padL+Math.max(w,1),0);
-        g.addColorStop(0, rgba(c,.9)); g.addColorStop(1, rgba(c,.38));
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.roundRect ? ctx.roundRect(padL,y,w,bh,3) : ctx.rect(padL,y,w,bh);
-        ctx.fill();
-
-        ctx.font = '11px ' + token('--sans');
-        ctx.fillStyle = rgba(C.text3,.95); ctx.textAlign='right';
-        ctx.fillText(name, padL-10, y+bh/2+4);
-
-        if(p > .35){
-          ctx.font = '11px ' + token('--mono');
-          ctx.fillStyle = rgba(c, Math.min(1,(p-.35)/.65));
-          ctx.textAlign='left';
-          ctx.fillText(val.toFixed(1)+unit, padL+w+8, y+bh/2+4);
-        }
-      });
-    }
-
-    if(!animate){ paint(1); return; }
-    const start = performance.now(), dur = 950;
-    (function step(now){
-      const p = easeOutCubic(Math.min((now-start)/dur, 1));
-      paint(p);
-      if(p < 1) requestAnimationFrame(step);
-    })(performance.now());
-  }
-
-  document.querySelectorAll('.switch').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.switch').forEach(b=>b.setAttribute('aria-pressed','false'));
-      btn.setAttribute('aria-pressed','true');
-      current = btn.dataset.metric;
-      render(current, !REDUCE);
-    });
-  });
-
-  onFirstView(canvas, ()=>{ ready = true; render(current, !REDUCE); }, .2);
-  let t; addEventListener('resize', ()=>{
-    if(!ready) return; clearTimeout(t); t = setTimeout(()=>render(current,false), 180);
-  }, {passive:true});
-})();
-
-/* ═══════════════════════════════════════════════
-   11 · GLOBE  (gated; static frame under reduced motion)
-   ═══════════════════════════════════════════════ */
-addEventListener('load', function(){
-  const canvas = document.getElementById('globe-canvas');
-  if(!canvas || typeof THREE === 'undefined') return;
-
-  let W = canvas.clientWidth || 900, H = canvas.clientHeight || 420;
-  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
-  renderer.setSize(W,H,false);
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-  renderer.setClearColor(0x000000,0);
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(42, W/H, .1, 100);
-  camera.position.set(0,0,2.7);
-
-  const globe = new THREE.Mesh(
-    new THREE.SphereGeometry(1,48,48),
-    new THREE.MeshPhongMaterial({color:0x0c0e10, emissive:0x050a12, shininess:22})
-  );
-  scene.add(globe);
-
-  const gridMat = new THREE.LineBasicMaterial({color:0x1a2535, transparent:true, opacity:.22});
-  for(let lat=-60; lat<=60; lat+=30){
-    const phi = (90-lat)*Math.PI/180, pts=[];
-    for(let lon=0; lon<=360; lon+=6){
-      const th = lon*Math.PI/180;
-      pts.push(new THREE.Vector3(-Math.sin(phi)*Math.cos(th), Math.cos(phi), Math.sin(phi)*Math.sin(th)).multiplyScalar(1.002));
-    }
-    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
-  }
-  for(let lon=0; lon<360; lon+=30){
-    const th = lon*Math.PI/180, pts=[];
-    for(let lat=90; lat>=-90; lat-=6){
-      const phi = (90-lat)*Math.PI/180;
-      pts.push(new THREE.Vector3(-Math.sin(phi)*Math.cos(th), Math.cos(phi), Math.sin(phi)*Math.sin(th)).multiplyScalar(1.002));
-    }
-    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
-  }
-
-  scene.add(new THREE.Mesh(
-    new THREE.SphereGeometry(1.08,48,48),
-    new THREE.ShaderMaterial({
-      vertexShader:'varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
-      fragmentShader:'varying vec3 vN;void main(){float i=pow(0.7-dot(vN,vec3(0,0,1)),2.0);gl_FragColor=vec4(0.1,0.25,0.5,i*0.32);}',
-      transparent:true, depthWrite:false
-    })
-  ));
-
-  const ring = new THREE.Mesh(
-    new THREE.TorusGeometry(1.02,.0025,10,180),
-    new THREE.MeshBasicMaterial({color:0xc9a96e, transparent:true, opacity:.28})
-  );
-  scene.add(ring);
-
-  const toVec = (lat,lon,r) => {
-    const phi=(90-lat)*Math.PI/180, th=(lon+180)*Math.PI/180;
-    return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(th), r*Math.cos(phi), r*Math.sin(phi)*Math.sin(th));
-  };
-
-  const cities = [
-    [51.5,-0.12,0xc9a96e,.021],[52.4,-1.5,0xc9a96e,.017],[53.5,-2.2,0x7b9fc4,.013],
-    [55.8,-4.2,0x7b9fc4,.012],[48.8,2.35,0xd4954a,.013],[52.5,13.4,0xd4954a,.012],
-    [40.7,-74,0x4a9c78,.013],[37.8,-122.4,0x4a9c78,.012],[35.6,139.7,0xb07a8a,.011],
-    [1.35,103.8,0xb07a8a,.010]
-  ];
-  const pins = [];
-  cities.forEach(([lat,lon,col,size])=>{
-    const pos = toVec(lat,lon,1.028);
-    const dot = new THREE.Mesh(new THREE.SphereGeometry(size,8,8), new THREE.MeshBasicMaterial({color:col}));
-    dot.position.copy(pos); dot.userData.base = pos.clone();
-    scene.add(dot); pins.push(dot);
-    const halo = new THREE.Mesh(
-      new THREE.RingGeometry(size*1.5, size*2.2, 14),
-      new THREE.MeshBasicMaterial({color:col, transparent:true, opacity:.35, side:THREE.DoubleSide})
-    );
-    halo.position.copy(pos); halo.lookAt(0,0,0);
-    halo.userData = {halo:true, base:pos.clone(), phase:Math.random()*Math.PI*2};
-    scene.add(halo); pins.push(halo);
-  });
-
-  const arcs = [];
-  [[[51.5,-0.12],[40.7,-74],0xc9a96e],[[51.5,-0.12],[48.8,2.35],0x7b9fc4],
-   [[52.4,-1.5],[53.5,-2.2],0xc9a96e],[[51.5,-0.12],[35.6,139.7],0x4a9c78],
-   [[40.7,-74],[37.8,-122.4],0x4a9c78],[[51.5,-0.12],[1.35,103.8],0xd4954a]
-  ].forEach(([p1,p2,col])=>{
-    const v1 = toVec(p1[0],p1[1],1.03), v2 = toVec(p2[0],p2[1],1.03), pts=[];
-    for(let i=0;i<=60;i++){
-      const t = i/60;
-      const v = new THREE.Vector3().lerpVectors(v1,v2,t);
-      v.normalize().multiplyScalar(1.035 + Math.sin(t*Math.PI)*.12);
-      pts.push(v);
-    }
-    const curve = new THREE.CatmullRomCurve3(pts);
-    scene.add(new THREE.Mesh(
-      new THREE.TubeGeometry(curve,60,.0018,4,false),
-      new THREE.MeshBasicMaterial({color:col, transparent:true, opacity:.18})
-    ));
-    const dot = new THREE.Mesh(
-      new THREE.SphereGeometry(.006,6,6),
-      new THREE.MeshBasicMaterial({color:col, transparent:true, opacity:.9})
-    );
-    dot.userData = {curve, t:Math.random(), speed:.0018+Math.random()*.001};
-    scene.add(dot); arcs.push(dot);
-  });
-
-  scene.add(new THREE.AmbientLight(0xffffff,.25));
-  const key = new THREE.DirectionalLight(0xc9a96e,.9); key.position.set(3,2,4); scene.add(key);
-  const fill = new THREE.DirectionalLight(0x7b9fc4,.35); fill.position.set(-3,-1,-2); scene.add(fill);
-
-  /* Pointer Events with capture: one code path for mouse, pen and touch,
-     and tracking survives the pointer leaving the canvas. */
-  let dragging=false, lastX=0, lastY=0, rotY=.4, rotX=0, velX=0, velY=0;
-  canvas.addEventListener('pointerdown', e=>{
-    dragging = true; velX = velY = 0;
-    lastX = e.clientX; lastY = e.clientY;
-    canvas.setPointerCapture(e.pointerId);
-  });
-  canvas.addEventListener('pointermove', e=>{
-    if(!dragging) return;
-    velX = (e.clientX-lastX)*.004;
-    velY = (e.clientY-lastY)*.003;
-    rotY += velX;
-    rotX = Math.max(-.7, Math.min(.7, rotX+velY));
-    lastX = e.clientX; lastY = e.clientY;
-    if(REDUCE) draw();
-  });
-  const release = e=>{
-    if(!dragging) return;
-    dragging = false;
-    try{ canvas.releasePointerCapture(e.pointerId); }catch(_){}
-  };
-  canvas.addEventListener('pointerup', release);
-  canvas.addEventListener('pointercancel', release);
-
-  let tick = 0;
-  function draw(){
-    const rot = new THREE.Euler(rotX, rotY, 0);
-    globe.rotation.copy(rot); ring.rotation.copy(rot);
-    pins.forEach(p=>{
-      p.position.copy(p.userData.base.clone().applyEuler(rot));
-      if(p.userData.halo){
-        p.rotation.copy(rot);
-        const s = .5 + .5*Math.sin(tick*1.7 + p.userData.phase);
-        p.material.opacity = .1 + .3*s;
-        p.scale.setScalar(1 + .4*s);
-      }
-    });
-    arcs.forEach(a=>{
-      a.userData.t = (a.userData.t + a.userData.speed) % 1;
-      a.position.copy(a.userData.curve.getPoint(a.userData.t).applyEuler(rot));
-      a.material.opacity = Math.sin(a.userData.t*Math.PI)*.9 + .05;
-    });
-    renderer.render(scene,camera);
-  }
-
-  gatedLoop(canvas, ()=>{
-    tick += .007;
-    if(!dragging){ velX *= .94; velY *= .94; rotY += velX + .0032; rotX += velY; }
-    draw();
-  });
-
-  /* One static frame so the section is never blank when motion is reduced */
-  draw();
-  motionQuery.addEventListener('change', ()=>{ if(motionQuery.matches) draw(); });
-
-  addEventListener('resize', ()=>{
-    W = canvas.clientWidth || W; H = canvas.clientHeight || H;
-    renderer.setSize(W,H,false);
-    camera.aspect = W/H; camera.updateProjectionMatrix();
-    draw();
-  }, {passive:true});
-});
-
-})();
+  requestAnimationFrame(frame);
+}
+addEventListener('resize', resize, {passive:true});
+addEventListener('scroll', () => { dirty = true; }, {passive:true});
+motionQuery.addEventListener('change', e => { REDUCE = e.matches; dirty = true; });
+const start = () => { resize(); targetFor(REDUCE ? 0 : scrollY); if(REDUCE){ camPos.copy(tgtPos); camLook.copy(tgtLook); } setActive(0); requestAnimationFrame(frame); };
+(document.fonts ? document.fonts.ready : Promise.resolve()).then(start);
+addEventListener('load', () => { measure(); dirty = true; });
+}
 </script>
 </body>
 </html>

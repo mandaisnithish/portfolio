@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<title>Nithish Kaliannan Ananth · Data Scientist</title>
+<meta name="description" content="Data scientist working on decision-focused analytics. BSc Data Science, First Class. Currently an engineer intern working on test and measurement software. Open to graduate roles in the UK."/>
+<meta name="color-scheme" content="dark"/>
+<meta name="theme-color" content="#0e1d33"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=Martian+Mono:wght@400;500&family=Schibsted+Grotesk:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* Tokens. Every colour used in CSS and in the canvas charts is declared here. */
+:root{
+  --bg:#0e1d33;
+  --bg-raised:#132743;
+  --bg-sunk:#0b182b;
+  --line:#2b4466;
+  --line-strong:#3d5c84;
+
+  --text:#e9eff7;
+  --text-2:#b6c4d6;
+  --text-3:#8fa3bd;
+
+  --copper:#e39a62;
+  --copper-hi:#efb187;
+  --copper-ink:#0e1d33;
+
+  /* Heatmap ramp: blue (negative / correct) through neutral to orange (positive / error) */
+  --heat-blue:#5c9cf0;
+  --heat-mid:#22385a;
+  --heat-orange:#ff7a45;
+
+  --mono:'Martian Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'Atkinson Hyperlegible Next','Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --display:'Schibsted Grotesk','Atkinson Hyperlegible Next',system-ui,sans-serif;
+
+  --ease:cubic-bezier(.16,1,.3,1);
+  --shell:min(1200px,100% - 2.5rem);
+  --gap:clamp(1rem,2vw,1.5rem);
+  --section-y:clamp(4rem,8vw,7rem);
+  --rail:5.5rem;
+  --bar-h:3.5rem;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--bar-h) + 1rem)}
+body{
+  background:var(--bg);color:var(--text);
+  font:400 1.0625rem/1.65 var(--sans);
+  -webkit-font-smoothing:antialiased;
+  caret-color:var(--copper);
+  scrollbar-color:var(--line-strong) var(--bg-sunk);
+}
+::selection{background:var(--copper);color:var(--copper-ink)}
+a{color:inherit;text-underline-offset:.22em;text-decoration-thickness:1px}
+:focus-visible{outline:2px solid var(--copper);outline-offset:3px;border-radius:2px}
+.skip{
+  position:absolute;left:1rem;top:-4rem;z-index:300;
+  background:var(--copper);color:var(--copper-ink);font:700 .9rem var(--sans);
+  padding:.6rem 1.1rem;border-radius:2px;text-decoration:none;transition:top .18s var(--ease);
+}
+.skip:focus{top:1rem}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+h1,h2,h3{font-family:var(--display);font-weight:700;text-wrap:balance;letter-spacing:-.02em;line-height:1.1}
+h2{font-size:clamp(1.85rem,3.6vw,2.75rem);font-weight:800;letter-spacing:-.03em;margin-bottom:1rem}
+h3{font-size:1.15rem;letter-spacing:-.012em}
+p{max-width:68ch}
+strong{font-weight:700;color:var(--text)}
+.mono{font-family:var(--mono);font-size:.75rem;letter-spacing:0}
+.out-val,.fi-val,.cm-cell b,.role-when,.axis-ticks,.metrics{font-variant-numeric:tabular-nums}
+.lede{color:var(--text-2);font-size:1.0625rem;margin-bottom:2.5rem}
+.shell{width:var(--shell);margin-inline:auto}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;min-height:2.875rem;
+  padding:.7rem 1.35rem;border-radius:2px;text-decoration:none;
+  font:700 .95rem var(--sans);border:1px solid transparent;cursor:pointer;
+  transition:background-color .2s,border-color .2s,color .2s,transform .2s var(--ease);
+}
+.btn-copper{background:var(--copper);color:var(--copper-ink)}
+.btn-copper:hover{background:var(--copper-hi)}
+.btn-line{border-color:var(--line-strong);color:var(--text)}
+.btn-line:hover{border-color:var(--copper);color:var(--copper)}
+.btn:active{transform:translateY(1px)}
+
+/* ═════ BAR (top nav; becomes bottom bar on phones) ═════ */
+.bar{
+  position:fixed;inset:0 0 auto;z-index:100;height:var(--bar-h);
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:0 max(1.25rem,env(safe-area-inset-left));
+  padding-top:env(safe-area-inset-top,0px);height:calc(var(--bar-h) + env(safe-area-inset-top,0px));
+  background:var(--bg);border-bottom:1px solid var(--line);
+}
+.wordmark{font:500 .8rem var(--mono);color:var(--text);text-decoration:none;display:inline-flex;align-items:center;min-height:2.75rem}
+.wordmark span{color:var(--copper)}
+.layers{display:flex;list-style:none;gap:.25rem}
+.layers a{
+  display:flex;align-items:center;gap:.45rem;min-height:2.75rem;padding:0 .75rem;
+  font:400 .75rem var(--mono);color:var(--text-2);text-decoration:none;
+  border-bottom:2px solid transparent;transition:color .2s,border-color .2s;
+}
+.layers a b{font-weight:500;color:var(--text-3)}
+.layers .short{display:none}
+.layers a:hover{color:var(--text)}
+.layers a[aria-current="true"]{color:var(--text);border-bottom-color:var(--copper)}
+.layers a[aria-current="true"] b{color:var(--copper)}
+.bar .btn{min-height:2.375rem;padding:.4rem 1rem;font-size:.85rem}
+
+@media(max-width:860px){
+  .layers{
+    position:fixed;inset:auto 0 0;z-index:100;justify-content:space-around;gap:0;
+    background:var(--bg);border-top:1px solid var(--line);
+    padding:0 .25rem env(safe-area-inset-bottom,0px);
+  }
+  .layers li{flex:1}
+  .layers a{
+    flex-direction:column;justify-content:center;gap:0;min-height:3.5rem;padding:0 .2rem;
+    font-size:.6875rem;border-bottom:0;border-top:2px solid transparent;text-align:center;
+  }
+  .layers a[aria-current="true"]{border-top-color:var(--copper)}
+  .layers .long{display:none}
+  .layers .short{display:inline}
+  body{padding-bottom:calc(3.6rem + env(safe-area-inset-bottom,0px))}
+}
+
+/* ═════ HERO: the forward pass ═════ */
+.hero{padding-block:calc(var(--bar-h) + clamp(2.5rem,6vw,4.5rem)) clamp(3rem,6vw,5rem)}
+.hero-head{
+  display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+  gap:clamp(1.5rem,4vw,4rem);align-items:end;margin-bottom:clamp(2rem,4vw,3rem);
+}
+@media(max-width:900px){.hero-head{grid-template-columns:minmax(0,1fr)}}
+.hero h1{font-size:clamp(2.6rem,6.2vw,5.25rem);font-weight:800;letter-spacing:-.035em;line-height:.98;margin-bottom:1rem}
+.hero-role{font:600 clamp(1.05rem,1.8vw,1.3rem)/1.4 var(--display);color:var(--text-2);letter-spacing:-.005em}
+.hero-stmt{color:var(--text-2);margin-bottom:1.5rem}
+.hero-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+
+.net{
+  display:grid;grid-template-columns:minmax(10rem,.9fr) minmax(0,3.2fr) minmax(13rem,1.25fr);
+  gap:2rem;align-items:stretch;
+  border:1px solid var(--line);background:var(--bg-sunk);padding:1.25rem;
+}
+.stage{position:relative;display:flex;flex-direction:column;gap:.6rem;min-width:0}
+.stage + .stage::before{
+  content:'';position:absolute;left:-2rem;top:50%;width:2rem;height:1px;background:var(--line-strong);
+}
+.stage-label{font:400 .75rem var(--mono);color:var(--text-3)}
+.stage-label b{font-weight:500;color:var(--text-2)}
+
+.input-block{
+  flex:1;display:flex;flex-direction:column;justify-content:center;gap:.35rem;
+  border:1px solid var(--line);background:var(--bg-raised);padding:1rem;
+}
+.input-block p{font-size:.95rem;color:var(--text-2);line-height:1.45}
+.input-block p:first-child{color:var(--text);font-weight:700}
+.input-block .live{display:flex;align-items:center;gap:.5rem;color:var(--text)}
+.input-block .live::before{content:'';width:.5rem;height:.5rem;background:var(--copper);flex:none}
+
+.tiles{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr) minmax(0,.75fr);gap:1rem;flex:1}
+.tile{
+  all:unset;box-sizing:border-box;cursor:pointer;
+  display:flex;flex-direction:column;gap:.55rem;padding:.75rem;min-width:0;
+  border:1px solid var(--line);background:var(--bg-raised);
+  transition:opacity .25s,border-color .25s;
+}
+.tile:hover,.tile[aria-pressed="true"]{border-color:var(--copper)}
+.tile:focus-visible{outline:2px solid var(--copper);outline-offset:2px}
+.net.soloing .tile:not([aria-pressed="true"]){opacity:.35}
+.tile-name{font:500 .75rem var(--mono);color:var(--text);overflow-wrap:anywhere}
+.tile-shape{font:400 .75rem var(--mono);color:var(--text-3)}
+.cells{display:grid;gap:3px;flex:1;grid-auto-rows:minmax(1.5rem,1fr);min-height:4.5rem}
+.cell{background:var(--heat-mid);transition:background-color .5s var(--ease)}
+
+.outputs{list-style:none;display:grid;gap:.5rem;flex:1}
+.outputs li{
+  display:grid;grid-template-columns:4.6rem 1fr;align-items:baseline;gap:.75rem;
+  padding:.45rem .75rem;border:1px solid var(--line);background:var(--bg-raised);
+}
+.out-val{font:700 1.35rem/1.1 var(--display);letter-spacing:-.02em;color:var(--text)}
+.out-lab{font-size:.85rem;line-height:1.35;color:var(--text-2)}
+.outputs .decision{background:var(--copper);border-color:var(--copper);padding:0}
+.outputs .decision a{
+  grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:.75rem;
+  padding:.65rem .75rem;color:var(--copper-ink);text-decoration:none;font-weight:700;min-height:2.75rem;
+}
+.outputs .decision a span{font:500 .75rem var(--mono)}
+.outputs .decision:hover{background:var(--copper-hi)}
+
+.readout{
+  grid-column:1/-1;display:flex;gap:.75rem;align-items:baseline;flex-wrap:wrap;
+  border-top:1px solid var(--line);padding-top:.9rem;margin-top:-.25rem;
+  font-size:.9rem;color:var(--text-2);max-width:none;min-height:2.6rem;
+}
+.readout b{font:500 .75rem var(--mono);color:var(--copper)}
+
+/* forward pass: stages wake in order, once */
+.net .tile,.net .outputs li{opacity:1}
+.js .net:not(.passed) .outputs li{opacity:.25}
+.js .net .outputs li{transition:opacity .45s var(--ease)}
+.js .net.passed .outputs li:nth-child(1){transition-delay:1.05s}
+.js .net.passed .outputs li:nth-child(2){transition-delay:1.15s}
+.js .net.passed .outputs li:nth-child(3){transition-delay:1.25s}
+.js .net.passed .outputs li:nth-child(4){transition-delay:1.35s}
+.js .net.passed .outputs li:nth-child(5){transition-delay:1.5s}
+
+@media(max-width:1060px){
+  .net{grid-template-columns:minmax(0,1fr);gap:1.75rem}
+  .stage + .stage::before{left:50%;top:-1.75rem;width:1px;height:1.75rem}
+  .outputs{grid-template-columns:1fr 1fr}
+  .outputs .decision{grid-column:1/-1}
+}
+@media(max-width:620px){
+  .net{padding:.9rem}
+  .tiles{grid-template-columns:minmax(0,1fr)}
+  .tile{padding:.6rem .7rem}
+  .cells{grid-auto-rows:minmax(1.1rem,1fr);min-height:2.4rem}
+  .outputs li{grid-template-columns:1fr;gap:.15rem}
+}
+@media(max-width:420px){.outputs{grid-template-columns:1fr}}
+
+/* ═════ LAYERS (sections) ═════ */
+.layer{padding-block:var(--section-y);border-top:1px solid var(--line)}
+.layer-grid{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);gap:clamp(1rem,3vw,2.5rem)}
+.rail{position:relative}
+.rail-tag{
+  position:sticky;top:calc(var(--bar-h) + 1.5rem);
+  display:flex;flex-direction:column;gap:.2rem;padding-top:.45rem;
+}
+.rail-tag b{font:500 .875rem var(--mono);color:var(--text-2)}
+.rail-tag span{font:400 .75rem var(--mono);color:var(--text-3)}
+.layer.active .rail-tag b{color:var(--copper)}
+.rail::after{content:'';position:absolute;right:0;top:0;bottom:0;width:1px;background:var(--line)}
+.layer.active .rail::after{background:var(--copper)}
+@media(max-width:700px){
+  :root{--rail:1.75rem}
+  .layer-grid{gap:.85rem}
+  .rail-tag span{display:none}
+  .rail-tag b{font-size:.75rem}
+}
+.layer-body{min-width:0}
+
+.panel{border:1px solid var(--line);background:var(--bg-raised);padding:1.35rem}
+.panel h3{margin-bottom:.4rem}
+.panel p{font-size:.95rem;color:var(--text-2)}
+
+/* About */
+.about{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(1.5rem,4vw,3rem);align-items:start}
+@media(max-width:960px){.about{grid-template-columns:minmax(0,1fr)}}
+.about-copy p{color:var(--text-2);margin-bottom:1.1rem}
+.reflexes{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+@media(max-width:560px){.reflexes{grid-template-columns:1fr}}
+.reflexes article{background:var(--bg-raised);padding:1.2rem}
+.reflexes .mono{display:block;color:var(--text-3);margin-bottom:.45rem}
+.reflexes h3{font-size:1rem;margin-bottom:.35rem}
+.reflexes p{font-size:.9rem;line-height:1.55;color:var(--text-2)}
+.text-link{color:var(--copper);font-weight:700}
+.text-link:hover{color:var(--copper-hi)}
+
+/* Experience: timeline on one time axis */
+.axis{margin-bottom:3rem;border:1px solid var(--line);background:var(--bg-sunk);padding:1.25rem 1.25rem 1rem}
+.axis-row{display:grid;grid-template-columns:12rem minmax(0,1fr);gap:1rem;align-items:center;min-height:2.25rem}
+.axis-row > span:first-child{font-size:.875rem;color:var(--text-2);line-height:1.3}
+.axis-track{position:relative;height:1.1rem}
+.axis-track::before{content:'';position:absolute;inset:50% 0 auto;height:1px;background:var(--line)}
+.axis-bar{position:absolute;top:0;bottom:0;background:var(--heat-blue)}
+.axis-bar.now{background:var(--copper)}
+.axis-bar.now::after{content:'';position:absolute;left:100%;top:0;bottom:0;width:1.25rem;
+  background:repeating-linear-gradient(90deg,var(--copper) 0 3px,transparent 3px 6px)}
+.axis-ticks{position:relative;height:1.4rem;margin-top:.4rem}
+.axis-ticks span{position:absolute;top:0;font:400 .75rem var(--mono);color:var(--text-3);transform:translateX(-50%)}
+.axis-ticks span:first-child{transform:none}
+.axis-ticks::before{content:'';position:absolute;left:0;right:0;top:-.3rem;height:1px;background:var(--line-strong)}
+@media(max-width:700px){
+  .axis{padding:1rem .9rem .9rem}
+  .axis-row{grid-template-columns:minmax(0,1fr);gap:.3rem;margin-bottom:.6rem}
+}
+
+.roles{display:grid;gap:3rem}
+.role{display:grid;grid-template-columns:12rem minmax(0,1fr);gap:clamp(1rem,3vw,2.5rem)}
+@media(max-width:820px){.role{grid-template-columns:minmax(0,1fr);gap:.75rem}}
+.role-meta{display:flex;flex-direction:column;gap:.35rem}
+.role-when{font:400 .75rem var(--mono);color:var(--text-2)}
+.role-org{font-size:.95rem;color:var(--text-2);line-height:1.4}
+.tag{align-self:start;font:400 .75rem var(--mono);color:var(--heat-blue);border:1px solid var(--line-strong);padding:.15rem .5rem}
+.role h3{font-size:1.3rem;margin-bottom:.75rem}
+.bullets{list-style:none;display:grid;gap:.6rem}
+.bullets li{position:relative;padding-left:1.25rem;color:var(--text-2);font-size:.98rem;line-height:1.6;max-width:72ch}
+.bullets li::before{content:'';position:absolute;left:0;top:.62em;width:.45rem;height:.45rem;background:var(--line-strong)}
+.pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1rem}
+.pills span{font:400 .75rem var(--mono);color:var(--text-2);border:1px solid var(--line);padding:.25rem .55rem}
+
+/* Charts */
+.chart{position:relative;width:100%;height:190px;margin:.25rem 0 .75rem;border:1px solid var(--line);background:var(--bg-sunk)}
+.chart canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.chart-cap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font:400 .75rem/1.5 var(--mono);color:var(--text-3);margin-bottom:.4rem}
+.chart-cap b{font-weight:500;color:var(--text-2)}
+.synthetic{font:400 .75rem/1.5 var(--mono);color:var(--text-3);margin-bottom:1rem}
+.synthetic::before{content:'≈ '}
+
+/* Projects */
+.case{border:1px solid var(--line);background:var(--bg-raised);padding:clamp(1.25rem,3vw,2rem);margin-bottom:var(--gap)}
+.case h3{font-size:clamp(1.4rem,2.6vw,1.9rem);letter-spacing:-.025em;margin-bottom:1.25rem;max-width:30ch}
+.case .chart{height:220px}
+.case-blocks{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem 2.5rem;margin-top:1.5rem}
+@media(max-width:820px){.case-blocks{grid-template-columns:minmax(0,1fr)}}
+.kind{font:400 .75rem var(--mono);color:var(--text-3);margin-bottom:.6rem}
+.block h4{font:500 .75rem var(--mono);color:var(--copper);margin-bottom:.35rem;letter-spacing:0}
+.block p{font-size:.95rem;line-height:1.65;color:var(--text-2)}
+.block + .block{margin-top:1.25rem}
+.metrics{display:flex;flex-wrap:wrap;gap:.4rem;margin:1.5rem 0 .75rem}
+.metrics span{font:400 .75rem var(--mono);color:var(--text);background:var(--bg-sunk);border:1px solid var(--line-strong);padding:.3rem .6rem}
+.stack{display:flex;flex-wrap:wrap;gap:.35rem}
+.stack span{font-size:.8125rem;color:var(--text-3);padding:.1rem .45rem;border:1px solid var(--line)}
+
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+@media(max-width:860px){.proj-grid{grid-template-columns:minmax(0,1fr)}}
+.proj{border:1px solid var(--line);background:var(--bg-raised);padding:1.5rem;display:flex;flex-direction:column;min-width:0}
+.proj h3{margin-bottom:.9rem}
+.proj .chart{height:190px}
+.proj .stack{margin-top:auto;padding-top:.75rem}
+
+.proj .chart.arch{height:auto;min-height:190px;padding:1rem;display:flex;flex-direction:column;justify-content:center;gap:.5rem}
+.arch-lbl{font:400 .75rem var(--mono);color:var(--text-3)}
+.arch-row{display:flex;align-items:center;margin-bottom:.6rem}
+.node{font:400 .75rem/1.3 var(--mono);color:var(--text-2);border:1px solid var(--line-strong);background:var(--bg-raised);padding:.4rem .55rem;white-space:nowrap}
+.node small{display:block;font-size:.75rem;color:var(--text-3)}
+.node.hot{border-color:var(--copper);color:var(--text)}
+.node-stack{display:flex;flex-direction:column;gap:.3rem}
+.wire{flex:1;min-width:.9rem;max-width:2.5rem;height:1px;background:var(--line-strong)}
+.wire.hot{background:var(--copper)}
+@media(max-width:560px){
+  .arch-row{flex-direction:column;align-items:flex-start}
+  .wire{flex:none;width:1px;min-width:0;height:.8rem;margin-left:1.25rem}
+  .node-stack{flex-direction:row}
+}
+
+/* Skills */
+.skill-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(1.25rem,3vw,2.5rem);margin-bottom:2rem}
+@media(max-width:860px){.skill-cols{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.skill-cols{grid-template-columns:minmax(0,1fr)}}
+.skill-head{font:500 .75rem var(--mono);color:var(--text-2);padding-bottom:.5rem;margin-bottom:.75rem;border-bottom:1px solid var(--line-strong)}
+.skill-list{list-style:none;display:grid;gap:.15rem}
+.skill-list li{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;font-size:.95rem;color:var(--text-2);padding:.3rem 0;border-bottom:1px solid var(--line)}
+.level{font:400 .75rem var(--mono);flex:none;color:var(--text-3)}
+.level.core{color:var(--copper)}
+.level.working{color:var(--heat-blue)}
+.gap-note{color:var(--text-2);margin-bottom:2.5rem}
+
+.two-up{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:var(--gap)}
+@media(max-width:860px){.two-up{grid-template-columns:minmax(0,1fr)}}
+.fi-row{display:grid;grid-template-columns:9.5rem minmax(0,1fr) 2.6rem;align-items:center;gap:.75rem;margin-bottom:.55rem}
+.fi-name{font:400 .75rem var(--mono);color:var(--text-2);text-align:right;overflow-wrap:anywhere}
+.fi-track{display:block;height:.9rem;background:var(--bg-sunk);border:1px solid var(--line)}
+.fi-fill{display:block;height:100%;width:0;background:var(--heat-orange);transition:width 1s var(--ease)}
+.fi-val{font:500 .75rem var(--mono);color:var(--text)}
+@media(max-width:480px){.fi-row{grid-template-columns:minmax(0,1fr) 2.6rem}.fi-name{grid-column:1/-1;text-align:left}}
+.footnote{margin-top:1rem;font-size:.9rem;line-height:1.6;color:var(--text-2)}
+
+.cm-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;max-width:22rem}
+.cm-cell{padding:1rem .75rem;display:flex;flex-direction:column;gap:.15rem;color:var(--text)}
+.cm-cell b{font:700 1.5rem/1 var(--display);letter-spacing:-.02em}
+.cm-cell span{font:400 .75rem var(--mono)}
+.cm-tn{background:rgba(92,156,240,.55)} .cm-tp{background:rgba(92,156,240,.42)}
+.cm-fp{background:rgba(255,122,69,.22)} .cm-fn{background:rgba(255,122,69,.36)}
+
+/* Education */
+.edu-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+@media(max-width:820px){.edu-grid{grid-template-columns:minmax(0,1fr)}}
+.edu-org{font-size:.95rem;color:var(--text-2);margin-bottom:.75rem}
+.badges{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.9rem}
+.badges span{font:400 .75rem var(--mono);padding:.2rem .5rem;border:1px solid var(--line-strong);color:var(--text)}
+.badges span.hot{border-color:var(--copper);color:var(--copper)}
+
+/* Contact: the output */
+.contact h2{font-size:clamp(2.1rem,4.6vw,3.4rem)}
+.contact-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.contact-addr{font-size:1rem;color:var(--text-2)}
+.contact-addr a{color:var(--text)}
+
+footer{border-top:1px solid var(--line);padding:1.5rem 0;font:400 .75rem var(--mono);color:var(--text-3)}
+.footer-inner{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+
+/* Preferences */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition-duration:.01ms!important;transition-delay:0s!important;animation:none!important}
+}
+@media (prefers-contrast: more){
+  :root{--text-2:#d6e0ec;--text-3:#b9c7d8;--line:#4d6d96;--line-strong:#6f8fb8}
+}
+@media print{
+  .bar,.layers,.chart,.tiles,.readout,.skip{display:none!important}
+  body{background:#fff;color:#000;padding:0}
+  .layer,.hero{padding-block:1.25rem}
+  .panel,.case,.proj,.net,.input-block,.outputs li{background:#fff;border-color:#999}
+  *{color:#000!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="bar">
+  <a href="#input" class="wordmark" aria-label="Nithish Kaliannan Ananth, back to top">NKA<span>_</span></a>
+  <nav aria-label="Sections">
+    <ul class="layers">
+      <li><a href="#about"><b>1</b> About</a></li>
+      <li><a href="#work"><b>2</b> <span class="long">Experience</span><span class="short">Work</span></a></li>
+      <li><a href="#projects"><b>3</b> Projects</a></li>
+      <li><a href="#skills"><b>4</b> Skills</a></li>
+      <li><a href="#education"><b>5</b> <span class="long">Education</span><span class="short">Study</span></a></li>
+    </ul>
+  </nav>
+  <a href="#contact" class="btn btn-copper">Contact</a>
+</header>
+
+<main id="main">
+
+<!-- ═══════════ INPUT → OUTPUT ═══════════ -->
+<section id="input" class="hero" aria-labelledby="h-name">
+  <div class="shell">
+    <div class="hero-head">
+      <div>
+        <h1 id="h-name">Nithish Kaliannan Ananth</h1>
+        <p class="hero-role">Data Scientist · Decision-focused analytics · Business intelligence</p>
+      </div>
+      <div>
+        <p class="hero-stmt">Most operational decisions get made on instinct or on a report that was already stale when it arrived. I find where that's happening, build the analysis that exposes the real pattern, and translate it into something a person can act on.</p>
+        <div class="hero-actions">
+          <a href="#projects" class="btn btn-line">See the work</a>
+          <a href="https://linkedin.com/in/nithishka" target="_blank" rel="noopener" class="btn btn-line">LinkedIn ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <figure class="net" aria-labelledby="net-cap">
+      <figcaption id="net-cap" class="vh">The work as a forward pass: background in, three pieces of evidence from the AGS Roadways and fraud projects, and four measured outcomes out.</figcaption>
+
+      <div class="stage">
+        <p class="stage-label"><b>x</b> · input</p>
+        <div class="input-block">
+          <p>BSc Data Science, First Class</p>
+          <p>Engineer intern, test &amp; measurement software</p>
+          <p class="live">Open to graduate roles · London</p>
+        </div>
+      </div>
+
+      <div class="stage">
+        <p class="stage-label"><b>h</b> · evidence layers, tap one to read its source</p>
+        <div class="tiles" id="tiles"></div>
+      </div>
+
+      <div class="stage">
+        <p class="stage-label"><b>y</b> · output, AGS Roadways</p>
+        <ol class="outputs">
+          <li><span class="out-val">−15%</span><span class="out-lab">delivery ETA error (MAE) vs the manual baseline</span></li>
+          <li><span class="out-val">−8%</span><span class="out-lab">operating cost, from one fuel × load finding</span></li>
+          <li><span class="out-val">61%</span><span class="out-lab">of missed SLAs traced to 3 routes</span></li>
+          <li><span class="out-val">5 h</span><span class="out-lab">a week returned from manual reporting</span></li>
+          <li class="decision"><a href="#contact">Decision: get in touch <span>→ y</span></a></li>
+        </ol>
+      </div>
+
+      <p class="readout" id="readout" aria-live="polite"><b>readout</b><span>Tap or hover a layer to see which figures it's drawn from.</span></p>
+    </figure>
+  </div>
+</section>
+
+<!-- ═══════════ L1 ABOUT ═══════════ -->
+<section id="about" class="layer" aria-labelledby="h-about">
+  <div class="shell layer-grid">
+    <div class="rail" aria-hidden="true"><div class="rail-tag"><b>L1</b><span>about</span></div></div>
+    <div class="layer-body">
+      <h2 id="h-about" tabindex="-1">Most data scientists never meet the instrument.</h2>
+      <p class="lede">I&#8217;ve spent this year on the other end of the cable.</p>
+      <div class="about">
+        <div class="about-copy">
+          <p>I came out of a <strong>BSc in Data Science</strong> at Coventry with First Class Honours and the Course Director&#8217;s Award, then did something slightly off script: I took an engineering job. I&#8217;ve spent this year building test and measurement software, and learning the hardware side properly alongside it.</p>
+          <p>That&#8217;s the difference, and it&#8217;s a small one that compounds. Most analysts inherit a dataset and take it at face value. I&#8217;ve been watching where a reading actually comes from, and how many ways it can quietly be wrong before it reaches a spreadsheet. You get suspicious of clean data in a useful way.</p>
+          <p>The habit underneath both jobs is the same: <strong>start with the decision, not the data.</strong> I want to know what someone will do differently before I write a line of code, because a model that changes nobody's mind is an expensive way to be right.</p>
+          <p><a class="text-link" href="https://linkedin.com/in/nithishka" target="_blank" rel="noopener">linkedin.com/in/nithishka ↗</a></p>
+        </div>
+        <div class="reflexes">
+          <article>
+            <span class="mono">reflex 01</span>
+            <h3>Ask what changes</h3>
+            <p>If I can&#8217;t say what someone will do differently with the answer, the question isn&#8217;t scoped yet. That conversation happens before any code.</p>
+          </article>
+          <article>
+            <span class="mono">reflex 02</span>
+            <h3>Distrust the tidy number</h3>
+            <p>Every measurement has a physical path behind it. Knowing that path is usually faster than debugging the model that consumed it.</p>
+          </article>
+          <article>
+            <span class="mono">reflex 03</span>
+            <h3>Say the trade-off out loud</h3>
+            <p>Recall against precision, accuracy against interpretability. I&#8217;d rather argue about the cost ratio than quietly pick a default and hope.</p>
+          </article>
+          <article>
+            <span class="mono">reflex 04</span>
+            <h3>Lead with the implication</h3>
+            <p>&#8220;departure_hour scores 0.67&#8221; tells a logistics director nothing. &#8220;You&#8217;re losing more time to scheduling than to distance&#8221; tells them where to look.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ L2 EXPERIENCE ═══════════ -->
+<section id="work" class="layer" aria-labelledby="h-work">
+  <div class="shell layer-grid">
+    <div class="rail" aria-hidden="true"><div class="rail-tag"><b>L2</b><span>experience</span></div></div>
+    <div class="layer-body">
+      <h2 id="h-work" tabindex="-1">Where decisions changed because of the work.</h2>
+      <p class="lede">Real roles, patterns that weren't visible before, and what followed.</p>
+
+      <figure class="axis" aria-labelledby="axis-cap">
+        <figcaption id="axis-cap" class="vh">Timeline from 2023 to 2026: McDonald's from January 2023 to June 2026, AGS Roadways from January to September 2025, Students' Union representative from September 2025 to June 2026, and EECL from July 2026 to now.</figcaption>
+        <div class="axis-row"><span>McDonald's</span><span class="axis-track"><span class="axis-bar" style="left:0%;width:87.5%"></span></span></div>
+        <div class="axis-row"><span>AGS Roadways</span><span class="axis-track"><span class="axis-bar" style="left:50%;width:18.75%"></span></span></div>
+        <div class="axis-row"><span>Students' Union</span><span class="axis-track"><span class="axis-bar" style="left:66.7%;width:20.8%"></span></span></div>
+        <div class="axis-row"><span>EECL</span><span class="axis-track"><span class="axis-bar now" style="left:87.5%;width:10%"></span></span></div>
+        <div class="axis-row" aria-hidden="true"><span></span><span class="axis-ticks"><span style="left:0">2023</span><span style="left:25%">2024</span><span style="left:50%">2025</span><span style="left:75%">2026</span></span></div>
+      </figure>
+
+      <div class="roles">
+        <article class="role">
+          <div class="role-meta">
+            <p class="role-when">Jul 2026 – now</p>
+            <p class="role-org">EECL, European Engineering &amp; Consultancy</p>
+            <span class="tag">Engineering</span>
+          </div>
+          <div>
+            <h3>Engineer Intern</h3>
+            <ul class="bullets">
+              <li>Building <strong>test and measurement software</strong>: instrument control from the user interface down to the embedded Linux target it runs on.</li>
+              <li>Learning the hardware side properly alongside it: soldering theory, materials, PCB fabrication and inspection to <strong>IPC-A-610</strong>, plus the measurement theory behind the instruments themselves.</li>
+              <li>Finding that a data background transfers to an engineering floor mostly through one habit: working out which measurement answers the question before trusting the number it returns.</li>
+            </ul>
+            <div class="pills"><span>Python</span><span>Embedded Linux</span><span>Instrument control</span><span>IPC-A-610</span></div>
+          </div>
+        </article>
+
+        <article class="role">
+          <div class="role-meta">
+            <p class="role-when">Sep 2025 – Jun 2026</p>
+            <p class="role-org">Coventry University Students' Union</p>
+            <span class="tag">Academic</span>
+          </div>
+          <div>
+            <h3>Student Representative</h3>
+            <p class="chart-cap"><b>Feedback themes · priority vs frequency</b><span>size = actionability</span></p>
+            <div class="chart" data-chart="themes"><canvas role="img" aria-label="Bubble chart of five feedback themes. Assessment clarity ranks highest on both priority and frequency, then feedback timing, resource access, lecture pacing and module content."></canvas></div>
+            <p class="synthetic">Illustrative reconstruction of the prioritisation framework</p>
+            <ul class="bullets">
+              <li>Collected and structured qualitative feedback from 80+ students, converting unstructured complaints into a <strong>prioritised theme framework</strong> ranked by frequency and actionability, then took the top three issues to faculty with specific evidence rather than a summary.</li>
+              <li>Acted as the bridge between students and academic staff, turning high-volume, ambiguous feedback into a <strong>priority matrix</strong> so faculty could spend limited response capacity on the highest-impact issues first.</li>
+              <li>Tracked implementation across two terms, following up with both sides to check whether the interventions actually improved anything. Closing that loop is the part most feedback exercises skip.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="role">
+          <div class="role-meta">
+            <p class="role-when">Jan 2025 – Sep 2025 · 9 months</p>
+            <p class="role-org">AGS Roadways</p>
+            <span class="tag">Logistics &amp; transport</span>
+          </div>
+          <div>
+            <h3>Data Scientist</h3>
+            <p class="chart-cap"><b>ETA forecast · actual vs predicted</b><span>24 weeks</span></p>
+            <div class="chart" data-chart="ags"><canvas role="img" aria-label="Line chart over 24 weeks: predicted delivery times track actual times closely, mostly within a quarter of an hour."></canvas></div>
+            <p class="synthetic">Illustrative reconstruction. Underlying data is confidential</p>
+            <ul class="bullets">
+              <li>Built a <strong>supervised forecasting pipeline</strong> (Python, scikit-learn, XGBoost) over 10,000+ logistics records, cutting delivery ETA error by <strong>15% MAE</strong> against the manual baseline.</li>
+              <li>Used <strong>SHAP</strong> and multivariate EDA to find what aggregate reporting hid: departure hour predicted SLA failure better than route distance, and a fuel type × load interaction drove 23% higher cost per trip. Together they led to an <strong>8% operating cost reduction</strong>.</li>
+              <li>Shipped four <strong>Power BI dashboards</strong> (DAX, SQL ETL) that replaced a five-hour manual Excel cycle and returned five analyst hours a week.</li>
+              <li>Presented the root cause to logistics management: three routes behind <strong>61% of SLA failures</strong>, with remediation acted on the following quarter. <a class="text-link" href="#case-ags">Read the case study ↓</a></li>
+            </ul>
+            <div class="pills"><span>Python · scikit-learn · XGBoost</span><span>SHAP</span><span>Power BI · DAX · SQL</span></div>
+          </div>
+        </article>
+
+        <article class="role">
+          <div class="role-meta">
+            <p class="role-when">Jan 2023 – Jun 2026 · 3+ years</p>
+            <p class="role-org">McDonald's</p>
+            <span class="tag">Operations</span>
+          </div>
+          <div>
+            <h3>Engagement Champion</h3>
+            <ul class="bullets">
+              <li>Maintained KPI datasets for service time, order accuracy and throughput in a high-volume operational environment, keeping the data clean enough to be worth deciding on.</li>
+              <li>Analysed operational metrics to identify performance trends and turn them into recommendations that fed measurable process changes.</li>
+              <li>Reported to management stakeholders regularly in a fast-moving setting, which is where I learned to lead with the implication rather than the finding.</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ L3 PROJECTS ═══════════ -->
+<section id="projects" class="layer" aria-labelledby="h-projects">
+  <div class="shell layer-grid">
+    <div class="rail" aria-hidden="true"><div class="rail-tag"><b>L3</b><span>projects</span></div></div>
+    <div class="layer-body">
+      <h2 id="h-projects" tabindex="-1">Work that changed a decision.</h2>
+      <p class="lede">Problem, reasoning, insight, and what happened differently as a result. Where a chart appears it&#8217;s an illustrative reconstruction, built to show the shape of a result rather than exported from the original run.</p>
+
+      <article class="case" id="case-ags">
+        <p class="kind">Case study · AGS Roadways</p>
+        <h3>Late deliveries weren't a route problem. They were a scheduling problem.</h3>
+        <p class="chart-cap"><b>Late rate by departure hour</b><span>07:00–09:00 = peak failure window</span></p>
+        <div class="chart" data-chart="hours"><canvas role="img" aria-label="Bar chart of late-delivery rate by departure hour from 05:00 to 18:00. Rates peak at 38, 52 and 61 percent for 07:00, 08:00 and 09:00 departures, and stay between 8 and 30 percent at other hours."></canvas></div>
+
+        <div class="case-blocks">
+          <div>
+            <div class="block">
+              <h4>The problem, as it was being solved</h4>
+              <p>AGS attributed late deliveries to route complexity and vehicle availability, and optimised accordingly. Dispatchers estimated ETAs from accumulated experience with no formal method, so there was no way to tell whether delays were structural or random, or which part of the operation was producing them.</p>
+            </div>
+            <div class="block">
+              <h4>Approach, and why</h4>
+              <p>EDA came before modelling, specifically to find out what the data actually tracked versus what people assumed it tracked. Gradient boosting over simple regression, because trip characteristics interact non-linearly. A heavy load matters more on some routes, in some weather. The configuration was chosen for interpretability on purpose: the goal wasn't accuracy alone, it was being able to explain an output to a dispatcher who had to trust it.</p>
+            </div>
+            <div class="block">
+              <h4>What it found</h4>
+              <p>Departure hour explained late deliveries better than route distance, which pointed at congestion rather than route complexity. A fuel type × vehicle load interaction showed diesel on heavy loads running 23% more expensive per trip. Three routes accounted for 61% of SLA failures, not because they were hard but because they were consistently scheduled into the peak congestion window.</p>
+            </div>
+          </div>
+          <div>
+            <div class="block">
+              <h4>The trade-off</h4>
+              <p>Recall over raw accuracy, because a missed late-delivery pattern costs more than a false alarm. The decision threshold moved from the default 0.5 down to 0.42, accepting more false positives to catch more real operational failures.</p>
+            </div>
+            <div class="block">
+              <h4>What changed</h4>
+              <p>Management shifted attention from route optimisation to departure scheduling. The fuel finding became a procurement question. Forecast error fell 15%, operating costs 8%. Four Power BI dashboards replaced the weekly Excel summary, built around exception flags rather than averages so a manager scanning for thirty seconds sees what needs attention, and leadership stopped making Monday decisions against a spreadsheet built the previous Thursday.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics"><span>↓15% forecast error</span><span>↓8% operating cost</span><span>3 routes → 61% of failures</span><span>Decision: scheduling, not routing</span></div>
+        <div class="stack"><span>Python</span><span>scikit-learn</span><span>XGBoost</span><span>Pandas</span><span>SHAP</span><span>Power BI</span><span>DAX</span><span>SQL</span></div>
+      </article>
+
+      <div class="proj-grid">
+        <article class="proj">
+          <p class="kind">Current work</p>
+          <h3>An instrument you drive from a browser</h3>
+          <p class="chart-cap"><b>Where the transport layer sits</b><span>before → after</span></p>
+          <div class="chart arch" role="img" aria-label="Before: one browser tab talks to the instrument directly and holds the port. After: several browsers talk to a Python backend on an embedded Linux board, which owns the instrument.">
+            <p class="arch-lbl">before · one tab holds the port</p>
+            <div class="arch-row" aria-hidden="true"><span class="node">browser tab</span><span class="wire"></span><span class="node">instrument</span></div>
+            <p class="arch-lbl">after · the backend owns the hardware</p>
+            <div class="arch-row" aria-hidden="true"><span class="node-stack"><span class="node">browser</span><span class="node">browser</span></span><span class="wire"></span><span class="node hot">Python backend<small>embedded Linux</small></span><span class="wire hot"></span><span class="node">instrument</span></div>
+          </div>
+          <div class="block">
+            <h4>What it is</h4>
+            <p>Control software for laboratory test equipment: a single-page web interface over a Python backend, running on an embedded Linux board so the instrument is usable on its own without a laptop attached.</p>
+          </div>
+          <div class="block">
+            <h4>The architectural decision</h4>
+            <p>The first version talked to the hardware directly from the browser. That put the transport in the wrong place. One tab held the port, so one tab held the instrument, and nothing worked across a network. Moving that layer behind the backend meant the browser stopped being a driver and became a client, which is what made multiple users and network access possible at all.</p>
+          </div>
+          <div class="block">
+            <h4>What it taught me</h4>
+            <p>Shared hardware needs an ownership model, not just an interface. Most of the hard problems were concurrency: who holds a resource, what happens when a reading fails mid-run, how a second user is told no. I wrote an architecture reference and reviewed my own code against it, because those failure modes only surface once you have to describe the system to someone else.</p>
+          </div>
+          <div class="stack"><span>Python</span><span>Flask</span><span>JavaScript</span><span>Plotly</span><span>Linux</span></div>
+        </article>
+
+        <article class="proj">
+          <p class="kind">Sequence modelling</p>
+          <h3>When to trust a forecast</h3>
+          <p class="chart-cap"><b>Prediction vs actual</b><span>shaded = uncertainty band</span></p>
+          <div class="chart" data-chart="lstm"><canvas role="img" aria-label="Price series with a forecast section; the forecast's uncertainty band widens as it moves further ahead."></canvas></div>
+          <div class="block">
+            <h4>The question</h4>
+            <p>Can a model learn anything meaningful in a market defined by noise, and if it can, when should you believe it?</p>
+          </div>
+          <div class="block">
+            <h4>Approach</h4>
+            <p>An LSTM, because price at any moment depends on recent history in a way plain regression can't hold. Rolling momentum and volatility features were added less to improve the headline number than to give the model a sense of market regime, which changed how it behaved under high volatility.</p>
+          </div>
+          <div class="block">
+            <h4>What it found</h4>
+            <p>Prediction intervals widened sharply during regime shifts, which is the correct behaviour. A model that admits uncertainty honestly is more useful than one that projects false confidence, and that's the finding I'd actually defend.</p>
+          </div>
+          <div class="stack"><span>TensorFlow</span><span>Keras</span><span>NumPy</span><span>Matplotlib</span></div>
+        </article>
+
+        <article class="proj">
+          <p class="kind">Imbalanced classification</p>
+          <h3>The cost of being wrong</h3>
+          <p class="chart-cap"><b>ROC · fraud classifier</b><span>marker = threshold 0.42</span></p>
+          <div class="chart" data-chart="roc"><canvas role="img" aria-label="ROC curve rising steeply toward the top left, with the operating point at threshold 0.42 marked: recall 0.85, precision 0.91."></canvas></div>
+          <div class="block">
+            <h4>The real problem</h4>
+            <p>A model optimised for accuracy on an imbalanced dataset predicts "not fraud" almost every time and still scores 99%. That isn't a detector, it's a rubber stamp.</p>
+          </div>
+          <div class="block">
+            <h4>Approach</h4>
+            <p>SMOTE for the 97:3 class imbalance, not because it&#8217;s standard but because without it the model never learns what fraud looks like. XGBoost because the signal lives in interactions between transaction size, time of day and merchant category that logistic regression flattens out.</p>
+          </div>
+          <div class="block">
+            <h4>The trade-off, stated</h4>
+            <p>Threshold dropped from 0.5 to 0.42, deliberately accepting more false positives to cut false negatives. Whether that's the right call depends entirely on the cost ratio in the specific business, which is the part worth arguing about. SHAP made each flag explainable to the reviewer who had to action it.</p>
+          </div>
+          <div class="stack"><span>XGBoost</span><span>SHAP</span><span>SMOTE</span><span>scikit-learn</span></div>
+        </article>
+
+        <article class="proj">
+          <p class="kind">Risk scoring</p>
+          <h3>A probability isn't a reason</h3>
+          <p class="chart-cap"><b>Precision–recall</b><span>orange = ensemble · blue = logistic baseline</span></p>
+          <div class="chart" data-chart="pr"><canvas role="img" aria-label="Precision-recall curves: the ensemble holds higher precision than the logistic regression baseline at every recall level."></canvas></div>
+          <div class="block">
+            <h4>Why interpretability was the requirement</h4>
+            <p>In credit decisions a score alone isn't actionable. An officer needs to know <em>why</em> a customer is high risk, because a decline without a reason isn't defensible to the customer or the regulator.</p>
+          </div>
+          <div class="block">
+            <h4>Approach</h4>
+            <p>An XGBoost and logistic regression ensemble: the first for predictive strength, the second for the calibration that makes a 0.7 mean roughly 70%. SHAP was built into the output so every prediction arrived with its top three drivers in language a reviewer could read.</p>
+          </div>
+          <div class="block">
+            <h4>What it found</h4>
+            <p>Churn and default shared leading indicators: customers showing early churn signals were around three times more likely to default within 90 days. That cross-signal only appeared once both models existed side by side.</p>
+          </div>
+          <div class="stack"><span>XGBoost</span><span>SHAP</span><span>scikit-learn</span><span>Python</span></div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ L4 SKILLS ═══════════ -->
+<section id="skills" class="layer" aria-labelledby="h-skills">
+  <div class="shell layer-grid">
+    <div class="rail" aria-hidden="true"><div class="rail-tag"><b>L4</b><span>skills</span></div></div>
+    <div class="layer-body">
+      <h2 id="h-skills" tabindex="-1">Tools in context.</h2>
+      <p class="lede">Chosen for fit rather than familiarity. Levels are self-assessed and described in words, because a percentage on a skill bar means whatever the person drawing it wants it to mean.</p>
+
+      <div class="skill-cols">
+        <div>
+          <p class="skill-head">Machine learning</p>
+          <ul class="skill-list">
+            <li>scikit-learn <span class="level core">Core</span></li>
+            <li>XGBoost / ensembles <span class="level core">Core</span></li>
+            <li>Model evaluation <span class="level core">Core</span></li>
+            <li>SHAP &amp; explainability <span class="level core">Core</span></li>
+            <li>TensorFlow / Keras <span class="level working">Working</span></li>
+          </ul>
+        </div>
+        <div>
+          <p class="skill-head">Data engineering</p>
+          <ul class="skill-list">
+            <li>Python · Pandas · NumPy <span class="level core">Core</span></li>
+            <li>Feature engineering <span class="level core">Core</span></li>
+            <li>SQL <span class="level core">Core</span></li>
+            <li>EDA &amp; root cause analysis <span class="level core">Core</span></li>
+            <li>ETL pipeline design <span class="level working">Working</span></li>
+            <li>MLOps &amp; deployment <span class="level">Developing</span></li>
+          </ul>
+        </div>
+        <div>
+          <p class="skill-head">Analysis &amp; BI</p>
+          <ul class="skill-list">
+            <li>Matplotlib / Seaborn <span class="level core">Core</span></li>
+            <li>Power BI / DAX <span class="level core">Core</span></li>
+            <li>Statistical analysis <span class="level working">Working</span></li>
+            <li>A/B testing <span class="level working">Working</span></li>
+            <li>NLP pipelines <span class="level working">Working</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="gap-note">The visible gap is MLOps and deployment, and it&#8217;s a real one. My focus has been the analytical work that comes before deployment rather than the infrastructure that follows it. It&#8217;s the first thing I&#8217;d want to close in a first role.</p>
+
+      <div class="two-up">
+        <div class="panel" id="fi-panel">
+          <h3>ETA model · what drove delivery time</h3>
+          <p class="chart-cap"><span>feature importance [1×5]</span></p>
+          <div class="fi-row"><span class="fi-name">route_distance</span><span class="fi-track"><span class="fi-fill" data-w="88%"></span></span><span class="fi-val">0.88</span></div>
+          <div class="fi-row"><span class="fi-name">fuel_type</span><span class="fi-track"><span class="fi-fill" data-w="73%"></span></span><span class="fi-val">0.73</span></div>
+          <div class="fi-row"><span class="fi-name">departure_hour</span><span class="fi-track"><span class="fi-fill" data-w="67%"></span></span><span class="fi-val">0.67</span></div>
+          <div class="fi-row"><span class="fi-name">vehicle_load</span><span class="fi-track"><span class="fi-fill" data-w="54%"></span></span><span class="fi-val">0.54</span></div>
+          <div class="fi-row"><span class="fi-name">weather_code</span><span class="fi-track"><span class="fi-fill" data-w="39%"></span></span><span class="fi-val">0.39</span></div>
+          <p class="footnote">Distance drives how long a trip takes, but you can&#8217;t shorten the route. departure_hour is the highest-ranked feature anyone can change, and for whether a delivery missed its SLA it was the stronger predictor of the two. That&#8217;s why the recommendation was scheduling rather than routing.</p>
+        </div>
+
+        <div class="panel">
+          <h3>Fraud classifier · what each error costs</h3>
+          <p class="chart-cap"><span>confusion matrix [2×2]</span><span>blue = correct · orange = error</span></p>
+          <div class="cm-grid">
+            <div class="cm-cell cm-tn"><b>9,412</b><span>true negative</span></div>
+            <div class="cm-cell cm-fp"><b>47</b><span>false positive</span></div>
+            <div class="cm-cell cm-fn"><b>83</b><span>false negative</span></div>
+            <div class="cm-cell cm-tp"><b>458</b><span>true positive</span></div>
+          </div>
+          <p class="footnote">Recall 0.85 · Precision 0.91. 47 false alarms cost a reviewer a minute each; 83 missed cases cost real money. The threshold sits at 0.42 to shift errors toward the cheaper kind.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ L5 EDUCATION ═══════════ -->
+<section id="education" class="layer" aria-labelledby="h-edu">
+  <div class="shell layer-grid">
+    <div class="rail" aria-hidden="true"><div class="rail-tag"><b>L5</b><span>education</span></div></div>
+    <div class="layer-body">
+      <h2 id="h-edu" tabindex="-1">Academic foundation.</h2>
+      <div class="edu-grid">
+        <article class="panel">
+          <h3>BSc (Hons) Data Science</h3>
+          <p class="edu-org">Coventry University · 2022–2026</p>
+          <div class="badges"><span class="hot">First Class Honours</span><span>Course Director's Award for Endeavour</span></div>
+          <p>Statistical modelling, machine learning, deep learning, data engineering, NLP, computer vision and business analytics. Final year focused on applied ML and production pipeline design.</p>
+        </article>
+        <article class="panel">
+          <h3>Currently learning</h3>
+          <p class="edu-org">On the job, and on my own time</p>
+          <div class="badges"><span>Ongoing</span></div>
+          <p>Electronics manufacturing fundamentals: soldering theory, materials, PCB fabrication and IPC-A-610 inspection. Alongside that: MLOps and deployment, which is the gap I named above and the one I&#8217;m actively closing.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ OUTPUT: CONTACT ═══════════ -->
+<section id="contact" class="layer contact" aria-labelledby="h-contact">
+  <div class="shell layer-grid">
+    <div class="rail" aria-hidden="true"><div class="rail-tag"><b>y</b><span>output</span></div></div>
+    <div class="layer-body">
+      <h2 id="h-contact" tabindex="-1">Let's build something worth measuring.</h2>
+      <p class="lede">If you're building a team that needs someone who asks the right question before picking a model, and can explain the answer to a room that doesn&#8217;t code, I&#8217;d like to talk. Open to data science, ML engineering, analytics and software engineering roles, based in London.</p>
+      <div class="contact-actions">
+        <a href="mailto:nithish9195@gmail.com" class="btn btn-copper">Send a message</a>
+        <a href="https://linkedin.com/in/nithishka" target="_blank" rel="noopener" class="btn btn-line">LinkedIn ↗</a>
+      </div>
+      <p class="contact-addr">Email: <a href="mailto:nithish9195@gmail.com">nithish9195@gmail.com</a></p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="shell footer-inner">
+    <span>© 2026 Nithish Kaliannan Ananth</span>
+    <span>Decision-focused analytics · London, UK</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+document.documentElement.classList.add('js');
+
+const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+let REDUCE = motionQuery.matches;
+motionQuery.addEventListener('change', e => { REDUCE = e.matches; });
+
+const css = getComputedStyle(document.documentElement);
+const token = n => css.getPropertyValue(n).trim();
+function rgb(hex){
+  const h = hex.replace('#','');
+  return [0,2,4].map(i => parseInt(h.slice(i,i+2),16));
+}
+const C = {
+  blue  : rgb(token('--heat-blue')   || '#5c9cf0'),
+  orange: rgb(token('--heat-orange') || '#ff7a45'),
+  mid   : rgb(token('--heat-mid')    || '#22385a'),
+  copper: rgb(token('--copper')      || '#e39a62'),
+  text  : rgb(token('--text')        || '#e9eff7'),
+  text2 : rgb(token('--text-2')      || '#b6c4d6'),
+  text3 : rgb(token('--text-3')      || '#8fa3bd'),
+  line  : rgb(token('--line')        || '#2b4466'),
+};
+const rgba = (c,a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+const mix = (a,b,t) => a.map((v,i) => Math.round(v + (b[i]-v)*t));
+const easeOut = t => 1 - Math.pow(1-t,3);
+const MONO = token('--mono'), SANS = token('--sans');
+
+function fitCanvas(canvas,w,h){
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return ctx;
+}
+function onFirstView(el, fn, threshold){
+  const io = new IntersectionObserver(es => {
+    if(es[0].isIntersecting){ io.disconnect(); fn(); }
+  }, {threshold: threshold == null ? 0.2 : threshold});
+  io.observe(el);
+}
+
+/* ── Layer navigation: scroll-spy, active rail, number keys 1–5 ── */
+const links = [...document.querySelectorAll('.layers a')];
+const layers = [...document.querySelectorAll('.layer')];
+const spy = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(!e.isIntersecting) return;
+    layers.forEach(l => l.classList.toggle('active', l === e.target));
+    links.forEach(a => a.getAttribute('href') === '#'+e.target.id
+      ? a.setAttribute('aria-current','true') : a.removeAttribute('aria-current'));
+  });
+}, {rootMargin:'-35% 0px -60% 0px'});
+layers.forEach(l => spy.observe(l));
+
+addEventListener('keydown', e => {
+  if(e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
+  if(e.target.closest('input,textarea,select,[contenteditable]')) return;
+  const i = '12345'.indexOf(e.key);
+  if(i < 0 || !links[i]) return;
+  const target = document.querySelector(links[i].getAttribute('href'));
+  if(!target) return;
+  e.preventDefault();
+  target.scrollIntoView({behavior: REDUCE ? 'auto' : 'smooth'});
+  const h = target.querySelector('h2');
+  if(h) h.focus({preventScroll:true});
+});
+
+/* ── The forward pass: evidence tiles built from figures stated on the page ── */
+const TILES = [
+  { id:'fi', name:'feature_importance', shape:'[1×5]', cols:5,
+    values:[.88,.73,.67,.54,.39], scale:'seq',
+    labels:['route_distance','fuel_type','departure_hour','vehicle_load','weather_code'],
+    source:'ETA model feature importance, AGS Roadways: route_distance 0.88, fuel_type 0.73, departure_hour 0.67, vehicle_load 0.54, weather_code 0.39.' },
+  { id:'late', name:'late_rate_by_hour', shape:'[1×14]', cols:7,
+    values:[8,10,38,52,61,22,15,12,14,18,20,25,30,22].map(v => v/61), scale:'seq',
+    labels:['05','06','07','08','09','10','11','12','13','14','15','16','17','18'].map((h,i)=>h+':00 '+[8,10,38,52,61,22,15,12,14,18,20,25,30,22][i]+'%'),
+    source:'Late-delivery rate by departure hour, 05:00 to 18:00; 07:00–09:00 peaks at 38–61%. Illustrative reconstruction, the underlying data is confidential.' },
+  { id:'cm', name:'confusion', shape:'[2×2]', cols:2,
+    values:[9412/9459, -(47/9459), -(83/541), 458/541], scale:'div',
+    labels:['true negative 9,412','false positive 47','false negative 83','true positive 458'],
+    source:'Fraud classifier at threshold 0.42: 9,412 true negatives, 47 false positives, 83 false negatives, 458 true positives. Recall 0.85, precision 0.91.' }
+];
+function heat(v, scale){
+  if(scale === 'seq') return mix(C.mid, C.orange, Math.max(0,Math.min(1,v)));
+  return v >= 0 ? mix(C.mid, C.blue, Math.min(1,v)) : mix(C.mid, C.orange, Math.min(1, .35 + Math.abs(v)*3));
+}
+const tilesHost = document.getElementById('tiles');
+const net = document.querySelector('.net');
+const readout = document.querySelector('#readout span');
+const defaultReadout = readout ? readout.textContent : '';
+if(tilesHost && net){
+  TILES.forEach((t, ti) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'tile'; b.setAttribute('aria-pressed','false');
+    b.innerHTML = `<span class="tile-name">${t.name}</span><span class="tile-shape">${t.shape}</span>`;
+    const grid = document.createElement('span');
+    grid.className = 'cells';
+    grid.style.gridTemplateColumns = `repeat(${t.cols},minmax(0,1fr))`;
+    t.values.forEach((v, ci) => {
+      const c = document.createElement('span');
+      c.className = 'cell'; c.title = t.labels[ci];
+      c.dataset.color = `rgb(${heat(v, t.scale).join(',')})`;
+      c.style.transitionDelay = REDUCE ? '0s' : (ti*.28 + ci*.025) + 's';
+      grid.appendChild(c);
+    });
+    b.appendChild(grid);
+    b.setAttribute('aria-label', `${t.name} ${t.shape}. ${t.source}`);
+    const show = () => { readout.textContent = t.source; };
+    b.addEventListener('mouseenter', show);
+    b.addEventListener('focus', show);
+    b.addEventListener('click', () => {
+      const on = b.getAttribute('aria-pressed') !== 'true';
+      tilesHost.querySelectorAll('.tile').forEach(x => x.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      net.classList.toggle('soloing', on);
+      readout.textContent = on ? t.source : defaultReadout;
+    });
+    b.addEventListener('mouseleave', () => {
+      if(!net.classList.contains('soloing')) readout.textContent = defaultReadout;
+    });
+    tilesHost.appendChild(b);
+  });
+  const run = () => {
+    net.querySelectorAll('.cell').forEach(c => { c.style.backgroundColor = c.dataset.color; });
+    net.classList.add('passed');
+  };
+  onFirstView(net, () => setTimeout(run, 60), .35);
+}
+
+/* ── Feature bars ── */
+const fiPanel = document.getElementById('fi-panel');
+if(fiPanel){
+  onFirstView(fiPanel, () => {
+    fiPanel.querySelectorAll('.fi-fill').forEach((bar,i) => {
+      setTimeout(() => { bar.style.width = bar.dataset.w; }, REDUCE ? 0 : i*90);
+    });
+  }, .3);
+}
+
+/* ── Charts: draw once on first view, redraw on resize ── */
+const F = px => px + 'px ' + MONO;
+function grid(ctx,x,y,w,h,rows,fmt,minV,maxV){
+  ctx.textAlign = 'right'; ctx.font = F(11);
+  for(let i=0;i<=rows;i++){
+    const gy = y + i*(h/rows);
+    ctx.strokeStyle = rgba(C.line,1); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x,gy+.5); ctx.lineTo(x+w,gy+.5); ctx.stroke();
+    if(fmt){ ctx.fillStyle = rgba(C.text3,1); ctx.fillText(fmt(maxV - (i/rows)*(maxV-minV)), x-6, gy+4); }
+  }
+}
+function legend(ctx,x,y,items){
+  ctx.textAlign='left'; ctx.font = F(11);
+  let cx = x;
+  items.forEach(([label,col,dash]) => {
+    ctx.strokeStyle = rgba(col,1); ctx.lineWidth = 2; ctx.setLineDash(dash ? [4,3] : []);
+    ctx.beginPath(); ctx.moveTo(cx,y-4); ctx.lineTo(cx+14,y-4); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = rgba(C.text2,1); ctx.fillText(label, cx+20, y);
+    cx += 20 + ctx.measureText(label).width + 18;
+  });
+}
+function line(ctx,pts,col,w,dash){
+  ctx.beginPath();
+  pts.forEach(([x,y],i) => i ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
+  ctx.setLineDash(dash || []); ctx.strokeStyle = rgba(col,1); ctx.lineWidth = w; ctx.lineJoin='round';
+  ctx.stroke(); ctx.setLineDash([]);
+}
+
+const CHARTS = {
+  ags(ctx,W,H,p){
+    const actual = [2.4,2.1,2.8,2.5,3.1,2.9,2.3,2.6,2.9,3.2,2.7,2.4,2.8,2.6,3.0,2.4,2.2,2.7,2.5,2.9,2.3,2.6,2.8,2.5];
+    const pred = actual.map((v,i)=> +(v - .14 + .08*Math.sin(i*.9)).toFixed(2));
+    const padL=44, padR=14, padT=30, padB=26, gW=W-padL-padR, gH=H-padT-padB;
+    const minV=1.8, maxV=3.4, n=actual.length;
+    const sx=i=>padL+(i/(n-1))*gW, sy=v=>padT+gH-((v-minV)/(maxV-minV))*gH;
+    ctx.clearRect(0,0,W,H);
+    grid(ctx,padL,padT,gW,gH,4,v=>v.toFixed(1)+'h',minV,maxV);
+    ctx.textAlign='center'; ctx.font=F(11); ctx.fillStyle=rgba(C.text3,1);
+    [0,6,12,18,23].forEach(i => ctx.fillText('wk '+(i+1), sx(i), H-8));
+    const last = Math.max(1, Math.round(p*(n-1)));
+    line(ctx, actual.slice(0,last+1).map((v,i)=>[sx(i),sy(v)]), C.blue, 2);
+    line(ctx, pred.slice(0,last+1).map((v,i)=>[sx(i),sy(v)]), C.orange, 2, [5,3]);
+    legend(ctx, padL, 16, [['actual ETA',C.blue],['predicted',C.orange,true]]);
+  },
+
+  hours(ctx,W,H,p){
+    const hours = ['05','06','07','08','09','10','11','12','13','14','15','16','17','18'];
+    const rate  = [8,10,38,52,61,22,15,12,14,18,20,25,30,22];
+    const padL=40, padR=10, padT=24, padB=26, gW=W-padL-padR, gH=H-padT-padB;
+    const maxV = 70, slot = gW/rate.length, bw = Math.max(6, slot - 6);
+    ctx.clearRect(0,0,W,H);
+    grid(ctx,padL,padT,gW,gH,7,v=>Math.round(v)+'%',0,maxV);
+    rate.forEach((v,i)=>{
+      const x = padL + i*slot + (slot-bw)/2;
+      const bh = (v/maxV)*gH*p, y = padT+gH-bh;
+      ctx.fillStyle = `rgb(${mix(C.mid, C.orange, Math.min(1, v/61)).join(',')})`;
+      ctx.fillRect(x,y,bw,bh);
+      ctx.textAlign='center'; ctx.font=F(11); ctx.fillStyle=rgba(C.text3,1);
+      if(slot > 26 || i%2===0) ctx.fillText(hours[i], x+bw/2, H-8);
+      if(p > .6 && slot > 30){ ctx.fillStyle=rgba(C.text,1); ctx.fillText(v+'%', x+bw/2, y-5); }
+    });
+    const x0 = padL + 2*slot, x1 = padL + 5*slot;
+    ctx.strokeStyle = rgba(C.copper,1); ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+    [x0,x1].forEach(x => { ctx.beginPath(); ctx.moveTo(x+.5,padT); ctx.lineTo(x+.5,padT+gH); ctx.stroke(); });
+    ctx.setLineDash([]);
+    ctx.textAlign='left'; ctx.font=F(11); ctx.fillStyle=rgba(C.copper,1);
+    ctx.fillText('07:00–09:00', x0+6, 14);
+  },
+
+  themes(ctx,W,H,p){
+    const themes = [
+      {label:'Assessment clarity', f:85, pr:90, a:1},
+      {label:'Feedback timing', f:72, pr:88, a:.85},
+      {label:'Resource access', f:68, pr:75, a:.7},
+      {label:'Lecture pacing', f:55, pr:60, a:.5},
+      {label:'Module content', f:42, pr:50, a:.35}
+    ];
+    const padL=34, padR=16, padT=16, padB=30, gW=W-padL-padR, gH=H-padT-padB;
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle = rgba(C.line,1); ctx.lineWidth = 1;
+    for(let i=0;i<=4;i++){
+      const gy = padT+(i/4)*gH, gx = padL+(i/4)*gW;
+      ctx.beginPath(); ctx.moveTo(padL,gy+.5); ctx.lineTo(padL+gW,gy+.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(gx+.5,padT); ctx.lineTo(gx+.5,padT+gH); ctx.stroke();
+    }
+    ctx.font=F(11); ctx.fillStyle=rgba(C.text3,1);
+    ctx.textAlign='right'; ctx.fillText('frequency →', padL+gW, H-8);
+    ctx.save(); ctx.translate(14, padT); ctx.rotate(-Math.PI/2); ctx.textAlign='right';
+    ctx.fillText('priority →',0,0); ctx.restore();
+    themes.forEach((t,i)=>{
+      const bp = Math.max(0, Math.min(1, (p - i*.1)/.9));
+      if(bp <= 0) return;
+      const x = padL + (t.f/100)*gW, y = padT + gH - (t.pr/100)*gH, s = (8 + t.a*10)*bp;
+      ctx.fillStyle = `rgb(${mix(C.mid, C.orange, t.a).join(',')})`;
+      ctx.fillRect(x-s/2, y-s/2, s, s);
+      if(bp > .8 && W > 380){
+        ctx.font=F(11); ctx.fillStyle=rgba(C.text2,1); ctx.textAlign='right';
+        ctx.fillText(t.label, x - s/2 - 6, y + 4);
+      }
+    });
+  },
+
+  lstm(ctx,W,H,p){
+    const n = 58, split = 38, actual = [], pred = [], hi = [], lo = [];
+    for(let i=0;i<n;i++){
+      const v = 28000 + 3000*Math.sin(i*.18) + 1500*Math.sin(i*.37);
+      actual.push(v);
+      if(i >= split){ const q = v + 220*Math.sin(i*.9); pred.push(q); hi.push(q + 600 + (i-split)*120); lo.push(q - 600 - (i-split)*110); }
+    }
+    const padL=44, padR=14, padT=30, padB=14, gW=W-padL-padR, gH=H-padT-padB;
+    const all = actual.concat(hi, lo), minV=Math.min(...all)*.99, maxV=Math.max(...all)*1.01;
+    const sx=i=>padL+(i/(n-1))*gW, sy=v=>padT+gH-((v-minV)/(maxV-minV))*gH;
+    ctx.clearRect(0,0,W,H);
+    grid(ctx,padL,padT,gW,gH,4,v=>Math.round(v/1000)+'k',minV,maxV);
+    const upto = Math.min(Math.round(p*n), split+1);
+    line(ctx, actual.slice(0,upto).map((v,i)=>[sx(i),sy(v)]), C.blue, 2);
+    if(p > .55){
+      const end = Math.min(pred.length-1, Math.round(((p-.55)/.45)*(pred.length-1)));
+      ctx.beginPath(); ctx.moveTo(sx(split), sy(hi[0]));
+      for(let i=1;i<=end;i++) ctx.lineTo(sx(split+i), sy(hi[i]));
+      for(let i=end;i>=0;i--) ctx.lineTo(sx(split+i), sy(lo[i]));
+      ctx.closePath(); ctx.fillStyle = rgba(C.orange,.18); ctx.fill();
+      line(ctx, pred.slice(0,end+1).map((v,i)=>[sx(split+i),sy(v)]), C.orange, 2, [5,3]);
+      ctx.strokeStyle = rgba(C.text3,1); ctx.lineWidth=1; ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.moveTo(sx(split)+.5,padT); ctx.lineTo(sx(split)+.5,padT+gH); ctx.stroke(); ctx.setLineDash([]);
+    }
+    legend(ctx, padL, 16, [['actual',C.blue],['forecast',C.orange,true]]);
+  },
+
+  roc(ctx,W,H,p){
+    const pts = [[0,0],[.015,.3],[.04,.55],[.08,.73],[.14,.84],[.22,.91],[.35,.955],[.55,.975],[.8,.99],[1,1]];
+    const padL=40, padB=26, padT=12, S=Math.min(W-padL-16, H-padT-padB), ox=padL, oy=padT;
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle = rgba(C.line,1); ctx.lineWidth = 1;
+    ctx.strokeRect(ox+.5,oy+.5,S,S);
+    ctx.setLineDash([3,4]); ctx.beginPath(); ctx.moveTo(ox,oy+S); ctx.lineTo(ox+S,oy); ctx.stroke(); ctx.setLineDash([]);
+    ctx.font=F(11); ctx.fillStyle=rgba(C.text3,1);
+    ctx.textAlign='center'; ctx.fillText('false positive rate', ox+S/2, oy+S+18);
+    ctx.save(); ctx.translate(14, oy+S/2); ctx.rotate(-Math.PI/2); ctx.fillText('true positive rate',0,0); ctx.restore();
+    const upto = Math.max(1, Math.round(p*(pts.length-1)));
+    line(ctx, pts.slice(0,upto+1).map(([fx,fy])=>[ox+fx*S, oy+S-fy*S]), C.blue, 2.4);
+    if(p > .7){
+      const tx = ox + .05*S, ty = oy + S - .847*S;
+      ctx.fillStyle = rgba(C.orange,1); ctx.fillRect(tx-4,ty-4,8,8);
+      ctx.textAlign='left'; ctx.font=F(11);
+      ctx.fillStyle=rgba(C.text,1); ctx.fillText('threshold 0.42', tx+10, ty+16);
+      ctx.fillStyle=rgba(C.text2,1); ctx.fillText('recall 0.85 · precision 0.91', tx+10, ty+31);
+    }
+  },
+
+  pr(ctx,W,H,p){
+    const xgb = [[0,1],[.08,.985],[.18,.97],[.32,.95],[.5,.92],[.65,.88],[.78,.82],[.88,.73],[.95,.61],[1,.52]];
+    const log = [[0,.95],[.2,.93],[.4,.88],[.6,.78],[.8,.62],[1,.45]];
+    const padL=40, padB=26, padT=12, S=Math.min(W-padL-16, H-padT-padB), ox=padL, oy=padT;
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle = rgba(C.line,1); ctx.lineWidth = 1; ctx.strokeRect(ox+.5,oy+.5,S,S);
+    ctx.font=F(11); ctx.fillStyle=rgba(C.text3,1);
+    ctx.textAlign='center'; ctx.fillText('recall', ox+S/2, oy+S+18);
+    ctx.save(); ctx.translate(14, oy+S/2); ctx.rotate(-Math.PI/2); ctx.fillText('precision',0,0); ctx.restore();
+    const upto = Math.max(1, Math.round(p*(xgb.length-1)));
+    line(ctx, xgb.slice(0,upto+1).map(([fx,fy])=>[ox+fx*S, oy+S-fy*S]), C.orange, 2.4);
+    if(p > .4){
+      const n2 = Math.max(1, Math.round(((p-.4)/.6)*(log.length-1)));
+      line(ctx, log.slice(0,n2+1).map(([fx,fy])=>[ox+fx*S, oy+S-fy*S]), C.blue, 1.8, [4,3]);
+    }
+  }
+};
+
+document.querySelectorAll('.chart[data-chart]').forEach(wrap => {
+  const canvas = wrap.querySelector('canvas'), draw = CHARTS[wrap.dataset.chart];
+  if(!canvas || !draw) return;
+  let drawn = false;
+  function render(animate){
+    const W = wrap.clientWidth, H = wrap.clientHeight;
+    if(!W || !H) return;
+    const ctx = fitCanvas(canvas, W, H);
+    if(!animate){ draw(ctx, W, H, 1); return; }
+    const start = performance.now(), dur = 900;
+    (function step(now){
+      const p = easeOut(Math.min((now-start)/dur, 1));
+      draw(ctx, W, H, p);
+      if(p < 1) requestAnimationFrame(step);
+    })(performance.now());
+  }
+  onFirstView(wrap, () => { drawn = true; render(!REDUCE); }, .25);
+  let t;
+  addEventListener('resize', () => {
+    if(!drawn) return;
+    clearTimeout(t); t = setTimeout(() => render(false), 150);
+  }, {passive:true});
+});
+
+})();
+</script>
+</body>
+</html>

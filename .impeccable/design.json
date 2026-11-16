@@ -1,0 +1,647 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-16T06:22:00+00:00",
+  "title": "Design System: Nithish Kaliannan Ananth · Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "#121314",
+        "oklch": "oklch(18.6% 0.003 248)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252526",
+          "#414243",
+          "#606162",
+          "#818284",
+          "#a4a5a6",
+          "#c8c9ca",
+          "#eeeeef"
+        ]
+      },
+      "graphite-raised": {
+        "role": "neutral",
+        "displayName": "Raised Graphite",
+        "canonical": "#18191b",
+        "oklch": "oklch(21.3% 0.004 264)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242526",
+          "#414244",
+          "#606163",
+          "#818285",
+          "#a4a5a7",
+          "#c8c9ca",
+          "#eeeeef"
+        ]
+      },
+      "graphite-sunk": {
+        "role": "neutral",
+        "displayName": "Sunk Graphite",
+        "canonical": "#0d0e0f",
+        "oklch": "oklch(16.3% 0.003 248)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242526",
+          "#414243",
+          "#606162",
+          "#818284",
+          "#a4a5a6",
+          "#c8c9ca",
+          "#eeeeef"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#2c2f33",
+        "oklch": "oklch(30.4% 0.008 256)",
+        "tonalRamp": [
+          "#0a0b0c",
+          "#242527",
+          "#404245",
+          "#5e6165",
+          "#7f8387",
+          "#a3a5a9",
+          "#c7c9cc",
+          "#edeef0"
+        ]
+      },
+      "hairline-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "#43474d",
+        "oklch": "oklch(39.6% 0.011 258)",
+        "tonalRamp": [
+          "#0a0b0c",
+          "#232528",
+          "#3f4246",
+          "#5e6167",
+          "#7f8389",
+          "#a2a5aa",
+          "#c7c9cd",
+          "#edeef0"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Bone",
+        "canonical": "#ecebe8",
+        "oklch": "oklch(94.0% 0.004 91)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252524",
+          "#424240",
+          "#62615f",
+          "#838280",
+          "#a6a5a3",
+          "#c9c9c8",
+          "#efeeed"
+        ]
+      },
+      "text-2": {
+        "role": "neutral",
+        "displayName": "Ash",
+        "canonical": "#b8b9bb",
+        "oklch": "oklch(78.6% 0.003 265)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252526",
+          "#414243",
+          "#606163",
+          "#818284",
+          "#a4a5a6",
+          "#c8c9ca",
+          "#eeeeef"
+        ]
+      },
+      "text-3": {
+        "role": "neutral",
+        "displayName": "Slate",
+        "canonical": "#8e9196",
+        "oklch": "oklch(65.6% 0.008 261)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242527",
+          "#404245",
+          "#5f6165",
+          "#808287",
+          "#a3a5a9",
+          "#c8c9cc",
+          "#edeef0"
+        ]
+      },
+      "copper": {
+        "role": "primary",
+        "displayName": "Interconnect Copper",
+        "canonical": "#d98c55",
+        "oklch": "oklch(70.8% 0.118 55)",
+        "tonalRamp": [
+          "#150701",
+          "#3a1c06",
+          "#623510",
+          "#8e4f1c",
+          "#b27040",
+          "#cd9874",
+          "#e7c0a7",
+          "#ffeadd"
+        ]
+      },
+      "copper-hi": {
+        "role": "primary",
+        "displayName": "Hot Copper",
+        "canonical": "#e8a678",
+        "oklch": "oklch(77.8% 0.099 56)",
+        "tonalRamp": [
+          "#140802",
+          "#371e0c",
+          "#5d371b",
+          "#87532b",
+          "#ab744c",
+          "#c79a7c",
+          "#e2c2ac",
+          "#feeade"
+        ]
+      },
+      "copper-ink": {
+        "role": "primary",
+        "displayName": "Copper Ink",
+        "canonical": "#121314",
+        "oklch": "oklch(18.6% 0.003 248)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252526",
+          "#414243",
+          "#606162",
+          "#818284",
+          "#a4a5a6",
+          "#c8c9ca",
+          "#eeeeef"
+        ]
+      },
+      "data-blue": {
+        "role": "secondary",
+        "displayName": "Reading Blue",
+        "canonical": "#7aa6dc",
+        "oklch": "oklch(71.4% 0.093 254)",
+        "tonalRamp": [
+          "#050c16",
+          "#15263a",
+          "#294363",
+          "#3f638f",
+          "#5f85b3",
+          "#8aa8cd",
+          "#b6cbe6",
+          "#e4f0fe"
+        ]
+      },
+      "data-orange": {
+        "role": "secondary",
+        "displayName": "Signal Orange",
+        "canonical": "#f08046",
+        "oklch": "oklch(71.5% 0.155 46)",
+        "tonalRamp": [
+          "#190500",
+          "#411600",
+          "#6e2b00",
+          "#9e4100",
+          "#c46330",
+          "#dc8f6a",
+          "#f3bba0",
+          "#feeae1"
+        ]
+      },
+      "data-mid": {
+        "role": "secondary",
+        "displayName": "Ramp Floor",
+        "canonical": "#2b2f35",
+        "oklch": "oklch(30.4% 0.012 258)",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#232528",
+          "#3f4247",
+          "#5d6168",
+          "#7e8389",
+          "#a2a5aa",
+          "#c7c9cd",
+          "#edeef1"
+        ]
+      },
+      "si-die": {
+        "role": "tertiary",
+        "displayName": "Die",
+        "canonical": "#262b31",
+        "oklch": "oklch(28.7% 0.013 253)",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#232528",
+          "#3f4247",
+          "#5d6268",
+          "#7d8389",
+          "#a1a5ab",
+          "#c6c9cd",
+          "#edeff1"
+        ]
+      },
+      "si-cpu": {
+        "role": "tertiary",
+        "displayName": "CPU Core",
+        "canonical": "#3a4250",
+        "oklch": "oklch(37.7% 0.026 262)",
+        "tonalRamp": [
+          "#090b0e",
+          "#22252b",
+          "#3d424c",
+          "#5a626f",
+          "#7b8391",
+          "#9fa5b1",
+          "#c5c9d2",
+          "#eceff3"
+        ]
+      },
+      "si-sram": {
+        "role": "tertiary",
+        "displayName": "SRAM",
+        "canonical": "#33404e",
+        "oklch": "oklch(36.6% 0.030 251)",
+        "tonalRamp": [
+          "#090b0f",
+          "#20262c",
+          "#3a434d",
+          "#566370",
+          "#778492",
+          "#9ca6b2",
+          "#c2cad2",
+          "#ebeff4"
+        ]
+      },
+      "si-npu": {
+        "role": "tertiary",
+        "displayName": "NPU Array",
+        "canonical": "#2f3946",
+        "oklch": "oklch(34.1% 0.027 255)",
+        "tonalRamp": [
+          "#090b0e",
+          "#21252b",
+          "#3c434c",
+          "#58626f",
+          "#798391",
+          "#9ea6b1",
+          "#c4cad2",
+          "#ebeff3"
+        ]
+      },
+      "si-cache": {
+        "role": "tertiary",
+        "displayName": "Cache",
+        "canonical": "#3a4250",
+        "oklch": "oklch(37.7% 0.026 262)",
+        "tonalRamp": [
+          "#090b0e",
+          "#22252b",
+          "#3d424c",
+          "#5a626f",
+          "#7b8391",
+          "#9fa5b1",
+          "#c5c9d2",
+          "#eceff3"
+        ]
+      },
+      "si-rom": {
+        "role": "tertiary",
+        "displayName": "ROM",
+        "canonical": "#353c46",
+        "oklch": "oklch(35.4% 0.020 257)",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#22252a",
+          "#3d4249",
+          "#5b626c",
+          "#7c838d",
+          "#a0a5ae",
+          "#c5c9cf",
+          "#eceff2"
+        ]
+      },
+      "si-pad": {
+        "role": "tertiary",
+        "displayName": "Bond Pad",
+        "canonical": "#6b6f75",
+        "oklch": "oklch(54.0% 0.011 258)",
+        "tonalRamp": [
+          "#0a0b0c",
+          "#242528",
+          "#404246",
+          "#5e6167",
+          "#7f8388",
+          "#a2a5aa",
+          "#c7c9cc",
+          "#edeef0"
+        ]
+      },
+      "si-lid": {
+        "role": "tertiary",
+        "displayName": "Lid",
+        "canonical": "#8b8f95",
+        "oklch": "oklch(64.9% 0.010 258)",
+        "tonalRamp": [
+          "#0a0b0c",
+          "#242527",
+          "#404246",
+          "#5e6166",
+          "#7f8388",
+          "#a2a5a9",
+          "#c7c9cc",
+          "#edeef0"
+        ]
+      },
+      "si-substrate": {
+        "role": "tertiary",
+        "displayName": "Substrate",
+        "canonical": "#1c1d1f",
+        "oklch": "oklch(23.1% 0.004 264)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242526",
+          "#414243",
+          "#606163",
+          "#818285",
+          "#a4a5a7",
+          "#c8c9ca",
+          "#eeeeef"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Panel",
+        "canonical": "rgba(18,19,20,.95)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252526",
+          "#414243",
+          "#606162",
+          "#818284",
+          "#a4a5a6",
+          "#c8c9ca",
+          "#eeeeef"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The name in the hero only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "One implication-first sentence per section panel."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Role, project and education titles."
+      },
+      "reading": {
+        "displayName": "Reading",
+        "purpose": "Test-pad values and confusion-matrix counts; tabular numerals."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All prose, max 68ch."
+      },
+      "body-small": {
+        "displayName": "Body small",
+        "purpose": "Secondary prose in blocks, roles and education."
+      },
+      "label": {
+        "displayName": "Label (mono)",
+        "purpose": "Bond pads, block tags, captions, ticks, tags, dates, sources."
+      }
+    },
+    "shadows": [],
+    "depth": [
+      {
+        "name": "tonal-steps",
+        "value": "graphite-sunk < graphite < graphite-raised",
+        "purpose": "Wells, ground, raised cells; no box-shadows."
+      },
+      {
+        "name": "hairline-gap-grid",
+        "value": "gap:1px; background:#2c2f33; cells #18191b",
+        "purpose": "Test pads and reflex cards read as ruled cells."
+      },
+      {
+        "name": "chip-lighting",
+        "value": "HemisphereLight(0xe6ebf2,0x0b0b0c,1.1); key DirectionalLight(#fff,2.6) at (8,14,7); copper rim 0.35 at (-12,1.2,-10)",
+        "purpose": "The only real depth on the page."
+      },
+      {
+        "name": "block-highlight",
+        "value": "emissive copper 0.07 + copper edges; contact pads 0.6 active / 0.15 rest",
+        "purpose": "Marks the active floorplan block."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.16,1,.3,1)",
+        "purpose": "Skip link and feature-bar fills."
+      },
+      {
+        "name": "state-transition",
+        "value": "color, background-color, border-color 0.2s",
+        "purpose": "Buttons and bond pads."
+      },
+      {
+        "name": "lid-lift",
+        "value": "delay 350ms, 1700ms, cubic ease-out, rises 7 units and fades to 0",
+        "purpose": "Opening reveal of the die; skipped under reduced motion."
+      },
+      {
+        "name": "camera-path",
+        "value": "7 stations; smoothstep between a panel's leave and the next arrive; exponential follow k = 1 - e^(-3.2·dt)",
+        "purpose": "Scroll-driven flight from block to block."
+      },
+      {
+        "name": "pointer-tilt",
+        "value": "±0.04 rad on fine pointers, same follow rate",
+        "purpose": "Drag-free life on hover; off under reduced motion."
+      },
+      {
+        "name": "chart-draw",
+        "value": "900ms ease-out (1-(1-t)^3) on first view",
+        "purpose": "Charts draw in once; static under reduced motion."
+      },
+      {
+        "name": "feature-fill",
+        "value": "width 1s ease, 90ms stagger",
+        "purpose": "Feature-importance bars."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "transitions 0.01ms, no lid, camera fixed at hero station, instant scroll",
+        "purpose": "Still chip."
+      },
+      {
+        "name": "no-webgl",
+        "value": "SVG floorplan drawing if WebGL throws or no ready flag within 6000ms",
+        "purpose": "Flat fallback."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "chip-left",
+        "value": "1000px",
+        "purpose": "At and above: chip left, reading column right. Below: chip band at top, full-width panels."
+      },
+      {
+        "name": "bottom-nav",
+        "value": "860px",
+        "purpose": "Bond pads move to a fixed bottom bar with short labels."
+      },
+      {
+        "name": "skills-stack",
+        "value": "700px"
+      },
+      {
+        "name": "grid-stack",
+        "value": "560px"
+      },
+      {
+        "name": "bars-stack",
+        "value": "480px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Copper Button",
+      "kind": "button",
+      "refersTo": "button-copper",
+      "description": "The single primary action: Contact in the bar, Send a message in the contact panel.",
+      "html": "<a class=\"ds-btn-copper\" href=\"#\">Send a message</a>",
+      "css": ".ds-btn-copper{display:inline-flex;align-items:center;gap:.5rem;min-height:2.875rem;padding:.7rem 1.35rem;text-decoration:none;font:700 .95rem 'Atkinson Hyperlegible Next',system-ui,sans-serif;background:#d98c55;color:#121314;border:1px solid transparent;border-radius:0;transition:background-color .2s,border-color .2s,color .2s}.ds-btn-copper:hover{background:#e8a678}.ds-btn-copper:focus-visible{outline:2px solid #d98c55;outline-offset:3px}"
+    },
+    {
+      "name": "Line Button",
+      "kind": "button",
+      "refersTo": "button-line",
+      "description": "Secondary actions (See the work, LinkedIn); hairline border turns copper on hover.",
+      "html": "<a class=\"ds-btn-line\" href=\"#\">LinkedIn <svg class=\"ds-ext\" viewBox=\"0 0 12 12\" aria-hidden=\"true\"><path d=\"M4 2h6v6M10 2 2 10\"/></svg></a>",
+      "css": ".ds-btn-line{display:inline-flex;align-items:center;gap:.5rem;min-height:2.875rem;padding:.7rem 1.35rem;text-decoration:none;font:700 .95rem 'Atkinson Hyperlegible Next',system-ui,sans-serif;background:#121314;color:#ecebe8;border:1px solid #43474d;border-radius:0;transition:border-color .2s,color .2s}.ds-btn-line:hover{border-color:#d98c55;color:#d98c55}.ds-btn-line:focus-visible{outline:2px solid #d98c55;outline-offset:3px}.ds-ext{width:.7em;height:.7em;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:square}"
+    },
+    {
+      "name": "Bond-pad Nav",
+      "kind": "nav",
+      "refersTo": "bond-pad",
+      "description": "Top bar: NKA wordmark, mono bond pads with hollow squares (copper-filled when current), copper Contact.",
+      "html": "<header class=\"ds-bar\"><a class=\"ds-wordmark\" href=\"#\">NKA</a><ul class=\"ds-pads\"><li><a href=\"#\" aria-current=\"true\">About</a></li><li><a href=\"#\">Experience</a></li><li><a href=\"#\">Projects</a></li><li><a href=\"#\">Skills</a></li></ul><a class=\"ds-bar-btn\" href=\"#\">Contact</a></header>",
+      "css": ".ds-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;height:3.5rem;padding:0 1.25rem;background:#121314;border-bottom:1px solid #2c2f33}.ds-wordmark{font:500 .8rem 'Martian Mono',ui-monospace,monospace;color:#ecebe8;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}.ds-wordmark::before{content:'';width:.7rem;height:.7rem;border:1px solid #d98c55;background:linear-gradient(#d98c55,#d98c55) center/40% 40% no-repeat}.ds-pads{display:flex;list-style:none;gap:.15rem;margin:0;padding:0}.ds-pads a{display:flex;align-items:center;gap:.5rem;min-height:2.75rem;padding:0 .7rem;font:400 .75rem 'Martian Mono',ui-monospace,monospace;color:#b8b9bb;text-decoration:none;transition:color .2s}.ds-pads a::before{content:'';width:.55rem;height:.55rem;border:1px solid #43474d;transition:background-color .2s,border-color .2s}.ds-pads a:hover{color:#ecebe8}.ds-pads a:hover::before{border-color:#d98c55}.ds-pads a[aria-current=true]{color:#ecebe8}.ds-pads a[aria-current=true]::before{background:#d98c55;border-color:#d98c55}.ds-pads a:focus-visible{outline:2px solid #d98c55;outline-offset:3px}.ds-bar-btn{min-height:2.375rem;padding:.4rem 1rem;display:inline-flex;align-items:center;font:700 .85rem 'Atkinson Hyperlegible Next',system-ui,sans-serif;background:#d98c55;color:#121314;text-decoration:none}.ds-bar-btn:hover{background:#e8a678}"
+    },
+    {
+      "name": "Test Pads",
+      "kind": "custom",
+      "refersTo": "test-pad",
+      "description": "Hero proof grid: 2x2 hairline-gapped readings, each a stated case-study figure, with a mono source line.",
+      "html": "<div><ul class=\"ds-testpads\"><li><span class=\"ds-pad-val\">−15%</span><span class=\"ds-pad-lab\">delivery ETA error (MAE) vs the manual baseline</span></li><li><span class=\"ds-pad-val\">−8%</span><span class=\"ds-pad-lab\">operating cost, from one fuel × load finding</span></li><li><span class=\"ds-pad-val\">61%</span><span class=\"ds-pad-lab\">of missed SLAs traced to 3 routes</span></li><li><span class=\"ds-pad-val\">5 h</span><span class=\"ds-pad-lab\">a week returned from manual reporting</span></li></ul><p class=\"ds-pad-src\">test pads · AGS Roadways, Jan–Sep 2025</p></div>",
+      "css": ".ds-testpads{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#2c2f33;border:1px solid #2c2f33}.ds-testpads li{background:#18191b;padding:.85rem 1rem;display:grid;grid-template-columns:auto 1fr;gap:.15rem .75rem;align-items:baseline}.ds-testpads li::before{content:'';grid-row:1/3;align-self:start;margin-top:.35rem;width:.7rem;height:.7rem;border:1px solid #d98c55}.ds-pad-val{font:700 1.5rem/1.1 'Schibsted Grotesk',system-ui,sans-serif;letter-spacing:-.02em;color:#ecebe8;font-variant-numeric:tabular-nums}.ds-pad-lab{grid-column:2;font:400 .875rem/1.35 'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#b8b9bb}.ds-pad-src{font:400 .75rem 'Martian Mono',ui-monospace,monospace;color:#8e9196;margin-top:.6rem}"
+    },
+    {
+      "name": "Section Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Solid 95% graphite reading panel; headline paired with a mono block tag naming its floorplan block.",
+      "html": "<section class=\"ds-panel\"><div class=\"ds-panel-head\"><h2>Most data scientists never meet the instrument.</h2><span class=\"ds-blk\"><b>CPU</b> · about</span></div><p>I&#8217;ve spent this year on the other end of the cable.</p></section>",
+      "css": ".ds-panel{background:rgba(18,19,20,.95);border:1px solid #2c2f33;padding:clamp(1.25rem,2.6vw,2.25rem);color:#ecebe8;font:400 1.0625rem/1.65 'Atkinson Hyperlegible Next',system-ui,sans-serif;max-width:640px}.ds-panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem 1rem;flex-wrap:wrap;margin-bottom:1rem}.ds-panel h2{margin:0;font:800 clamp(1.75rem,3vw,2.5rem)/1.1 'Schibsted Grotesk',system-ui,sans-serif;letter-spacing:-.03em;text-wrap:balance}.ds-panel p{color:#b8b9bb;margin:0}.ds-blk{font:400 .75rem 'Martian Mono',ui-monospace,monospace;color:#8e9196;white-space:nowrap}.ds-blk b{font-weight:500;color:#d98c55}"
+    },
+    {
+      "name": "Chart Frame",
+      "kind": "custom",
+      "refersTo": "chart-frame",
+      "description": "Mono caption, sunk hairline well, and the illustrative-reconstruction note for reconstructed data.",
+      "html": "<figure class=\"ds-chart-fig\"><p class=\"ds-chart-cap\"><b>ETA forecast · actual vs predicted</b><span>24 weeks</span></p><div class=\"ds-chart\"><svg viewBox=\"0 0 300 120\" preserveAspectRatio=\"none\" role=\"img\" aria-label=\"Predicted tracks actual closely\"><path d=\"M0 30H300M0 60H300M0 90H300\" stroke=\"#2c2f33\"/><polyline fill=\"none\" stroke=\"#7aa6dc\" stroke-width=\"2\" points=\"0,70 50,55 100,80 150,50 200,65 250,45 300,60\"/><polyline fill=\"none\" stroke=\"#f08046\" stroke-width=\"2\" stroke-dasharray=\"5 3\" points=\"0,74 50,60 100,82 150,56 200,68 250,50 300,63\"/></svg></div><p class=\"ds-synthetic\">Illustrative reconstruction. Underlying data is confidential</p></figure>",
+      "css": ".ds-chart-fig{margin:0}.ds-chart-cap{display:flex;justify-content:space-between;gap:.25rem 1rem;flex-wrap:wrap;font:400 .75rem/1.5 'Martian Mono',ui-monospace,monospace;color:#8e9196;margin:0 0 .4rem}.ds-chart-cap b{font-weight:500;color:#b8b9bb}.ds-chart{height:190px;border:1px solid #2c2f33;background:#0d0e0f}.ds-chart svg{width:100%;height:100%;display:block}.ds-synthetic{font:400 .75rem/1.5 'Martian Mono',ui-monospace,monospace;color:#8e9196;margin:.75rem 0 0}.ds-synthetic::before{content:'≈ '}"
+    },
+    {
+      "name": "Metric Tags & Badges",
+      "kind": "chip",
+      "refersTo": "metric-tag",
+      "description": "Square mono tags: copper-bordered outcomes, hairline pills, copper 'hot' badge.",
+      "html": "<div class=\"ds-tags\"><span class=\"ds-metric\">↓15% forecast error</span><span class=\"ds-metric\">3 routes → 61% of failures</span><span class=\"ds-pill\">Python</span><span class=\"ds-pill ds-hot\">First Class Honours</span></div>",
+      "css": ".ds-tags{display:flex;flex-wrap:wrap;gap:.4rem}.ds-metric{font:400 .75rem 'Martian Mono',ui-monospace,monospace;color:#ecebe8;border:1px solid #d98c55;padding:.3rem .6rem}.ds-pill{font:400 .75rem 'Martian Mono',ui-monospace,monospace;color:#b8b9bb;border:1px solid #2c2f33;padding:.25rem .55rem}.ds-pill.ds-hot{border-color:#d98c55;color:#d98c55}"
+    },
+    {
+      "name": "Chip Tooltip",
+      "kind": "custom",
+      "refersTo": "chip-tooltip",
+      "description": "Follows the pointer over a 3D block: block name in copper, arrow, section.",
+      "html": "<div class=\"ds-chip-tip\"><b>NPU ARRAY</b> → projects</div>",
+      "css": ".ds-chip-tip{display:inline-block;font:400 .75rem 'Martian Mono',ui-monospace,monospace;color:#ecebe8;background:#0d0e0f;border:1px solid #d98c55;padding:.3rem .55rem;white-space:nowrap}.ds-chip-tip b{color:#d98c55;font-weight:500}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Accelerator Floorplan",
+    "overview": "**Creative North Star: \"The Accelerator Floorplan\"**\n\nThe page is a single AI accelerator chip seen in 3D on a graphite ground. On arrival the package lid lifts away, and the camera settles over the die. Scrolling flies the camera from block to block. Each floorplan block (CPU core, SRAM, NPU array, cache, ROM, I/O ring) stands for one section of the portfolio, and the reading happens on solid graphite panels set beside the scene. The tone is precise and instrument-like: square edges, hairlines, mono readings, one copper highlight. It is never decorative glow.\n\nDensity is calm. One reading column carries all the prose. The chip holds the remaining width as a fixed scene, and it never sits behind text that the visitor has to read. The chip is a metaphor for how the work is organised. It is not a claim about the work, so every value it displays is a figure already stated in the text.\n\nThis world replaces an earlier dark-and-gold portfolio. Gold, glow effects and the flat stack of cards over a hero grid have all been rejected.",
+    "keyCharacteristics": [
+      "Graphite black ground, blue-grey silicon blocks in distinct metal tones, copper interconnect; no gold.",
+      "Square corners everywhere; 1px hairlines carry structure instead of shadows.",
+      "Mono for labels, readings and chart text; a highly legible sans for prose; a heavy grotesk for headings.",
+      "One copper highlight marks the active block, the current bond pad and the primary action.",
+      "One scroll-driven camera path, one lid lift, and nothing else moves on its own."
+    ],
+    "rules": [
+      {
+        "name": "The One Copper Rule",
+        "body": "Copper means \"this one\": the active section, the primary action, the live state. A screen never shows two competing copper calls to action, and copper is never used as general decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Data Pair Rule",
+        "body": "Blue and orange belong to data. In every chart, blue is the observed or correct value and orange is the predicted value or the error. Interface chrome never uses them, with two exceptions: the role tags and skill-level labels, which are coloured to match the data meanings.",
+        "section": "colors"
+      },
+      {
+        "name": "The Gold-Free Rule",
+        "body": "No gold, yellow-brass or warm metallic gradients. The previous gold world is retired.",
+        "section": "colors"
+      },
+      {
+        "name": "The Reading Rule",
+        "body": "Any number that is a measured outcome uses tabular numerals: in the display face when it is the headline figure, and in mono when it is inline in a caption or tag.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mono-Is-Instrument Rule",
+        "body": "Mono is only for things an instrument would print: names, readings, ticks, sources. Prose is never set in mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hairline Rule",
+        "body": "Structure is drawn with 1px lines in the two hairline tones, never with shadows or glow. The only emissive light on the page is the copper on the chip itself.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Solid Reading Rule",
+        "body": "Text always sits on graphite that is at least 95% opaque. The 3D scene never shows behind prose at legible strength.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** keep one copper accent per state: the active block, the current pad, the primary action.",
+      "**Do** put every new section on a solid 95%-graphite panel in the right-hand column, and give it a block tag that names its floorplan block.",
+      "**Do** show only figures that are stated in the text. Chip details may encode real counts and dates (roles, projects, skill levels) and nothing else.",
+      "**Do** label any reconstructed or confidential chart as an illustrative reconstruction, directly below it, with the \"≈\" note.",
+      "**Do** give every chart a text description and use the blue/orange data pair consistently: blue for observed, orange for predicted or error.",
+      "**Do** keep reduced-motion and no-WebGL paths working: a still chip and a flat floorplan drawing.",
+      "**Do** use square corners and 1px hairlines for every new surface."
+    ],
+    "donts": [
+      "**Don't** use gold, glow or warm metallic gradients. The earlier gold world is retired.",
+      "**Don't** add box-shadows or blur to cards. Depth comes from tonal steps and the 3D scene only.",
+      "**Don't** put prose over the live scene without a panel, or set prose in mono.",
+      "**Don't** present the chip as data. It is a metaphor for the page's structure, and its readings repeat stated figures; it never introduces new ones.",
+      "**Don't** add a second autonomous animation. The motion is one lid lift, one scroll-driven camera path and chart draw-ins.",
+      "**Don't** fall back to the flat stack of dark cards or the hero-over-grid template."
+    ]
+  }
+}
