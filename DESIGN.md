@@ -26,6 +26,11 @@ colors:
   si-pad: "#6b6f75"
   si-lid: "#8b8f95"
   si-substrate: "#1c1d1f"
+  si-mold: "#17181b"
+  si-pcb: "#0e1613"
+  si-trace: "#4a3526"
+  si-lead: "#c9cdd2"
+  si-solder: "#a9adb3"
 typography:
   display:
     fontFamily: "'Schibsted Grotesk', 'Atkinson Hyperlegible Next', system-ui, sans-serif"
@@ -156,7 +161,7 @@ This world replaces an earlier dark-and-gold portfolio. Gold, glow effects and t
 - Square corners everywhere; 1px hairlines carry structure instead of shadows.
 - Mono for labels, readings and chart text; a highly legible sans for prose; a heavy grotesk for headings.
 - One copper highlight marks the active block, the current bond pad and the primary action.
-- One scroll-driven camera path, one lid lift, and nothing else moves on its own.
+- One scroll-driven camera path and one lid lift move the view. The only motion that runs on its own is the chip working: faint charge moving along its wiring, and dataflow through the NPU. It all lives inside the scene, and nothing in the page chrome moves.
 
 ## Colors
 
@@ -173,6 +178,7 @@ The palette is graphite with blue-grey silicon. Copper is the only warm accent, 
 ### Tertiary (silicon)
 - **Die** (si-die), **CPU Core** (si-cpu), **SRAM** (si-sram), **NPU Array** (si-npu), **Cache** (si-cache), **ROM** (si-rom): blue-grey metal tones that give each floorplan block a slightly different shade. They appear only on the 3D chip and on the flat fallback drawing.
 - **Bond Pad** (si-pad), **Lid** (si-lid), **Substrate** (si-substrate): the package's pads, its lifting lid and its base.
+- **Mould** (si-mold), **Board** (si-pcb), **Board Trace** (si-trace), **Lead** (si-lead), **Solder** (si-solder): the epoxy package body, the circuit board it sits on, the board's copper traces under solder mask, the tin-plated gull-wing pins, and the solder pads under their feet.
 
 ### Neutral
 - **Graphite** (graphite): the page ground, the bar, the footer and the WebGL clear colour.
@@ -223,12 +229,12 @@ Rhythm comes from the spacing scale: 0.4rem inside tag groups, 0.75–1rem betwe
 
 ## Elevation & Depth
 
-The interface is flat and hairline-built: no box-shadows anywhere. Depth comes from three things. The first is tonal stepping: sunk (wells) < graphite (ground) < raised (pads, cards). The second is the 1px gap technique: a grid whose background is the hairline colour, with cells in raised graphite, so the gaps read as ruled lines. The third, and the only real depth, is the 3D scene: a hemisphere light, a white key light and a faint copper rim light on physically based metal materials. The chip's colours are taken from the CSS tokens at runtime.
+The interface is flat and hairline-built: no box-shadows anywhere. Depth comes from three things. The first is tonal stepping: sunk (wells) < graphite (ground) < raised (pads, cards). The second is the 1px gap technique: a grid whose background is the hairline colour, with cells in raised graphite, so the gaps read as ruled lines. The third, and the only real depth, is the 3D scene. It has physically based materials lit by a studio environment map (three.js RoomEnvironment) for reflections, plus a low hemisphere light, a white key light, and a faint copper rim light that grazes edges. Tone mapping is ACES filmic. On desktop a bloom pass with a high threshold (0.9) makes only emissive light glow: the moving signals, the NPU dataflow and the active copper. Fog fades the board into the graphite ground. The chip's colours are taken from the CSS tokens at runtime.
 
 ### Named Rules
-**The Hairline Rule.** Structure is drawn with 1px lines in the two hairline tones, never with shadows or glow. The only emissive light on the page is the copper on the chip itself.
+**The Hairline Rule.** Structure is drawn with 1px lines in the two hairline tones, never with shadows or glow. The only emissive light on the page belongs to the chip: copper wiring and pads, charge moving along routes, and NPU cells working. Interface chrome never glows.
 
-**The Solid Reading Rule.** Text always sits on graphite that is at least 95% opaque. The 3D scene never shows behind prose at legible strength.
+**The Solid Reading Rule.** Text always sits on graphite that is at least 95% opaque. The 3D scene never shows behind prose at legible strength. There is one deliberate exception: on desktop the hero sits on a left-to-right graphite scrim (88–92%) instead of a panel, so the chip and its board stay connected to the name.
 
 ## Shapes
 
@@ -268,14 +274,52 @@ Every corner is square: radius 0 on buttons, panels, pads, tags, charts and tool
 - **Other data components:** the experience timeline (blue bars, with a copper bar for the current role, on 2023–2026 ticks), the confusion matrix (blue tints for correct cells, orange tints for error cells) and the architecture diagram (mono nodes joined by hairline wires, with the new path in copper).
 
 ### The 3D chip (signature component)
-- **Build:** three.js 0.160, imported as a module from jsDelivr. It has a substrate, a die, five floorplan blocks with strong-hairline edges and mono labels, internal detail cells, a 12-per-side I/O ring of bond pads, copper Manhattan wiring in the channels between blocks, the name etched along the die's bottom edge, and a lid marked "NKA · AI ACCELERATOR · 2026".
-- **Block-to-section mapping:** CPU CORE → About (four cores, one per reflex). SRAM → Experience (four rows laid on the 2023–2026 axis, one per role, the current role in copper). NPU ARRAY → Projects (five tiles, the wide one for the case study). CACHE → Skills (one column of cells per skill group, coloured copper for core, blue for working and grey for developing, matching the listed counts). ROM → Education (two cells). I/O RING → Contact (two copper pads).
-- **Camera stations:** seven positions and look-at points: the package three-quarter view for the hero, then one for each block in order, ending at the I/O ring's copper pads. Between a section's panel leaving and the next section arriving, scroll position interpolates between stations with a smoothstep curve, and the camera eases toward its target (exponential, rate 3.2/s). Portrait viewports pull the camera back by up to 1.9×.
-- **Highlight:** the active block gets a faint copper emission (0.07) and a copper edge. The contact pads glow at 0.6 when contact is active, and 0.15 otherwise.
-- **Interaction:** on fine pointers there is a gentle tilt of up to ±0.04 rad, with no dragging. Hovering a block lights it and shows a mono tooltip (graphite-sunk with a copper border, "BLOCK → section"). Clicking or tapping a block scrolls to its panel. Hit-testing ignores pointers over panels, the bar and links.
+- **Build:** three.js 0.160 from jsDelivr, loaded through an import map with these add-ons: RoomEnvironment, EffectComposer with UnrealBloomPass and OutputPass, and BufferGeometryUtils. The chip is a real QFP-style package:
+  - an epoxy mould body sitting on a circuit board
+  - 24 tin gull-wing pins per side (shoulder, 45° bend, foot) on solder pads
+  - about two thirds of the pins fan out into the board as copper traces with a 45° jog
+  - copper lead-frame fingers on the package
+  - 48 copper bond wires arcing from the die's I/O pads to the fingers
+  - a seal ring around the die
+  - a die and five floorplan blocks with a procedural metal-fill surface texture, strong-hairline edges and mono labels
+  - copper buses routed from a central junction to every block and to the I/O ring
+  - the name etched along the die's bottom edge
+  - a lid marked "NKA · AI ACCELERATOR · 2026"
+- **Block-to-section mapping:** CPU CORE → About (four cores, one per reflex). SRAM → Experience (four rows laid on the 2023–2026 axis, one per role, the current role in copper). NPU ARRAY → Projects (five tiles, the wide one for the case study, each a grid of multiply-accumulate cells). CACHE → Skills (one column of cells per skill group, coloured copper for core, blue for working and grey for developing, matching the listed counts). ROM → Education (two cells). I/O RING → Contact (two copper pads, their bond wires and the pins beyond).
+- **Signals:** charge particles (320 on fine pointers, 150 otherwise) move along every route. Each route has an owner block.
+  - **Board → pins → bond wires** (owner I/O): the particles are blue.
+  - **Die buses** (owned per block, running both directions): the particles are copper.
+  - **Idle:** faintly visible, at about 0.28 brightness.
+  - **Working:** when the block is the current section, or is hovered on the chip or through its nav pad, its route brightens about 7× and speeds up about 3×.
+  - **Entering a block:** a short burst marks the moment.
+  - **Edges:** particles fade in and out at each end of a route.
+- **Processing:** each block shows its own kind of work while active. It is quiet when idle.
+  - **CPU cores:** flicker out of phase.
+  - **SRAM rows:** pulse in sequence, like read accesses.
+  - **Cache cells:** switch randomly, like hits.
+  - **ROM:** holds a steady glow.
+  - **NPU:** diagonal wavefronts sweep each tile's cell grid like a systolic array. Each cell has a fixed weight: positive weights light copper and negative weights light blue.
+- **Camera stations:** seven positions and look-at points.
+  - **Hero:** a three-quarter view of the package, its pins and the board.
+  - **Sections:** one station for each block in order.
+  - **Contact:** ends on the I/O edge, where the bond wires and pins lead out to the board.
+  - **Transitions:** between a section's panel leaving and the next section arriving, scroll position interpolates between stations with a smoothstep curve. The camera eases toward its target exponentially, at a rate of 3.2/s.
+  - **Portrait screens:** the camera pulls back by up to 1.9×.
+- **Highlight:** the active block gets a faint copper emission and a copper edge, and its bus brightens.
+- **Interaction:**
+  - **Tilt:** on fine pointers, a gentle tilt of up to ±0.04 rad, with no dragging.
+  - **Hover:** hovering a block wakes it and shows a mono tooltip (graphite-sunk with a copper border, "BLOCK → section").
+  - **Nav pads:** hovering or focusing a nav pad, or the Contact button, wakes the matching block.
+  - **Click or tap:** a block scrolls to its panel.
+  - **Hit-testing:** ignores pointers over panels, the bar and links. Scrolling clears any stale hover.
 - **Lid lift:** 350ms after start, the lid rises 7 units over 1.7s with a cubic ease-out and fades to nothing, then it is hidden.
-- **Rendering:** the scene renders only while something is moving or has changed.
-- **Fallbacks:** reduced motion hides the lid and holds the camera at the hero station, so the visitor sees a still chip with no scroll flight and no tilt. If WebGL fails, or the module has not reported within 6 seconds, the page shows a flat SVG floorplan drawing with the same block colours and labels, placed where the chip would be.
+- **Rendering:**
+  - **Continuous:** renders every frame while motion is allowed. The browser pauses it in hidden tabs.
+  - **Bloom:** only at 1000px and wider.
+  - **Pixel ratio:** capped at 2, and at 1.5 on smaller screens.
+- **Fallbacks:**
+  - **Reduced motion:** hides the lid and the signals. It renders one still frame at the hero station, with a static NPU pattern, no bloom and no tilt, and re-renders only on scroll or resize.
+  - **No 3D:** if WebGL fails, or the module has not reported within 6 seconds, the page shows a flat SVG floorplan drawing with the same block colours and labels.
 
 ## Do's and Don'ts
 
@@ -293,5 +337,6 @@ Every corner is square: radius 0 on buttons, panels, pads, tags, charts and tool
 - **Don't** add box-shadows or blur to cards. Depth comes from tonal steps and the 3D scene only.
 - **Don't** put prose over the live scene without a panel, or set prose in mono.
 - **Don't** present the chip as data. It is a metaphor for the page's structure, and its readings repeat stated figures; it never introduces new ones.
-- **Don't** add a second autonomous animation. The motion is one lid lift, one scroll-driven camera path and chart draw-ins.
+- **Don't** add autonomous motion outside the chip. The motion is the lid lift, the scroll-driven camera, the chip working (signals, block activity, NPU dataflow) and chart draw-ins. Page chrome, panels and text never animate on their own.
+- **Don't** put numbers on the chip's activity. It shows that work is happening, never invented voltages, clock speeds or loads.
 - **Don't** fall back to the flat stack of dark cards or the hero-over-grid template.

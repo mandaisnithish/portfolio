@@ -43,6 +43,11 @@
   --si-pad:#6b6f75;
   --si-lid:#8b8f95;
   --si-sub:#1c1d1f;
+  --si-mold:#17181b;
+  --si-pcb:#0e1613;
+  --si-trace:#4a3526;
+  --si-lead:#c9cdd2;
+  --si-solder:#a9adb3;
 
   --mono:'Martian Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   --sans:'Atkinson Hyperlegible Next','Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
@@ -157,7 +162,9 @@ main,footer{position:relative;z-index:1}
 
 /* Hero */
 .hero{min-height:100svh;display:flex;align-items:center;padding-block:calc(var(--bar-h) + 2rem) 3rem}
-.hero .shell{display:block}
+.hero{position:relative}
+.hero .shell{display:block;position:relative}
+@media(min-width:1000px){.hero::before{content:'';position:absolute;inset:0 0 0 38%;background:linear-gradient(90deg,transparent,rgba(18,19,20,.88) 30%,rgba(18,19,20,.92));pointer-events:none}}
 .hero h1{font-size:clamp(2.6rem,5.2vw,4.75rem);font-weight:800;letter-spacing:-.035em;line-height:.98;margin-bottom:.9rem}
 .hero-role{font:600 clamp(1.05rem,1.6vw,1.25rem)/1.4 var(--display);color:var(--text-2);margin-bottom:1rem}
 .hero-stmt{color:var(--text-2);margin-bottom:1.5rem}
@@ -847,8 +854,20 @@ document.querySelectorAll('.chart[data-chart]').forEach(wrap => {
 </script>
 
 <!-- The 3D chip -->
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 if(document.fonts) await document.fonts.ready;
 const root = document.documentElement;
@@ -858,68 +877,169 @@ const tok = n => css.getPropertyValue(n).trim();
 const col = n => new THREE.Color(tok(n));
 const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
 let REDUCE = motionQuery.matches;
+const FINE = matchMedia('(pointer:fine)').matches;
 
 let renderer;
-try {
-  renderer = new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:'high-performance'});
-} catch(err) {
-  root.classList.add('no-3d');
-}
+try { renderer = new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:'high-performance'}); }
+catch(err) { root.classList.add('no-3d'); }
+
 if(renderer){
 window.__chipReady = true;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.setClearColor(col('--bg'), 1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+const BG = col('--bg');
+renderer.setClearColor(BG, 1);
 
 const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(BG, 28, 62);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), .04).texture;
 const camera = new THREE.PerspectiveCamera(34, 1, .1, 200);
 
-scene.add(new THREE.HemisphereLight(0xe6ebf2, 0x0b0b0c, 1.1));
-const key = new THREE.DirectionalLight(0xffffff, 2.6); key.position.set(8,14,7); scene.add(key);
+scene.add(new THREE.HemisphereLight(0xdfe6ef, 0x050506, .45));
+const key = new THREE.DirectionalLight(0xffffff, 1.9); key.position.set(8,14,7); scene.add(key);
 const rim = new THREE.DirectionalLight(col('--copper'), .35); rim.position.set(-12,1.2,-10); scene.add(rim);
 
 const chip = new THREE.Group(); scene.add(chip);
-const COPPER = col('--copper');
+const COPPER = col('--copper'), BLUE = col('--data-blue');
 
-function mat(c, metal=.5, rough=.45, extra={}){
-  return new THREE.MeshStandardMaterial({color: c, metalness: metal, roughness: rough, ...extra});
+function mat(c, metal=.3, rough=.6, extra={}){
+  return new THREE.MeshStandardMaterial({color: c, metalness: metal, roughness: rough, envMapIntensity: .55, ...extra});
 }
 function box(w,h,d,material,x=0,y=0,z=0){
   const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), material);
   m.position.set(x,y,z); return m;
 }
+function glowMat(c){
+  return new THREE.MeshBasicMaterial({color: c.clone(), transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, toneMapped:false});
+}
 
-/* Package and die */
-chip.add(box(13,.5,13, mat(col('--si-sub'),.1,.9), 0,-.55,0));
-const die = box(10,.3,10, mat(col('--si-die'),.25,.6), 0,-.15,0); chip.add(die);
-
-/* Label textures, drawn with the page's mono face */
-function label(lines, w, h, opts={}){
-  const scale = 256;
-  const c = document.createElement('canvas'); c.width = Math.round(w*scale); c.height = Math.round(h*scale);
+/* Silicon surface: a fine metal-fill pattern so the die reads as fabricated, not painted */
+function siliconTexture(){
+  const c = document.createElement('canvas'); c.width = c.height = 512;
   const g = c.getContext('2d');
-  const mono = tok('--mono');
-  lines.forEach((ln, i) => {
+  g.fillStyle = '#9aa0a8'; g.fillRect(0,0,512,512);
+  for(let i=0;i<2600;i++){
+    const w = 2 + Math.random()*14, h = 2 + Math.random()*5, v = 130 + Math.random()*70;
+    g.fillStyle = `rgb(${v},${v+4},${v+10})`;
+    Math.random() < .5 ? g.fillRect(Math.random()*512, Math.random()*512, w, h) : g.fillRect(Math.random()*512, Math.random()*512, h, w);
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; return t;
+}
+const SI = siliconTexture();
+function siMat(c, repeat){
+  const t = SI.clone(); t.needsUpdate = true; t.repeat.set(repeat, repeat);
+  return mat(c, .45, .5, {map:t, emissive: COPPER.clone(), emissiveIntensity:0});
+}
+
+/* ── Board, package, leads ── */
+const PCB_Y = -1.16;
+const pcb = new THREE.Mesh(new THREE.PlaneGeometry(220,220), mat(col('--si-pcb'), .05, .78));
+pcb.rotation.x = -Math.PI/2; pcb.position.y = PCB_Y; chip.add(pcb);
+
+chip.add(box(14,.84,14, mat(col('--si-mold'), .05, .82), 0,-.72,0));        // mould compound body
+const ring = mat(col('--si-pad'), .8, .45, {envMapIntensity:.25});
+[[0,5,10,.1],[0,-5,10,.1],[5,0,.1,10],[-5,0,.1,10]].forEach(([x,z,w,d]) => chip.add(box(w,.04,d,ring,x,.02,z))); // seal ring
+
+const die = box(10,.3,10, siMat(col('--si-die'), 3), 0,-.15,0); chip.add(die);
+
+/* Gull-wing leads, 24 a side: shoulder, bend, foot */
+const LEAD = mat(col('--si-lead'), .85, .42, {envMapIntensity:.22});
+const PAD  = mat(col('--si-solder'), .8, .5, {envMapIntensity:.2});
+const N_SIDE = 24, LEADS = N_SIDE*4;
+const segA = new THREE.InstancedMesh(new THREE.BoxGeometry(.5,.07,.22), LEAD, LEADS);
+const segB = new THREE.InstancedMesh(new THREE.BoxGeometry(.58,.07,.22), LEAD, LEADS);
+const segC = new THREE.InstancedMesh(new THREE.BoxGeometry(.52,.06,.22), LEAD, LEADS);
+const pads = new THREE.InstancedMesh(new THREE.BoxGeometry(.7,.02,.3), PAD, LEADS);
+const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), S = new THREE.Vector3(1,1,1), P = new THREE.Vector3(), E = new THREE.Euler();
+const sideRot = [0, Math.PI/2, Math.PI, -Math.PI/2];
+const rotY = (x,z,a) => [x*Math.cos(a) + z*Math.sin(a), -x*Math.sin(a) + z*Math.cos(a)];
+const PATHS = [];                        // signal routes: {pts:[Vector3], owner, color}
+const traceSegs = [];                    // board traces as [x0,z0,x1,z1]
+let li = 0;
+sideRot.forEach((a, side) => {
+  for(let k=0;k<N_SIDE;k++){
+    const s = -5.75 + k*.5;
+    const put = (mesh, lx, ly, lz, rz) => {
+      const [x,z] = rotY(lx, lz, a);
+      E.set(0, a, rz); Q.setFromEuler(E); P.set(x, ly, z);
+      M.compose(P, Q, S); mesh.setMatrixAt(li, M);
+    };
+    put(segA, 7.25, -.72, s, 0);
+    put(segB, 7.7, -.93, s, -Math.PI/4);
+    put(segC, 8.14, -1.12, s, 0);
+    put(pads, 8.14, PCB_Y + .01, s, 0);
+    li++;
+    /* about two thirds of the leads fan out into the board */
+    if((k*7 + side*3) % 3 !== 0){
+      const L1 = 1.4 + ((k*37 + side*11) % 9)*.45, L2 = 1.5 + ((k*13 + side*5) % 7)*.5;
+      const dir = s < 0 ? -1 : 1;
+      const p0 = [8.4, s], p1 = [8.4 + L1, s], p2 = [8.4 + L1 + L2*.7071, s + dir*L2*.7071];
+      const w = [p0,p1,p2].map(([x,z]) => rotY(x,z,a));
+      traceSegs.push([...w[0], ...w[1]], [...w[1], ...w[2]]);
+      const lead = [[7.0,-.72],[7.45,-.72],[7.88,-1.12]].map(([x,y]) => { const [wx,wz] = rotY(x,s,a); return new THREE.Vector3(wx,y,wz); });
+      PATHS.push({owner:'io', color:BLUE, pts:[
+        new THREE.Vector3(w[2][0], PCB_Y+.02, w[2][1]), new THREE.Vector3(w[1][0], PCB_Y+.02, w[1][1]),
+        new THREE.Vector3(w[0][0], PCB_Y+.02, w[0][1]), lead[2], lead[1], lead[0]]});
+    }
+  }
+});
+[segA,segB,segC,pads].forEach(m => { m.instanceMatrix.needsUpdate = true; chip.add(m); });
+
+/* Board traces, drawn as thin copper under solder mask */
+const traceMat = mat(col('--si-trace'), .5, .55, {emissive: BLUE.clone(), emissiveIntensity: .0});
+const traces = new THREE.InstancedMesh(new THREE.BoxGeometry(1,.012,.09), traceMat, traceSegs.length);
+traceSegs.forEach(([x0,z0,x1,z1], i) => {
+  const len = Math.hypot(x1-x0, z1-z0);
+  E.set(0, -Math.atan2(z1-z0, x1-x0), 0); Q.setFromEuler(E);
+  P.set((x0+x1)/2, PCB_Y+.008, (z0+z1)/2); M.compose(P, Q, new THREE.Vector3(len,1,1));
+  traces.setMatrixAt(i, M);
+});
+chip.add(traces);
+
+/* Lead-frame fingers on the package and copper bond wires up to the die pads */
+const FINGER = mat(COPPER, .85, .35);
+const bondGeos = [];
+for(let i=0;i<12;i++){
+  const t = -4.4 + i*.8;
+  [[0,1],[0,-1],[1,0],[-1,0]].forEach(([sx,sz]) => {
+    const pad = sx ? new THREE.Vector3(sx*4.72, .05, t) : new THREE.Vector3(t, .05, sz*4.72);
+    const fin = sx ? new THREE.Vector3(sx*6.3, -.28, t*1.18) : new THREE.Vector3(t*1.18, -.28, sz*6.3);
+    chip.add(box(sx ? .7 : .2, .02, sx ? .2 : .7, FINGER, fin.x, -.29, fin.z));
+    const mid = pad.clone().lerp(fin, .45); mid.y = .95;
+    const curve = new THREE.QuadraticBezierCurve3(pad, mid, fin);
+    bondGeos.push(new THREE.TubeGeometry(curve, 12, .016, 4, false));
+    PATHS.push({owner:'io', color:COPPER, pts: curve.getPoints(10).reverse()});
+  });
+}
+chip.add(new THREE.Mesh(mergeGeometries(bondGeos), mat(COPPER, .95, .25)));
+
+/* ── Floorplan blocks, one per section ── */
+function label(lines, w, h){
+  const scale = 256, c = document.createElement('canvas');
+  c.width = Math.round(w*scale); c.height = Math.round(h*scale);
+  const g = c.getContext('2d'), mono = tok('--mono');
+  lines.forEach(ln => {
     g.font = `${ln.weight||500} ${ln.size*scale}px ${mono}`;
-    g.fillStyle = ln.color || '#d6d8db';
-    g.textBaseline = 'top';
+    g.fillStyle = ln.color || '#d6d8db'; g.textBaseline = 'top';
     g.fillText(ln.text, ln.x*scale, ln.y*scale);
   });
   const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   const m = new THREE.Mesh(new THREE.PlaneGeometry(w,h), new THREE.MeshBasicMaterial({map:tex, transparent:true, depthWrite:false}));
   m.rotation.x = -Math.PI/2; return m;
 }
-
-/* Floorplan blocks, one per section */
-const BLOCKS = [];
+const BLOCKS = [], GLOWS = [];
 function block(id, section, name, sub, x, z, w, d, colorVar){
   const g = new THREE.Group(); g.position.set(x,0,z);
-  const h = .14;
-  const m = mat(col(colorVar), .2, .62, {emissive: COPPER.clone(), emissiveIntensity: 0});
+  const h = .14, m = siMat(col(colorVar), 1.2);
   const body = box(w,h,d,m,0,h/2,0); g.add(body);
   const edges = new THREE.LineSegments(new THREE.EdgesGeometry(body.geometry), new THREE.LineBasicMaterial({color: tok('--line-strong')}));
   edges.position.copy(body.position); g.add(edges);
-  const lb = label([{text:name, size:.2, x:.04, y:.04, color:'#e4e5e7'},{text:sub, size:.15, x:.04, y:.3, color:'#9a9da2', weight:400}], Math.min(w-.2, 2.4), .55);
-  lb.position.set(-w/2 + Math.min(w-.2,2.4)/2 + .1, h+.004, -d/2 + .35); g.add(lb);
+  const lw = Math.min(w-.2, 2.4);
+  const lb = label([{text:name, size:.2, x:.04, y:.04, color:'#e4e5e7'},{text:sub, size:.15, x:.04, y:.3, color:'#9a9da2', weight:400}], lw, .55);
+  lb.position.set(-w/2 + lw/2 + .1, h+.004, -d/2 + .35); g.add(lb);
   body.userData = {id, section, name, sub};
   chip.add(g);
   const b = {id, section, group:g, body, edges, mat:m, w, d, h};
@@ -931,85 +1051,137 @@ const npu   = block('npu','projects','NPU ARRAY','projects', -1.75,1.6, 5.2,4.4,
 const cache = block('cache','skills','CACHE','skills', 2.7,.95, 3.2,2.1,'--si-cache');
 const rom   = block('rom','education','ROM','education', 2.7,3.15, 3.2,1.5,'--si-rom');
 
-function detail(b, x, z, w, d, color, h=.06){
-  const m = box(w,h,d, mat(new THREE.Color(color),.2,.6), x, b.h+h/2, z); b.group.add(m); return m;
+/* Detail cells; each carries a glow layer that shows it working */
+function detail(b, x, z, w, d, color, h=.06, kind='pulse', glowColor=COPPER){
+  const m = box(w,h,d, mat(new THREE.Color(color), .35, .5), x, b.h+h/2, z); b.group.add(m);
+  const gm = glowMat(glowColor);
+  const gl = new THREE.Mesh(new THREE.PlaneGeometry(w*.96, d*.96), gm);
+  gl.rotation.x = -Math.PI/2; gl.position.set(x, b.h+h+.004, z); b.group.add(gl);
+  GLOWS.push({block:b.id, mat:gm, base:gm.color.clone(), kind, idx:GLOWS.length, x, w});
+  return m;
 }
 /* CPU: four cores, one per reflex */
-[[-.75,.35],[.75,.35],[-.75,1.15],[.75,1.15]].forEach(([x,z]) => detail(cpu, x, z, 1.3, .65, '#4a5465'));
-/* SRAM: one row per role, laid on the 2023–2026 axis */
+[[-.75,.35],[.75,.35],[-.75,1.15],[.75,1.15]].forEach(([x,z]) => detail(cpu, x, z, 1.3, .65, '#4a5465', .06, 'core'));
+/* SRAM: one row per role on the 2023–2026 axis */
 const months = 48, span = sram.w - .5, x0 = -span/2;
 [[0,42],[24,33],[32,42],[42,47]].forEach(([a,b2],i) => {
   const w = ((b2-a)/months)*span, x = x0 + (a/months)*span + w/2;
-  detail(sram, x, -.2 + i*.42, w, .26, i===3 ? tok('--copper') : '#5f7894', .05);
+  detail(sram, x, -.2 + i*.42, w, .26, i===3 ? tok('--copper') : '#5f7894', .05, 'row', i===3 ? COPPER : BLUE);
 });
-/* NPU: five tiles, one per project (the case study is the wide one) */
-[[-1.25,-.55,2.3],[.95,-.55,1.6],[-1.55,1.15,1.6],[0,1.15,1.3],[1.4,1.15,1.3]].forEach(([x,z,w],i) => {
-  const t = detail(npu, x, z, w-.15, 1.35, i===0 ? '#4a5a6e' : '#3f4c5c', .07);
-  const e = new THREE.LineSegments(new THREE.EdgesGeometry(t.geometry), new THREE.LineBasicMaterial({color: COPPER, transparent:true, opacity:.45}));
-  e.position.copy(t.position); npu.group.add(e);
-});
-/* CACHE: cells per skill, copper = core, blue = working, grey = developing */
+/* CACHE: cells per skill level */
 [[4,1,0],[4,1,1],[2,3,0]].forEach(([core,work,dev],ci) => {
-  const cells = [...Array(core).fill('#b9784b'), ...Array(work).fill('#5d7fa8'), ...Array(dev).fill('#4a4f57')];
-  cells.forEach((c,ri) => detail(cache, -1.05 + ci*1.0, -.25 + ri*.22, .8, .16, c, .04));
+  const cells = [...Array(core).fill(['#b9784b',COPPER]), ...Array(work).fill(['#5d7fa8',BLUE]), ...Array(dev).fill(['#4a4f57',BLUE])];
+  cells.forEach(([c,gc],ri) => detail(cache, -1.05 + ci*1.0, -.25 + ri*.22, .8, .16, c, .04, 'cell', gc));
 });
-/* ROM: two cells, degree and current learning */
-detail(rom, -.6, .25, 1.4, .5, '#4a5465'); detail(rom, .85, .25, 1.1, .5, '#40474f');
+/* ROM: degree and current learning */
+detail(rom, -.6, .25, 1.4, .5, '#4a5465', .06, 'rom'); detail(rom, .85, .25, 1.1, .5, '#40474f', .06, 'rom');
 
-/* I/O ring: bond pads; the two contact pads are copper */
+/* NPU: five tiles (one per project), each a systolic array of multiply-accumulate cells */
+const TILES = [[-1.25,-.55,2.3],[.95,-.55,1.6],[-1.55,1.15,1.6],[0,1.15,1.3],[1.4,1.15,1.3]];
+const CELLS = [];
+TILES.forEach(([tx,tz,tw],ti) => {
+  const w = tw - .15, d = 1.35;
+  const t = box(w, .05, d, mat(new THREE.Color(ti===0 ? '#3c4858' : '#36414f'), .4, .5), tx, npu.h+.025, tz); npu.group.add(t);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(t.geometry), new THREE.LineBasicMaterial({color: COPPER, transparent:true, opacity:.4}));
+  e.position.copy(t.position); npu.group.add(e);
+  const nx = Math.floor((w-.12)/.2), nz = Math.floor((d-.12)/.2);
+  for(let i=0;i<nx;i++) for(let j=0;j<nz;j++){
+    const h = Math.sin(ti*91.7 + i*12.9898 + j*78.233)*43758.5453;
+    CELLS.push({ti, i, j, x: tx - (nx-1)*.1 + i*.2, z: tz - (nz-1)*.1 + j*.2, wgt: (h - Math.floor(h))*2 - 1});
+  }
+});
+const cellBase = new THREE.InstancedMesh(new THREE.BoxGeometry(.15,.03,.15), mat(new THREE.Color('#4a5a6e'), .5, .45), CELLS.length);
+const cellGlow = new THREE.InstancedMesh(new THREE.PlaneGeometry(.15,.15), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, toneMapped:false}), CELLS.length);
+CELLS.forEach((c,k) => {
+  P.set(c.x, npu.h+.065, c.z); M.compose(P, Q.identity(), S); cellBase.setMatrixAt(k, M);
+  E.set(-Math.PI/2,0,0); Q.setFromEuler(E); P.set(c.x, npu.h+.082, c.z); M.compose(P, Q, S); cellGlow.setMatrixAt(k, M);
+  cellGlow.setColorAt(k, new THREE.Color(0,0,0));
+});
+npu.group.add(cellBase, cellGlow);
+
+/* I/O ring: bond pads on the die; the two contact pads are copper */
 const ioGroup = new THREE.Group(); chip.add(ioGroup);
-const padMat = mat(col('--si-pad'), .85, .3), padHot = mat(COPPER, .7, .35, {emissive: COPPER.clone(), emissiveIntensity:.15});
+const padMat = mat(col('--si-pad'), .9, .3), padHot = mat(COPPER, .8, .3, {emissive: COPPER.clone(), emissiveIntensity:.15});
 const ioPads = [];
 for(let i=0;i<12;i++){
-  const t = -4.4 + i*0.8;
+  const t = -4.4 + i*.8;
   [[t,-4.72],[t,4.72],[-4.72,t],[4.72,t]].forEach(([x,z],side) => {
     const hot = side===3 && (i===5 || i===6);
     const p = box(.36,.05,.36, hot ? padHot : padMat, x, .025, z); ioGroup.add(p); ioPads.push(p);
     p.userData = {id:'io', section:'contact', name:'I/O RING', sub:'contact'};
   });
 }
-const ioBlock = {id:'io', section:'contact', group:ioGroup, body:null, mat:null};
 
-/* Copper interconnect, Manhattan-routed between blocks */
-const wireMat = mat(COPPER, .6, .35, {emissive: COPPER.clone(), emissiveIntensity:.25});
-function wire(pts){
+/* On-die interconnect: buses from a central junction to every block */
+const J = [.98,-.74];
+const DIE_ROUTES = {
+  cpu:   [J,[-2.55,-.74],[-2.55,-.9]],
+  sram:  [J,[.98,-2.5],[.55,-2.5]],
+  npu:   [J,[.98,2.6],[.85,2.6]],
+  cache: [J,[2.7,-.74],[2.7,-.1]],
+  rom:   [J,[.98,3.15],[1.1,3.15]],
+  io:    [J,[4.35,-.74],[4.35,-.4],[4.55,-.4]],
+};
+const busMat = {};
+Object.entries(DIE_ROUTES).forEach(([owner, pts]) => {
+  busMat[owner] = mat(COPPER, .7, .32, {emissive: COPPER.clone(), emissiveIntensity:.2});
   for(let i=1;i<pts.length;i++){
-    const [ax,az] = pts[i-1], [bx,bz] = pts[i];
-    const len = Math.hypot(bx-ax, bz-az), t = .07;
-    chip.add(box(ax===bx ? t : len, .02, ax===bx ? len : t, wireMat, (ax+bx)/2, .01, (az+bz)/2));
+    const [ax,az] = pts[i-1], [bx,bz] = pts[i], len = Math.hypot(bx-ax, bz-az), t = .07;
+    chip.add(box(ax===bx ? t : len + t, .02, ax===bx ? len + t : t, busMat[owner], (ax+bx)/2, .01, (az+bz)/2));
   }
-}
-/* main buses in the channels between blocks, with spurs out to the I/O ring */
-wire([[-4.3,-.74],[4.35,-.74]]);
-wire([[.98,-4.2],[.98,4.0]]);
-wire([[.55,-2.5],[.98,-2.5]]);
-wire([[.85,2.6],[.98,2.6]]);
-wire([[4.35,-.74],[4.35,-.4],[4.55,-.4]]);
-wire([[4.35,.4],[4.55,.4]]); wire([[4.3,.4],[4.35,.4]]);
-wire([[-4.3,-.74],[-4.55,-.74]]);
-wire([[.98,4.0],[.98,4.55]]);
+  const v = pts.map(([x,z]) => new THREE.Vector3(x,.04,z));
+  PATHS.push({owner, color:COPPER, pts:v});
+  PATHS.push({owner, color:COPPER, pts:v.slice().reverse()});
+});
 
 /* The name, etched along the die's bottom edge */
 const etch = label([{text:'NKA-2026 · NITHISH KALIANNAN ANANTH · DECISION-FOCUSED ANALYTICS', size:.17, x:.02, y:.06, color:'#7d8187', weight:400}], 8.4, .32);
 etch.position.set(-.1, .002, 4.15); chip.add(etch);
 
 /* The lid, which lifts on arrival */
-const lidMat = mat(col('--si-lid'), .85, .32, {transparent:true});
+const lidMat = mat(col('--si-lid'), .9, .3, {transparent:true});
 const lid = box(11.4,.45,11.4, lidMat, 0,1.2,0); chip.add(lid);
 const lidMark = label([{text:'NKA', size:.6, x:.1, y:.05, color:'#55585d', weight:500},{text:'AI ACCELERATOR · 2026', size:.18, x:.12, y:.8, color:'#55585d', weight:400}], 4, 1.1);
 lidMark.position.set(-3,1.43,3.6); chip.add(lidMark);
 
+/* ── Signals: faint charge moving along every route, brighter where work is happening ── */
+PATHS.forEach(p => {
+  p.len = []; let L = 0;
+  for(let i=1;i<p.pts.length;i++){ L += p.pts[i].distanceTo(p.pts[i-1]); p.len.push(L); }
+  p.total = L;
+});
+const totalLen = PATHS.reduce((a,p) => a + p.total, 0);
+const N_SIG = REDUCE ? 0 : (FINE ? 320 : 150);
+const sigs = [];
+for(let i=0;i<N_SIG;i++){
+  let r = Math.random()*totalLen, p = PATHS[0];
+  for(const q of PATHS){ if(r < q.total){ p = q; break; } r -= q.total; }
+  sigs.push({p, d: Math.random()*p.total, v: .9 + Math.random()*.8});
+}
+const sigMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(.05,6,6), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, toneMapped:false}), Math.max(1,N_SIG));
+sigMesh.count = N_SIG; chip.add(sigMesh);
+function along(p, d, out){
+  let i = 0; while(i < p.len.length-1 && d > p.len[i]) i++;
+  const a = i ? p.len[i-1] : 0, seg = p.len[i] - a || 1;
+  return out.copy(p.pts[i]).lerp(p.pts[i+1], (d - a)/seg);
+}
+
+/* Activity per block: 0 idle, 1 working. Driven by scroll section, hover and nav hover. */
+const OWNERS = ['cpu','sram','npu','cache','rom','io'];
+const act = Object.fromEntries(OWNERS.map(o => [o, 0]));
+const burst = Object.fromEntries(OWNERS.map(o => [o, 0]));
+
 /* Camera stations, one per section: [camera position, look-at] */
 const ST = [
-  [[13,14.5,15.5],[0,-.2,0]],          // hero: the package
+  [[15,16,18],[0,-.4,0]],              // hero: package, leads and board
   [[-1.2,9.5,5.2],[-2.55,0,-2.5]],     // about → CPU
   [[3.8,9.5,5.2],[2.45,0,-2.5]],       // work → SRAM
   [[-0.4,11,10.5],[-1.75,0,1.6]],      // projects → NPU
   [[4,8.2,8.4],[2.7,0,.95]],           // skills → cache
   [[4,7.6,9.6],[2.7,0,3.15]],          // education → ROM
-  [[9.5,8.5,6.5],[4.3,0,0]]            // contact → the I/O ring and its two copper pads
+  [[11.5,8.5,6.5],[5.4,-.5,0]]         // contact → I/O ring, bond wires and leads
 ];
-const ACTIVE = [null, cpu, sram, npu, cache, rom, ioBlock];
+const ACTIVE = [null, 'cpu', 'sram', 'npu', 'cache', 'rom', 'io'];
 
 const sections = [...document.querySelectorAll('main > section')];
 let stops = [];
@@ -1017,8 +1189,9 @@ function measure(){
   const vh = innerHeight;
   stops = sections.map((s,i) => {
     const panel = s.querySelector('.panel-col, .col');
+    const top = panel.getBoundingClientRect().top + scrollY;
     const arrive = i===0 ? 0 : s.offsetTop + vh*.08;
-    const leave = i===0 ? vh*.2 : panel.offsetTop + s.offsetTop*0 + panel.getBoundingClientRect().height + (panel.getBoundingClientRect().top + scrollY) - panel.offsetTop - vh*.75;
+    const leave = i===0 ? vh*.2 : top + panel.offsetHeight - vh*.75;
     return {arrive, leave: Math.max(arrive, leave)};
   });
 }
@@ -1031,32 +1204,24 @@ function stationAt(y){
   }
   return {i: stops.length-1, t:0};
 }
-
-const camPos = new THREE.Vector3(18,20,22), camLook = new THREE.Vector3(0,0,0);
-const tgtPos = new THREE.Vector3(), tgtLook = new THREE.Vector3();
-const vA = new THREE.Vector3(), vB = new THREE.Vector3();
-let activeIdx = 0, hoverId = null;
-
+const camPos = new THREE.Vector3(20,22,26), camLook = new THREE.Vector3(0,0,0);
+const tgtPos = new THREE.Vector3(), tgtLook = new THREE.Vector3(), vA = new THREE.Vector3(), vB = new THREE.Vector3();
+let activeIdx = 0, hoverId = null, navHover = null;
 function targetFor(y){
   const {i, t} = stationAt(y);
   const a = ST[i], b = ST[Math.min(i+1, ST.length-1)];
   tgtPos.copy(vA.fromArray(a[0])).lerp(vB.fromArray(b[0]), t);
   tgtLook.copy(vA.fromArray(a[1])).lerp(vB.fromArray(b[1]), t);
-  /* Narrow screens crop the sides, so back the camera off to keep each block whole */
   if(camera.aspect < 1) tgtPos.sub(tgtLook).multiplyScalar(Math.min(1.9, 1/Math.sqrt(camera.aspect))).add(tgtLook);
   return t < .5 ? i : Math.min(i+1, ST.length-1);
 }
-
-function setActive(idx){
-  BLOCKS.forEach(b => {
-    const on = ACTIVE[idx] === b || hoverId === b.id;
-    b.mat.emissiveIntensity = on ? .07 : 0;
-    b.edges.material.color.set(on ? tok('--copper') : tok('--line-strong'));
-  });
-  padHot.emissiveIntensity = (idx === 6 || hoverId === 'io') ? .6 : .15;
+function focusOf(o){ return ACTIVE[activeIdx] === o || hoverId === o || navHover === o; }
+function setEdges(){
+  BLOCKS.forEach(b => b.edges.material.color.set(focusOf(b.id) ? tok('--copper') : tok('--line-strong')));
 }
 
-/* Size and framing: chip on the left on wide screens, upper half on narrow ones */
+/* Size, framing and the glow pass (desktop only) */
+let composer = null, bloomOn = false;
 function resize(){
   const W = innerWidth, H = innerHeight;
   renderer.setPixelRatio(Math.min(devicePixelRatio, W < 1000 ? 1.5 : 2));
@@ -1065,13 +1230,22 @@ function resize(){
   if(W >= 1000) camera.setViewOffset(W, H, W*.2, 0, W, H);
   else camera.setViewOffset(W, H, 0, H*.33, W, H);
   camera.updateProjectionMatrix();
-  measure(); dirty = true;
+  bloomOn = W >= 1000 && !REDUCE;
+  if(bloomOn){
+    if(!composer){
+      composer = new EffectComposer(renderer);
+      composer.addPass(new RenderPass(scene, camera));
+      composer.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), .5, .4, .9));
+      composer.addPass(new OutputPass());
+    }
+    composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(W, H);
+  }
+  measure();
 }
 
-/* Pointer: gentle tilt, hover to light a block, click to go to its section */
+/* Pointer: gentle tilt, hover to wake a block, click to go to its section */
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
 const tip = document.getElementById('chip-tip');
-const fine = matchMedia('(pointer:fine)').matches;
 let tiltX = 0, tiltZ = 0, tiltTX = 0, tiltTZ = 0;
 const pickables = [...BLOCKS.map(b => b.body), ...ioPads];
 function overScene(target){ return !target.closest('.panel-col, .hero .col, .bar, .pads, footer, a, button'); }
@@ -1082,10 +1256,10 @@ function pick(e){
   return hit ? hit.object.userData : null;
 }
 addEventListener('pointermove', e => {
-  if(fine && !REDUCE){ tiltTX = (e.clientY/innerHeight - .5)*.08; tiltTZ = (e.clientX/innerWidth - .5)*-.08; }
+  if(FINE && !REDUCE){ tiltTX = (e.clientY/innerHeight - .5)*.08; tiltTZ = (e.clientX/innerWidth - .5)*-.08; }
   const data = overScene(e.target) ? pick(e) : null;
   const id = data ? data.id : null;
-  if(id !== hoverId){ hoverId = id; setActive(activeIdx); dirty = true; }
+  if(id !== hoverId){ hoverId = id; if(id) burst[id] = 1; setEdges(); }
   if(data){
     tip.hidden = false; tip.style.left = e.clientX+'px'; tip.style.top = e.clientY+'px';
     tip.innerHTML = `<b>${data.name}</b> → ${data.sub}`;
@@ -1098,43 +1272,106 @@ addEventListener('click', e => {
   const sec = document.getElementById(data.section); if(!sec) return;
   (sec.querySelector('.panel-col') || sec).scrollIntoView({behavior: REDUCE ? 'auto' : 'smooth', block:'start'});
 });
+/* Hovering a nav pad wakes its block on the chip */
+const NAV = {'#about':'cpu', '#work':'sram', '#projects':'npu', '#skills':'cache', '#education':'rom', '#contact':'io'};
+document.querySelectorAll('.pads a, .bar .btn').forEach(a => {
+  const o = NAV[a.getAttribute('href')]; if(!o) return;
+  a.addEventListener('pointerenter', () => { navHover = o; burst[o] = 1; setEdges(); });
+  a.addEventListener('pointerleave', () => { navHover = null; setEdges(); });
+  a.addEventListener('focus', () => { navHover = o; burst[o] = 1; setEdges(); });
+  a.addEventListener('blur', () => { navHover = null; setEdges(); });
+});
 
-/* Render loop: only draws while something is moving */
-let dirty = true, lidT = REDUCE ? 1 : 0, lidStart = performance.now() + 350, last = performance.now();
+/* ── The loop ── */
+let lidT = REDUCE ? 1 : 0, lidStart = performance.now() + 350, last = performance.now(), clock = 0;
 if(REDUCE){ lid.visible = false; lidMark.visible = false; }
+const tmpC = new THREE.Color(), tmpV = new THREE.Vector3();
+function update(dt){
+  clock += dt;
+  OWNERS.forEach(o => {
+    const target = focusOf(o) ? 1 : 0;
+    act[o] += (target - act[o]) * (1 - Math.exp(-dt*4));
+    burst[o] = Math.max(0, burst[o] - dt*.9);
+  });
+  const anyAct = Math.max(...OWNERS.map(o => act[o]));
+
+  BLOCKS.forEach(b => { b.mat.emissiveIntensity = .05*act[b.id]; });
+  padHot.emissiveIntensity = .2 + act.io*.9;
+  Object.entries(busMat).forEach(([o,m]) => { m.emissiveIntensity = .18 + act[o]*.9 + burst[o]*.6; });
+  traceMat.emissiveIntensity = .03 + act.io*.25;
+
+  /* signals */
+  for(let i=0;i<sigs.length;i++){
+    const s = sigs[i], a = s.p.owner === 'io' ? Math.max(act.io, anyAct*.35) : act[s.p.owner];
+    s.d += dt * s.v * (1.1 + a*2.6 + burst[s.p.owner]*3);
+    if(s.d > s.p.total) s.d -= s.p.total;
+    along(s.p, s.d, tmpV);
+    const fade = Math.min(1, s.d*3, (s.p.total - s.d)*3);
+    const k = (.28 + a*1.9 + burst[s.p.owner]*1.4) * fade;
+    M.makeTranslation(tmpV.x, tmpV.y, tmpV.z); sigMesh.setMatrixAt(i, M);
+    sigMesh.setColorAt(i, tmpC.copy(s.p.color).multiplyScalar(k));
+  }
+  if(sigs.length){ sigMesh.instanceMatrix.needsUpdate = true; sigMesh.instanceColor.needsUpdate = true; }
+
+  /* NPU: diagonal wavefronts move through each tile, weights light copper (+) or blue (−) */
+  const na = act.npu, amp = .12 + na*1.7 + burst.npu*.8;
+  for(let k=0;k<CELLS.length;k++){
+    const c = CELLS[k];
+    const ph = clock*(2.2 + na*2.5) - (c.i + c.j)*.45 - c.ti*1.7;
+    const pulse = Math.pow(Math.max(0, Math.sin(ph)), 8);
+    const v = pulse * Math.abs(c.wgt) * amp;
+    tmpC.copy(c.wgt > 0 ? COPPER : BLUE).multiplyScalar(v);
+    cellGlow.setColorAt(k, tmpC);
+  }
+  cellGlow.instanceColor.needsUpdate = true;
+
+  /* the other blocks show their own kind of work */
+  GLOWS.forEach(g => {
+    const a = act[g.block] + burst[g.block]*.6;
+    let v;
+    if(g.kind === 'core') v = .04 + a*(.35 + .35*Math.sin(clock*7 + g.idx*1.9));
+    else if(g.kind === 'row') v = .04 + a*(.25 + .5*Math.pow(Math.max(0, Math.sin(clock*3 - g.idx*.9)), 4));
+    else if(g.kind === 'cell') v = .03 + a*((Math.sin(Math.floor(clock*8 + g.idx*3.7)*12.9898)*43758.5453 % 1 + 1) % 1 > .55 ? .7 : .1);
+    else v = .03 + a*.25;
+    g.mat.color.copy(g.base).multiplyScalar(v);
+  });
+}
 function frame(now){
   const dt = Math.min(.05, (now - last)/1000); last = now;
   const y = REDUCE ? 0 : scrollY;
   const idx = targetFor(y);
-  if(idx !== activeIdx){ activeIdx = idx; setActive(idx); dirty = true; }
+  if(idx !== activeIdx){ activeIdx = idx; const o = ACTIVE[idx]; if(o) burst[o] = 1; setEdges(); }
   if(REDUCE){ camPos.copy(tgtPos); camLook.copy(tgtLook); }
   const k = 1 - Math.exp(-dt*3.2);
-  const moving = camPos.distanceTo(tgtPos) > .002 || camLook.distanceTo(tgtLook) > .002;
   camPos.lerp(tgtPos, k); camLook.lerp(tgtLook, k);
   tiltX += (tiltTX - tiltX)*k; tiltZ += (tiltTZ - tiltZ)*k;
-  const tilting = Math.abs(tiltTX - tiltX) > .0005 || Math.abs(tiltTZ - tiltZ) > .0005;
   if(!REDUCE && lidT < 1 && now > lidStart){
     lidT = Math.min(1, (now - lidStart)/1700);
     const e = 1 - Math.pow(1-lidT, 3);
     lid.position.y = 1.2 + e*7; lidMark.position.y = 1.43 + e*7;
     lidMat.opacity = 1 - e; lidMark.material.opacity = 1 - e;
     if(lidT >= 1){ lid.visible = false; lidMark.visible = false; }
-    dirty = true;
   }
-  if(moving || tilting || dirty){
-    chip.rotation.x = tiltX; chip.rotation.z = tiltZ;
-    camera.position.copy(camPos); camera.lookAt(camLook);
-    renderer.render(scene, camera);
-    dirty = false;
-  }
-  requestAnimationFrame(frame);
+  update(REDUCE ? 0 : dt);
+  chip.rotation.x = tiltX; chip.rotation.z = tiltZ;
+  camera.position.copy(camPos); camera.lookAt(camLook);
+  if(bloomOn && composer) composer.render(); else renderer.render(scene, camera);
+  if(!REDUCE) requestAnimationFrame(frame);
 }
-addEventListener('resize', resize, {passive:true});
-addEventListener('scroll', () => { dirty = true; }, {passive:true});
-motionQuery.addEventListener('change', e => { REDUCE = e.matches; dirty = true; });
-const start = () => { resize(); targetFor(REDUCE ? 0 : scrollY); if(REDUCE){ camPos.copy(tgtPos); camLook.copy(tgtLook); } setActive(0); requestAnimationFrame(frame); };
-(document.fonts ? document.fonts.ready : Promise.resolve()).then(start);
-addEventListener('load', () => { measure(); dirty = true; });
+let resizeT;
+addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { resize(); if(REDUCE) requestAnimationFrame(frame); }, 120); }, {passive:true});
+addEventListener('scroll', () => {
+  /* the chip moves under a still pointer, so drop any stale hover */
+  if(hoverId){ hoverId = null; setEdges(); }
+  tip.hidden = true; document.body.style.cursor = '';
+  if(REDUCE) requestAnimationFrame(frame);
+}, {passive:true});
+motionQuery.addEventListener('change', e => { REDUCE = e.matches; location.reload(); });
+resize(); targetFor(REDUCE ? 0 : scrollY);
+if(REDUCE){ camPos.copy(tgtPos); camLook.copy(tgtLook); update(.016); }
+setEdges();
+requestAnimationFrame(frame);
+addEventListener('load', measure);
 }
 </script>
 </body>
